@@ -1,0 +1,286 @@
+"use client"
+
+import Link from "next/link"
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Menu, X, Sparkles } from "lucide-react"
+
+const navigation = [
+  { name: "Home", href: "/" },
+  { name: "About", href: "/about" },
+  { name: "Services", href: "/services" },
+  { name: "Team", href: "/team" },
+  { name: "Projects", href: "/projects" },
+  { name: "Contact", href: "/contact" },
+]
+
+// --- CREATIVE ASRIVO TECH SVG LOGO ---
+const AsrivoLogoIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 100 100" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg" 
+    className={className}
+  >
+    <defs>
+      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#4fd1ed" />
+        <stop offset="100%" stopColor="#2b6cb0" />
+      </linearGradient>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#81e6d9" />
+        <stop offset="100%" stopColor="#4fd1ed" />
+      </linearGradient>
+    </defs>
+    
+    {/* Main Triangle "A" Structure */}
+    <path 
+      d="M50 15L85 85H70L50 40L30 85H15L50 15Z" 
+      fill="url(#logoGrad)" 
+      className="drop-shadow-lg"
+    />
+    <path d="M50 25L75 75H65L50 45L35 75H25L50 25Z" fill="white" fillOpacity="0.2" />
+    
+    {/* Orbital Rings */}
+    <ellipse 
+      cx="50" cy="55" rx="45" ry="12" 
+      stroke="url(#ringGrad)" 
+      strokeWidth="3" 
+      fill="none" 
+      transform="rotate(-15 50 55)"
+      strokeDasharray="140 20"
+    />
+    <ellipse 
+      cx="50" cy="58" rx="35" ry="8" 
+      stroke="#81e6d9" 
+      strokeWidth="2" 
+      fill="none" 
+      transform="rotate(-5 50 58)"
+      opacity="0.6"
+    />
+
+    {/* Tech Particles/Dots */}
+    <circle cx="75" cy="25" r="2.5" fill="#81e6d9" />
+    <circle cx="82" cy="35" r="1.5" fill="#4fd1ed" />
+    <circle cx="88" cy="28" r="1.2" fill="#81e6d9" opacity="0.8" />
+    <circle cx="70" cy="38" r="1" fill="#4fd1ed" />
+  </svg>
+)
+
+// --- SOCIAL ICONS ---
+const LinkedInIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
+<<<<<<< HEAD
+    <path
+      d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+      fill="#0A66C2"
+    />
+=======
+    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill="#0A66C2" />
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+  </svg>
+)
+
+const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="rg" cx="30%" cy="100%" r="150%">
+        <stop offset="0%" stopColor="#f09433" /><stop offset="25%" stopColor="#e6683c" /><stop offset="50%" stopColor="#dc2743" /><stop offset="75%" stopColor="#cc2366" /><stop offset="100%" stopColor="#bc1888" />
+      </radialGradient>
+    </defs>
+<<<<<<< HEAD
+    <path
+      fill="url(#rg)"
+      d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+    />
+  </svg>
+)
+
+const AsrivoLogoIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 100 120"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path d="M50 5L85 25L50 45L15 25L50 5Z" fill="#333333" />
+    <path d="M50 12L75 25L50 38L25 25L50 12Z" fill="white" fillOpacity="0.2" />
+    <path d="M15 35L50 55L85 35V45L50 65L15 45V35Z" fill="#1FA2E1" />
+    <path d="M15 55L50 75L85 55V65L50 85L15 65V55Z" fill="#1FA2E1" />
+=======
+    <path fill="url(#rg)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0.013-3.583 0.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+  </svg>
+)
+
+export function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({
+        x: (e.clientX / window.innerWidth - 0.5) * 20,
+        y: (e.clientY / window.innerHeight - 0.5) * 20,
+      })
+    }
+    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("mousemove", handleMouseMove)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("mousemove", handleMouseMove)
+    }
+  }, [])
+
+  return (
+    <header className={`sticky top-0 z-50 w-full transition-all duration-500 ${scrolled
+      ? "border-b border-border/40 bg-background/80 backdrop-blur-xl"
+      : "bg-transparent"
+      }`}>
+      <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
+<<<<<<< HEAD
+
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 opacity-50 transition-transform duration-700 ease-out"
+          style={{ transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)` }}
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#1FA2E10a_0%,transparent_70%)]" />
+=======
+        
+        {/* Animated Background Blur Glow */}
+        <div 
+          className="pointer-events-none absolute inset-0 -z-10 opacity-50 transition-transform duration-700 ease-out"
+          style={{ transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)` }}
+        >
+           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#4fd1ed15_0%,transparent_70%)]" />
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+        </div>
+
+        {/* --- LOGO SECTION --- */}
+        <div className="flex lg:flex-1">
+          <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2 sm:gap-3 group">
+<<<<<<< HEAD
+            <img
+              src="/asrivo.png"
+              alt="Asrivo Tech Logo"
+              className="h-11 w-11 sm:h-13 sm:w-13 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+            />
+            <div className="flex flex-col min-w-0">
+              <span className="text-lg sm:text-xl font-medium tracking-tight text-foreground whitespace-nowrap">
+                Asrivo<span className="font-bold">Tech</span>
+=======
+            <AsrivoLogoIcon className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-[360deg]" />
+            <div className="flex flex-col min-w-0">
+              <span className="text-xl sm:text-2xl font-bold tracking-tight text-foreground whitespace-nowrap">
+                ASRIVO <span className="text-[#4fd1ed] font-light">TECH</span>
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+              </span>
+              <span className="text-[7px] font-extrabold uppercase tracking-[0.3em] text-muted-foreground/80 whitespace-nowrap">
+                PVT LTD • Intelligent Solutions
+              </span>
+            </div>
+          </Link>
+        </div>
+<<<<<<< HEAD
+
+=======
+        
+        {/* Mobile Toggle */}
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+        <div className="flex lg:hidden">
+          <button onClick={() => setMobileMenuOpen(true)} className="p-2.5 text-foreground">
+            <Menu className="h-6 w-6" />
+          </button>
+        </div>
+<<<<<<< HEAD
+
+=======
+        
+        {/* Desktop Nav */}
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+        <div className="hidden lg:flex lg:gap-x-1">
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="relative px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-[#4fd1ed] group"
+            >
+              {item.name}
+              <span className="absolute bottom-0 left-1/2 h-0.5 w-0 bg-[#4fd1ed] transition-all group-hover:left-0 group-hover:w-full" />
+            </Link>
+          ))}
+        </div>
+<<<<<<< HEAD
+
+        {/* Desktop Actions Area with Real Icons */}
+=======
+        
+        {/* Desktop Actions */}
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-5">
+          <div className="flex items-center gap-3 border-r pr-5 border-border/40">
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110 active:scale-95">
+              <LinkedInIcon className="h-5 w-5" />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110 active:scale-95">
+              <InstagramIcon className="h-5 w-5" />
+            </a>
+          </div>
+
+          <Button size="sm" className="bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg shadow-blue-500/20 transition-colors" asChild>
+            <Link href="/contact" className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              Get Started
+            </Link>
+          </Button>
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-background p-6 lg:hidden flex flex-col">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+<<<<<<< HEAD
+              <img src="/logo.png" alt="Asrivo Tech Logo" className="h-8 w-8 shrink-0" />
+              <span className="font-bold text-foreground">AsrivoTech</span>
+=======
+               <AsrivoLogoIcon className="h-10 w-10" />
+               <span className="font-bold text-foreground text-xl">ASRIVO TECH</span>
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+            </div>
+            <button onClick={() => setMobileMenuOpen(false)} className="text-foreground"><X /></button>
+          </div>
+          <div className="mt-8 space-y-4 flex-grow">
+            {navigation.map((item) => (
+              <Link key={item.name} href={item.href} className="block text-xl font-medium text-foreground hover:text-[#4fd1ed]" onClick={() => setMobileMenuOpen(false)}>
+                {item.name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-auto pt-6 border-t border-border/40 flex items-center justify-around">
+<<<<<<< HEAD
+            <a href="https://linkedin.com" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors justify-around">
+              <LinkedInIcon className="h-6 w-6" />
+              <span>LinkedIn</span>
+            </a>
+            <a href="https://www.instagram.com/asrivotech" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors justify-center gap-10">
+=======
+            <a href="#" className="flex items-center gap-2 text-sm font-medium">
+              <LinkedInIcon className="h-6 w-6" />
+              <span>LinkedIn</span>
+            </a>
+            <a href="#" className="flex items-center gap-2 text-sm font-medium">
+>>>>>>> 80ff9e0f15cdfb2f4601bf9f665e4c521664f65c
+              <InstagramIcon className="h-6 w-6" />
+              <span>Instagram</span>
+            </a>
+          </div>
+        </div>
+      )}
+    </header>
+  )
+}
