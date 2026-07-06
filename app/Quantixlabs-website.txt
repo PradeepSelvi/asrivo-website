@@ -1,0 +1,3 @@
+anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXdycWxwbnRocHRkaGxuaGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTY4MzksImV4cCI6MjA4ODAzMjgzOX0.8QiG1s18jOge97YvtoyzJTkBrz75yLJuLoholcuGFSM
+
+api key: https://ywiwrqlpnthptdhlnhfd.supabase.co
