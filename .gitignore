@@ -1,3 +1,11 @@
-.next/ 
+.next/
 node_modules
+.env
 .env.local
+.env.development
+.env.staging
+.env.production
+!.env.example
+!.env.development.example
+!.env.staging.example
+!.env.production.example
