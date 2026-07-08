@@ -32,7 +32,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     redirect('/admin/login')
   }
 
-  const user = adminResult.user
+  const user = adminResult.user!
   const isHigh = user.role === 'high'
 
   const handleSignOut = async () => {

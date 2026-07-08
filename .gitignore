@@ -2,10 +2,12 @@
 node_modules
 .env
 .env.local
+.env*.local
+.env copy.local
 .env.development
 .env.staging
 .env.production
-!.env.example
-!.env.development.example
-!.env.staging.example
-!.env.production.example
+.env.example
+.env.development.example
+.env.staging.example
+.env.production.example

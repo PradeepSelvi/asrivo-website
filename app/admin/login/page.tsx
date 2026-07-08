@@ -2,7 +2,8 @@
 
 import React, { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { signInAdmin } from '@/lib/supabase/admin-actions'
+import { createClient } from '@/lib/supabase/client'
+import { verifyAdminProfile } from '@/lib/supabase/admin-actions'
 import { Lock, Mail, AlertTriangle, Loader2 } from 'lucide-react'
 
 function AdminLoginContent() {
@@ -30,15 +31,31 @@ function AdminLoginContent() {
     }
 
     try {
-      const result = await signInAdmin(email, password)
+      // Step 1: Sign in on the CLIENT — this sets the session cookie in the browser
+      const supabase = createClient()
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-      if (!result.success) {
-        setErrorMsg(result.error || 'Authentication failed.')
+      if (authError || !authData.user) {
+        setErrorMsg(authError?.message || 'Authentication failed.')
         setLoading(false)
         return
       }
 
-      // Hard navigate so the browser sends the session cookie on a fresh server request
+      // Step 2: Verify admin role via server action
+      const result = await verifyAdminProfile(authData.user.id)
+
+      if (!result.success) {
+        // Not an admin — sign them out and show error
+        await supabase.auth.signOut()
+        setErrorMsg('Unauthorized: You do not have administrator permissions.')
+        setLoading(false)
+        return
+      }
+
+      // Step 3: Session is set in browser, navigate to admin
       window.location.href = '/admin'
     } catch {
       setErrorMsg('An unexpected error occurred. Please try again.')
@@ -57,7 +74,7 @@ function AdminLoginContent() {
             <Lock className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
-            Admin CMS Panel
+            Admin Panel
           </h1>
           <p className="text-slate-400 mt-2 text-sm">
             Please log in with your administrator credentials
