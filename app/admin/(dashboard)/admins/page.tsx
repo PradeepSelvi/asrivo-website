@@ -18,8 +18,8 @@ export default async function AdminManageAdminsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Manage Admins</h1>
-          <p className="text-slate-400 text-sm mt-1">Add, remove, and manage admin user roles.</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Manage Admins</h1>
+          <p className="text-muted-foreground text-sm mt-1">Add, remove, and manage admin user roles.</p>
         </div>
       </div>
 
@@ -35,49 +35,49 @@ export default async function AdminManageAdminsPage() {
       </div>
 
       {/* Admin List */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-indigo-400" />
+      <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-primary" />
             Current Admin Accounts ({admins?.length || 0})
           </h2>
           <a
             href="/admin/admins/add"
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all"
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-foreground text-xs font-semibold px-3 py-2 rounded-lg transition-all"
           >
             <UserPlus className="w-3.5 h-3.5" />
             Add Admin
           </a>
         </div>
-        <div className="divide-y divide-slate-800/60">
+        <div className="divide-y divide-border">
           {!admins || admins.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">
+            <div className="p-12 text-center text-muted-foreground">
               <Shield className="w-8 h-8 mx-auto mb-2 text-slate-700" />
               <p>No admins found.</p>
             </div>
           ) : (
             admins.map((admin: any) => (
-              <div key={admin.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-800/20 transition-colors">
+              <div key={admin.id} className="flex items-center justify-between px-6 py-4 hover:bg-muted/20 transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
-                    <User className="w-5 h-5 text-slate-400" />
+                  <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center shrink-0">
+                    <User className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-slate-100">{admin.email}</p>
+                      <p className="text-sm font-semibold text-foreground">{admin.email}</p>
                       {admin.id === currentUserId && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded uppercase tracking-wider">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 bg-indigo-500/20 text-primary border border-primary/20 rounded uppercase tracking-wider">
                           You
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 font-mono">{admin.id.slice(0, 16)}…</p>
+                    <p className="text-xs text-muted-foreground font-mono">{admin.id.slice(0, 16)}…</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                     admin.role === 'high'
-                      ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      ? 'bg-red-500/10 text-destructive border border-red-500/20'
                       : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                   }`}>
                     {admin.role === 'high' ? <ShieldCheck className="w-3.5 h-3.5 inline mr-1" /> : <Shield className="w-3.5 h-3.5 inline mr-1" />}
@@ -87,14 +87,14 @@ export default async function AdminManageAdminsPage() {
                     <div className="flex items-center gap-2">
                       <a
                         href={`/admin/admins/${admin.id}/change-role`}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all"
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
                         title="Change role"
                       >
                         <ShieldOff className="w-4 h-4" />
                       </a>
                       <a
                         href={`/admin/admins/${admin.id}/remove`}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-red-500/10 transition-all"
                         title="Remove admin"
                       >
                         <Trash2 className="w-4 h-4" />

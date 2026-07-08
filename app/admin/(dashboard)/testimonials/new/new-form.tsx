@@ -56,42 +56,42 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/admin/testimonials" className="p-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-white transition-all">
+        <Link href="/admin/testimonials" className="p-2 bg-card border border-border rounded-lg text-muted-foreground hover:text-foreground transition-all">
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-white">Add Testimonial</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Publish a new client testimonial or review.</p>
+          <h1 className="text-2xl font-bold text-foreground">Add Testimonial</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Publish a new client testimonial or review.</p>
         </div>
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-950/40 border border-red-900/50 rounded-xl text-red-200 text-sm">
+        <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-xl text-red-200 text-sm">
           {errorMsg}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+      <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 shadow-xl space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Client Name</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Client Name</label>
             <input
               type="text"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Sarah Jenkins"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Client Title / Role</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Client Title / Role</label>
             <input
               type="text"
               value={clientTitle}
               onChange={(e) => setClientTitle(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Chief Marketing Officer"
             />
           </div>
@@ -99,23 +99,23 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Client Company</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Client Company</label>
             <input
               type="text"
               value={clientCompany}
               onChange={(e) => setClientCompany(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Acme Corporation"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Client Photo URL</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Client Photo URL</label>
             <input
               type="url"
               value={clientImageUrl}
               onChange={(e) => setClientImageUrl(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="https://example.com/photo.jpg"
             />
           </div>
@@ -123,11 +123,11 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Rating</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Rating</label>
             <select
               value={rating}
               onChange={(e) => setRating(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="5">5 Stars</option>
               <option value="4">4 Stars</option>
@@ -138,11 +138,11 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Related Project</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Related Project</label>
             <select
               value={projectId}
               onChange={(e) => setProjectId(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="">None / General</option>
               {projects.map((proj) => (
@@ -154,49 +154,49 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Display Order</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Display Order</label>
             <input
               type="number"
               value={displayOrder}
               onChange={(e) => setDisplayOrder(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               min="1"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Testimonial Content</label>
+          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Testimonial Content</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 h-32"
+            className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-32"
             placeholder="Write the client's detailed testimonial or review here..."
             required
           />
         </div>
 
-        <div className="flex items-center gap-3 bg-slate-950/40 p-4 border border-slate-850 rounded-xl">
+        <div className="flex items-center gap-3 bg-background/40 p-4 border border-slate-850 rounded-xl">
           <input
             id="featured"
             type="checkbox"
             checked={featured}
             onChange={(e) => setFeatured(e.target.checked)}
-            className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+            className="w-4 h-4 rounded text-indigo-600 focus:ring-primary"
           />
-          <label htmlFor="featured" className="text-sm font-medium text-slate-200 cursor-pointer select-none">
+          <label htmlFor="featured" className="text-sm font-medium text-foreground cursor-pointer select-none">
             Featured (highlights testimonial on key pages)
           </label>
         </div>
 
-        <div className="flex items-center gap-3 pt-6 border-t border-slate-800 justify-end">
-          <Link href="/admin/testimonials" className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold px-5 py-2.5 rounded-xl border border-slate-700 transition-all">
+        <div className="flex items-center gap-3 pt-6 border-t border-border justify-end">
+          <Link href="/admin/testimonials" className="bg-muted hover:bg-muted text-foreground text-sm font-semibold px-5 py-2.5 rounded-xl border border-border transition-all">
             Cancel
           </Link>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all disabled:opacity-50"
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-foreground text-sm font-semibold px-5 py-2.5 rounded-xl transition-all disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Add Testimonial

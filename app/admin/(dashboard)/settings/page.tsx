@@ -41,8 +41,8 @@ export default async function AdminSettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Global Settings</h1>
-        <p className="text-slate-400 text-sm mt-1">Manage website configuration and company information.</p>
+        <h1 className="text-3xl font-bold text-foreground tracking-tight">Global Settings</h1>
+        <p className="text-muted-foreground text-sm mt-1">Manage website configuration and company information.</p>
       </div>
 
       {/* Warning */}
@@ -59,7 +59,7 @@ export default async function AdminSettingsPage() {
       {/* Company Info */}
       <SettingsGroup
         title="Company Information"
-        icon={<Settings className="w-4 h-4 text-indigo-400" />}
+        icon={<Settings className="w-4 h-4 text-primary" />}
         settings={companySettings}
         handleUpdate={handleUpdate}
       />
@@ -67,7 +67,7 @@ export default async function AdminSettingsPage() {
       {/* Social Links */}
       <SettingsGroup
         title="Social Links"
-        icon={<Settings className="w-4 h-4 text-indigo-400" />}
+        icon={<Settings className="w-4 h-4 text-primary" />}
         settings={socialSettings}
         handleUpdate={handleUpdate}
       />
@@ -75,7 +75,7 @@ export default async function AdminSettingsPage() {
       {/* Feature Toggles */}
       <SettingsGroup
         title="Feature Toggles"
-        icon={<Settings className="w-4 h-4 text-indigo-400" />}
+        icon={<Settings className="w-4 h-4 text-primary" />}
         settings={featureSettings}
         handleUpdate={handleUpdate}
       />
@@ -111,35 +111,35 @@ function SettingsGroup({
   handleUpdate: (formData: FormData) => Promise<void>
 }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-      <div className="px-6 py-4 border-b border-slate-800 flex items-center gap-2">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl">
+      <div className="px-6 py-4 border-b border-border flex items-center gap-2">
         {icon}
-        <h2 className="text-sm font-semibold text-slate-200">{title}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
       </div>
-      <div className="divide-y divide-slate-800/50">
+      <div className="divide-y divide-border">
         {!settings || settings.length === 0 ? (
-          <p className="p-6 text-slate-500 text-sm">No settings in this group.</p>
+          <p className="p-6 text-muted-foreground text-sm">No settings in this group.</p>
         ) : (
           settings.map((setting: any) => (
-            <form key={setting.id} action={handleUpdate} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-800/10 transition-colors group">
+            <form key={setting.id} action={handleUpdate} className="flex items-center gap-4 px-6 py-4 hover:bg-muted/10 transition-colors group">
               <input type="hidden" name="key" value={setting.key} />
               <div className="flex-1 min-w-0">
-                <label htmlFor={`setting-${setting.key}`} className="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+                <label htmlFor={`setting-${setting.key}`} className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
                   {setting.key.replace(/_/g, ' ')}
                 </label>
                 {setting.description && (
-                  <p className="text-xs text-slate-600 mb-1">{setting.description}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{setting.description}</p>
                 )}
                 <input
                   id={`setting-${setting.key}`}
                   name="value"
                   defaultValue={setting.value || ''}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-mono"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all font-mono"
                 />
               </div>
               <button
                 type="submit"
-                className="shrink-0 flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                className="shrink-0 flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-foreground text-xs font-semibold px-3 py-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
               >
                 <Save className="w-3.5 h-3.5" />
                 Save

@@ -42,32 +42,32 @@ export default async function RemoveAdminPage({ params }: RemoveAdminPageProps) 
   return (
     <div className="max-w-md mx-auto space-y-6 pt-12">
       <div className="flex items-center gap-3">
-        <Link href="/admin/admins" className="p-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-white transition-all">
+        <Link href="/admin/admins" className="p-2 bg-card border border-border rounded-lg text-muted-foreground hover:text-foreground transition-all">
           <ArrowLeft className="w-4 h-4" />
         </Link>
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Revoke Access</span>
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Revoke Access</span>
       </div>
 
-      <div className="bg-slate-900 border border-red-950/60 rounded-2xl p-6 shadow-xl text-center space-y-6">
-        <div className="w-14 h-14 bg-red-950/30 border border-red-900/40 rounded-full flex items-center justify-center mx-auto text-red-500">
+      <div className="bg-card border border-destructive/30 rounded-2xl p-6 shadow-xl text-center space-y-6">
+        <div className="w-14 h-14 bg-destructive/10 border border-destructive/20 rounded-full flex items-center justify-center mx-auto text-destructive">
           <AlertTriangle className="w-6 h-6" />
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-xl font-bold text-white">Revoke Admin Access?</h1>
-          <p className="text-sm text-slate-400">
-            Are you sure you want to remove <strong className="text-slate-200">{profile.email}</strong>? 
+          <h1 className="text-xl font-bold text-foreground">Revoke Admin Access?</h1>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to remove <strong className="text-foreground">{profile.email}</strong>? 
             They will lose all administrative privileges and will be permanently deleted from the auth database.
           </p>
         </div>
 
         <form action={handleRemove} className="flex gap-3">
-          <Link href="/admin/admins" className="flex-1 bg-slate-850 hover:bg-slate-850/80 text-slate-300 text-sm font-semibold py-2.5 rounded-xl border border-slate-700 transition-all text-center block">
+          <Link href="/admin/admins" className="flex-1 bg-muted hover:bg-muted/80 text-foreground text-sm font-semibold py-2.5 rounded-xl border border-border transition-all text-center block">
             Cancel
           </Link>
           <button
             type="submit"
-            className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2.5 rounded-xl transition-all"
+            className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-foreground text-sm font-semibold py-2.5 rounded-xl transition-all"
           >
             <Trash2 className="w-4 h-4" />
             Confirm

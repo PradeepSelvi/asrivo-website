@@ -69,42 +69,42 @@ export default function NewTeamMemberPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/admin/team" className="p-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-white transition-all">
+        <Link href="/admin/team" className="p-2 bg-card border border-border rounded-lg text-muted-foreground hover:text-foreground transition-all">
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-white">Add Team Member</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Publish a new profile to your company directory.</p>
+          <h1 className="text-2xl font-bold text-foreground">Add Team Member</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Publish a new profile to your company directory.</p>
         </div>
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-950/40 border border-red-900/50 rounded-xl text-red-200 text-sm">
+        <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-xl text-red-200 text-sm">
           {errorMsg}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+      <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 shadow-xl space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Full Name</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Full Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. John Doe"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Position</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Position</label>
             <input
               type="text"
               value={position}
               onChange={(e) => setPosition(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Senior Software Architect"
               required
             />
@@ -113,80 +113,80 @@ export default function NewTeamMemberPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Work Email</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Work Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="john@company.com"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Display Order</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Display Order</label>
             <input
               type="number"
               value={displayOrder}
               onChange={(e) => setDisplayOrder(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               min="1"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Bio</label>
+          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Bio</label>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 h-24"
+            className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-24"
             placeholder="A short professional profile summary..."
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Profile Image URL</label>
+          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Profile Image URL</label>
           <input
             type="url"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="https://..."
           />
         </div>
 
         {/* Social profiles */}
-        <div className="bg-slate-950/40 p-4 border border-slate-850 rounded-xl space-y-4">
-          <p className="text-xs font-bold text-slate-300 uppercase tracking-wider">Social Links</p>
+        <div className="bg-background/40 p-4 border border-slate-850 rounded-xl space-y-4">
+          <p className="text-xs font-bold text-foreground uppercase tracking-wider">Social Links</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <label className="text-[10px] text-slate-500 uppercase">LinkedIn URL</label>
+              <label className="text-[10px] text-muted-foreground uppercase">LinkedIn URL</label>
               <input
                 type="url"
                 value={linkedin}
                 onChange={(e) => setLinkedin(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                className="w-full bg-background border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none"
                 placeholder="https://linkedin.com/..."
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] text-slate-500 uppercase">GitHub URL</label>
+              <label className="text-[10px] text-muted-foreground uppercase">GitHub URL</label>
               <input
                 type="url"
                 value={github}
                 onChange={(e) => setGithub(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                className="w-full bg-background border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none"
                 placeholder="https://github.com/..."
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] text-slate-500 uppercase">Twitter URL</label>
+              <label className="text-[10px] text-muted-foreground uppercase">Twitter URL</label>
               <input
                 type="url"
                 value={twitter}
                 onChange={(e) => setTwitter(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                className="w-full bg-background border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none"
                 placeholder="https://twitter.com/..."
               />
             </div>
@@ -195,24 +195,24 @@ export default function NewTeamMemberPage() {
 
         {/* Expertise tagging */}
         <div className="space-y-3">
-          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Expertise / Skills</label>
+          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Expertise / Skills</label>
           <div className="flex gap-2">
             <input
               type="text"
               value={expInput}
               onChange={(e) => setExpInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddExp())}
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="flex-1 bg-background border border-border rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Node.js"
             />
-            <button type="button" onClick={handleAddExp} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 rounded-xl text-sm font-semibold border border-slate-700">Add</button>
+            <button type="button" onClick={handleAddExp} className="bg-muted hover:bg-muted text-foreground px-4 rounded-xl text-sm font-semibold border border-border">Add</button>
           </div>
           {expertise.length > 0 && (
-            <div className="flex flex-wrap gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-850">
+            <div className="flex flex-wrap gap-2 p-3 bg-background/60 rounded-xl border border-slate-850">
               {expertise.map((exp, index) => (
-                <span key={exp} className="inline-flex items-center gap-1 bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-750">
+                <span key={exp} className="inline-flex items-center gap-1 bg-muted text-foreground px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-750">
                   {exp}
-                  <button type="button" onClick={() => handleRemoveExp(index)} className="text-slate-500 hover:text-red-400">
+                  <button type="button" onClick={() => handleRemoveExp(index)} className="text-muted-foreground hover:text-destructive">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </span>
@@ -221,27 +221,27 @@ export default function NewTeamMemberPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-3 bg-slate-950/40 p-4 border border-slate-850 rounded-xl">
+        <div className="flex items-center gap-3 bg-background/40 p-4 border border-slate-850 rounded-xl">
           <input
             id="active"
             type="checkbox"
             checked={active}
             onChange={(e) => setActive(e.target.checked)}
-            className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+            className="w-4 h-4 rounded text-indigo-600 focus:ring-primary"
           />
-          <label htmlFor="active" className="text-sm font-medium text-slate-200 cursor-pointer select-none">
+          <label htmlFor="active" className="text-sm font-medium text-foreground cursor-pointer select-none">
             Active (show profile on team directory page)
           </label>
         </div>
 
-        <div className="flex items-center gap-3 pt-6 border-t border-slate-800 justify-end">
-          <Link href="/admin/team" className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold px-5 py-2.5 rounded-xl border border-slate-700 transition-all">
+        <div className="flex items-center gap-3 pt-6 border-t border-border justify-end">
+          <Link href="/admin/team" className="bg-muted hover:bg-muted text-foreground text-sm font-semibold px-5 py-2.5 rounded-xl border border-border transition-all">
             Cancel
           </Link>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all disabled:opacity-50"
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-foreground text-sm font-semibold px-5 py-2.5 rounded-xl transition-all disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Add Member

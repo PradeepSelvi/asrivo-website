@@ -36,7 +36,7 @@ export default function ExportCsvButton({ subscribers }: { subscribers: any[] })
     <button
       onClick={handleExport}
       disabled={!subscribers || subscribers.length === 0}
-      className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+      className="flex items-center gap-2 bg-muted hover:bg-muted text-foreground text-sm font-semibold px-4 py-2.5 rounded-xl border border-border transition-all disabled:opacity-40 disabled:cursor-not-allowed"
     >
       <Download className="w-4 h-4" />
       Export CSV
