@@ -74,7 +74,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
               <ShieldAlert className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-              Admin CMS
+              Admin
             </span>
           </div>
 
