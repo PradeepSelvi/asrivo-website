@@ -66,7 +66,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen flex bg-background text-foreground font-sans overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col shrink-0 fixed top-0 left-0 h-screen z-30">
+      <aside className="w-64 bg-card border-r border-border flex flex-col justify-between shrink-0 sticky top-0 h-screen">
         <div>
           {/* Header/Logo */}
           <div className="p-6 border-b border-border flex items-center gap-3">
