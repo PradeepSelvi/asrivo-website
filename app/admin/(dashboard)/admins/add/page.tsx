@@ -73,13 +73,7 @@ export default function AddAdminPage() {
           </select>
         </div>
 
-        <div className="border border-indigo-950 bg-indigo-950/20 rounded-xl p-4 flex gap-3 text-xs text-primary">
-          <ShieldAlert className="w-5 h-5 shrink-0" />
-          <p>
-            New administrators will be created with a default password of <strong className="text-primary/80">AdminPassword123!</strong>. 
-            They should log in and change their password using standard account controls.
-          </p>
-        </div>
+       
 
         <div className="flex gap-3">
           <Link href="/admin/admins" className="flex-1 bg-muted hover:bg-slate-750 text-foreground text-sm font-semibold py-2.5 rounded-xl border border-border transition-all text-center">

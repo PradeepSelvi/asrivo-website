@@ -64,16 +64,16 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground font-sans">
+    <div className="min-h-screen flex bg-background text-foreground font-sans overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col justify-between shrink-0 sticky top-0 h-screen">
+      <aside className="w-64 bg-card border-r border-border flex flex-col shrink-0 fixed top-0 left-0 h-screen z-30">
         <div>
           {/* Header/Logo */}
           <div className="p-6 border-b border-border flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-tr from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-              <ShieldAlert className="w-4 h-4 text-foreground" />
+            <div className="w-8 h-8 bg-gradient-to-tr from-primary to-accent rounded-lg flex items-center justify-center shadow-md">
+              <ShieldAlert className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+            <span className="font-bold text-lg tracking-tight text-foreground">
               Admin
             </span>
           </div>

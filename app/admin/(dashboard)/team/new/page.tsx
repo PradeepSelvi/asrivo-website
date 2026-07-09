@@ -93,7 +93,7 @@ export default function NewTeamMemberPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="e.g. John Doe"
+              placeholder="Your name"
               required
             />
           </div>
@@ -119,20 +119,11 @@ export default function NewTeamMemberPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="john@company.com"
+              placeholder="username@company.com"
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Display Order</label>
-            <input
-              type="number"
-              value={displayOrder}
-              onChange={(e) => setDisplayOrder(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              min="1"
-            />
-          </div>
+          
         </div>
 
         <div className="space-y-2">
