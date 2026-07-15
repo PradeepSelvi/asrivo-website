@@ -19,8 +19,6 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -30,18 +28,21 @@ export async function middleware(request: NextRequest) {
   )
 
   // Must call getUser() — do NOT use getSession(), it's not safe in middleware
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
+  // Always allow login page (don't check auth)
   if (pathname === '/admin/login') {
     return supabaseResponse
   }
 
-  if (!user) {
+  // If no user or error, redirect to login
+  if (!user || error) {
     const url = new URL('/admin/login', request.url)
     url.searchParams.set('redirected', 'true')
     return NextResponse.redirect(url)
   }
 
+  // User is authenticated, allow access
   return supabaseResponse
 }
 
