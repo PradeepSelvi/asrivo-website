@@ -92,29 +92,56 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [visible, setVisible] = useState(true)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [lastScrollY, setLastScrollY] = useState(0)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      // Determine if scrolled past threshold
+      setScrolled(currentScrollY > 20)
+      
+      // Show navbar when scrolling up, hide when scrolling down
+      if (currentScrollY < lastScrollY || currentScrollY < 100) {
+        // Scrolling up or near top - show navbar
+        setVisible(true)
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and past threshold - hide navbar
+        setVisible(false)
+      }
+      
+      setLastScrollY(currentScrollY)
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({
         x: (e.clientX / window.innerWidth - 0.5) * 20,
         y: (e.clientY / window.innerHeight - 0.5) * 20,
       })
     }
-    window.addEventListener("scroll", handleScroll)
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
     window.addEventListener("mousemove", handleMouseMove)
+    
     return () => {
       window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("mousemove", handleMouseMove)
     }
-  }, [])
+  }, [lastScrollY])
 
   return (
-    <header className={`sticky top-0 z-50 w-full transition-all duration-500 ${scrolled
-      ? "border-b border-border/40 bg-background/80 backdrop-blur-xl"
-      : "bg-transparent"
-      }`}>
+    <header 
+      className={`sticky top-0 z-50 w-full transition-all duration-500 ${
+        scrolled
+          ? "border-b border-border/40 bg-background/95 backdrop-blur-xl shadow-lg shadow-black/5"
+          : "bg-background/60 backdrop-blur-md"
+      } ${
+        visible ? "translate-y-0" : "-translate-y-full"
+      }`}
+      style={{ transition: "transform 0.3s ease-in-out, background-color 0.5s, border-color 0.5s" }}
+    >
       <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
         
         {/* Animated Background Blur Glow */}
@@ -157,7 +184,11 @@ export function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className="relative px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-[#4fd1ed] group"
+              className={`relative px-4 py-2 text-sm font-medium transition-all group ${
+                scrolled 
+                  ? "text-foreground/90 hover:text-[#4fd1ed]" 
+                  : "text-muted-foreground hover:text-[#4fd1ed]"
+              }`}
             >
               {item.name}
               <span className="absolute bottom-0 left-1/2 h-0.5 w-0 bg-[#4fd1ed] transition-all group-hover:left-0 group-hover:w-full" />
