@@ -7,12 +7,15 @@ import { revalidatePath } from 'next/cache'
 // Helper function to verify permissions
 async function checkAuthAndPermission(requiredRole?: 'high') {
   const authResult = await getCurrentAdmin()
+  
+  // Only throw for auth failures (session invalid/expired)
   if (!authResult.success || !authResult.user) {
-    throw new Error('Unauthorized: Authentication required')
+    throw new Error('AUTH_REQUIRED')
   }
   
+  // For role check failures, return null instead of throwing
   if (requiredRole === 'high' && authResult.user.role !== 'high') {
-    throw new Error('Unauthorized: High clearance level required')
+    return null
   }
   
   return authResult.user
@@ -39,7 +42,16 @@ export async function createProject(data: {
   display_order?: number
 }) {
   try {
-    await checkAuthAndPermission('high') // Only high admins can create
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { data: newProject, error } = await supabase
@@ -58,6 +70,9 @@ export async function createProject(data: {
     revalidatePath('/admin/projects')
     return { success: true, data: newProject }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -103,7 +118,16 @@ export async function updateProject(id: string | number, data: {
 
 export async function deleteProject(id: string | number) {
   try {
-    await checkAuthAndPermission('high') // Only high admins can delete
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { error } = await supabase
@@ -116,6 +140,9 @@ export async function deleteProject(id: string | number) {
     revalidatePath('/admin/projects')
     return { success: true }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -137,7 +164,16 @@ export async function createService(data: {
   pricing?: string
 }) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { data: newService, error } = await supabase
@@ -157,6 +193,9 @@ export async function createService(data: {
     revalidatePath('/admin/services')
     return { success: true, data: newService }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -198,7 +237,16 @@ export async function updateService(id: string | number, data: {
 
 export async function deleteService(id: string | number) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { error } = await supabase
@@ -211,6 +259,9 @@ export async function deleteService(id: string | number) {
     revalidatePath('/admin/services')
     return { success: true }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -231,7 +282,16 @@ export async function createTeamMember(data: {
   active?: boolean
 }) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { data: newMember, error } = await supabase
@@ -251,6 +311,9 @@ export async function createTeamMember(data: {
     revalidatePath('/admin/team')
     return { success: true, data: newMember }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -291,7 +354,16 @@ export async function updateTeamMember(id: string | number, data: {
 
 export async function deleteTeamMember(id: string | number) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { error } = await supabase
@@ -304,6 +376,9 @@ export async function deleteTeamMember(id: string | number) {
     revalidatePath('/admin/team')
     return { success: true }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -326,7 +401,16 @@ export async function createJobPosting(data: {
   department?: string
 }) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { data: newJob, error } = await supabase
@@ -346,6 +430,9 @@ export async function createJobPosting(data: {
     revalidatePath('/admin/jobs')
     return { success: true, data: newJob }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -388,7 +475,16 @@ export async function updateJobPosting(id: string | number, data: {
 
 export async function deleteJobPosting(id: string | number) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { error } = await supabase
@@ -401,6 +497,9 @@ export async function deleteJobPosting(id: string | number) {
     revalidatePath('/admin/jobs')
     return { success: true }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -437,7 +536,16 @@ export async function createTestimonial(data: {
   verified?: boolean
 }) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { data: newTestimonial, error } = await supabase
@@ -456,6 +564,9 @@ export async function createTestimonial(data: {
     revalidatePath('/admin/testimonials')
     return { success: true, data: newTestimonial }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -498,7 +609,16 @@ export async function updateTestimonial(id: string | number, data: {
 
 export async function deleteTestimonial(id: string | number) {
   try {
-    await checkAuthAndPermission('high')
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { error } = await supabase
@@ -511,6 +631,9 @@ export async function deleteTestimonial(id: string | number) {
     revalidatePath('/admin/testimonials')
     return { success: true }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -566,7 +689,16 @@ export async function updateContactStatus(id: string | number, status: string) {
 
 export async function deleteContact(id: string | number) {
   try {
-    await checkAuthAndPermission('high') // Only high admins can delete
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { error } = await supabase
@@ -579,6 +711,9 @@ export async function deleteContact(id: string | number) {
     revalidatePath('/admin/contacts')
     return { success: true }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }
@@ -631,7 +766,16 @@ export async function updateInquiryNotes(id: string | number, notes: string) {
 
 export async function deleteInquiry(id: string | number) {
   try {
-    await checkAuthAndPermission('high') // Only high admins can delete
+    const user = await checkAuthAndPermission('high')
+    
+    if (!user) {
+      return { 
+        success: false, 
+        error: 'Unauthorized: High-level admin access required',
+        code: 'INSUFFICIENT_ROLE'
+      }
+    }
+    
     const supabase = await createClient()
 
     const { error } = await supabase
@@ -644,6 +788,9 @@ export async function deleteInquiry(id: string | number) {
     revalidatePath('/admin/inquiries')
     return { success: true }
   } catch (error: any) {
+    if (error.message === 'AUTH_REQUIRED') {
+      return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
+    }
     return { success: false, error: error.message }
   }
 }

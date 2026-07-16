@@ -24,26 +24,13 @@ function AdminLoginContent() {
   React.useEffect(() => {
     const checkExistingSession = async () => {
       const supabase = createClient()
-      const { data: { user }, error } = await supabase.auth.getUser()
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Admin Login] Session check on mount:', { 
-          hasUser: !!user, 
-          userId: user?.id,
-          error: error?.message 
-        })
-      }
+      const { data: { user } } = await supabase.auth.getUser()
       
       if (user) {
-        // Already authenticated, verify admin and redirect
         const result = await verifyAdminProfile(user.id)
         if (result.success) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[Admin Login] Already authenticated, redirecting to dashboard')
-          }
           window.location.href = '/admin'
         } else {
-          // User exists but not an admin, sign them out
           await supabase.auth.signOut()
         }
       }
@@ -64,12 +51,7 @@ function AdminLoginContent() {
     }
 
     try {
-      // Step 1: Sign in on the CLIENT — this sets the session cookie in the browser
       const supabase = createClient()
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Admin Login] Attempting sign in for:', email)
-      }
       
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
@@ -77,44 +59,25 @@ function AdminLoginContent() {
       })
 
       if (authError || !authData.user) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('[Admin Login] Auth failed:', authError?.message)
-        }
         setErrorMsg(authError?.message || 'Authentication failed.')
         setLoading(false)
         return
       }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Admin Login] Auth successful, verifying admin profile')
-      }
-
-      // Step 2: Verify admin role via server action
+      // Verify admin role
       const result = await verifyAdminProfile(authData.user.id)
 
       if (!result.success) {
-        // Not an admin — sign them out and show error
-        if (process.env.NODE_ENV === 'development') {
-          console.error('[Admin Login] Not an admin, signing out')
-        }
         await supabase.auth.signOut()
         setErrorMsg('Unauthorized: You do not have administrator permissions.')
         setLoading(false)
         return
       }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Admin Login] Admin verified, redirecting to dashboard')
-      }
-
-      // Step 3: Session is set in browser, navigate to admin
-      // Use a short delay to ensure cookie propagation
+      // Small delay for cookie propagation, then redirect
       await new Promise(resolve => setTimeout(resolve, 100))
       window.location.href = '/admin'
-    } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[Admin Login] Unexpected error:', err)
-      }
+    } catch {
       setErrorMsg('An unexpected error occurred. Please try again.')
       setLoading(false)
     }
@@ -134,9 +97,7 @@ function AdminLoginContent() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Admin Panel
           </h1>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Please log in with your administrator credentials
-          </p>
+         
         </div>
 
         <div className="bg-background border border-border rounded-2xl p-8 shadow-sm">
