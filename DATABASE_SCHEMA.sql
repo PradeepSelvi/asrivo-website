@@ -1,11 +1,12 @@
 -- Asrivo Tech Website - Complete Database Schema
 -- Created for Supabase
+-- FIXED: Safe to re-run (idempotent) - won't error if tables/indexes/policies already exist
 
 -- ============================================
 -- 1. CONTACTS TABLE
 -- For general contact form submissions
 -- ============================================
-CREATE TABLE contacts (
+CREATE TABLE IF NOT EXISTS contacts (
   id BIGSERIAL PRIMARY KEY,
   email TEXT NOT NULL,
   name TEXT NOT NULL,
@@ -18,15 +19,15 @@ CREATE TABLE contacts (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_contacts_created_at ON contacts(created_at DESC);
-CREATE INDEX idx_contacts_email ON contacts(email);
-CREATE INDEX idx_contacts_status ON contacts(status);
+CREATE INDEX IF NOT EXISTS idx_contacts_created_at ON contacts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
+CREATE INDEX IF NOT EXISTS idx_contacts_status ON contacts(status);
 
 -- ============================================
 -- 2. SERVICE INQUIRIES TABLE
 -- For specific service-related inquiries
 -- ============================================
-CREATE TABLE service_inquiries (
+CREATE TABLE IF NOT EXISTS service_inquiries (
   id BIGSERIAL PRIMARY KEY,
   email TEXT NOT NULL,
   name TEXT NOT NULL,
@@ -41,15 +42,15 @@ CREATE TABLE service_inquiries (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_service_inquiries_service_type ON service_inquiries(service_type);
-CREATE INDEX idx_service_inquiries_status ON service_inquiries(status);
-CREATE INDEX idx_service_inquiries_created_at ON service_inquiries(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_service_inquiries_service_type ON service_inquiries(service_type);
+CREATE INDEX IF NOT EXISTS idx_service_inquiries_status ON service_inquiries(status);
+CREATE INDEX IF NOT EXISTS idx_service_inquiries_created_at ON service_inquiries(created_at DESC);
 
 -- ============================================
 -- 3. PROJECTS TABLE
 -- For showcasing completed and ongoing projects
 -- ============================================
-CREATE TABLE projects (
+CREATE TABLE IF NOT EXISTS projects (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -69,16 +70,16 @@ CREATE TABLE projects (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_projects_slug ON projects(slug);
-CREATE INDEX idx_projects_featured ON projects(featured);
-CREATE INDEX idx_projects_category ON projects(category);
-CREATE INDEX idx_projects_display_order ON projects(display_order);
+CREATE INDEX IF NOT EXISTS idx_projects_slug ON projects(slug);
+CREATE INDEX IF NOT EXISTS idx_projects_featured ON projects(featured);
+CREATE INDEX IF NOT EXISTS idx_projects_category ON projects(category);
+CREATE INDEX IF NOT EXISTS idx_projects_display_order ON projects(display_order);
 
 -- ============================================
 -- 4. TEAM MEMBERS TABLE
 -- For team information
 -- ============================================
-CREATE TABLE team_members (
+CREATE TABLE IF NOT EXISTS team_members (
   id BIGSERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   position TEXT NOT NULL, -- 'CEO', 'CTO', 'Senior Developer', etc.
@@ -93,15 +94,15 @@ CREATE TABLE team_members (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_team_members_active ON team_members(active);
-CREATE INDEX idx_team_members_display_order ON team_members(display_order);
-CREATE INDEX idx_team_members_position ON team_members(position);
+CREATE INDEX IF NOT EXISTS idx_team_members_active ON team_members(active);
+CREATE INDEX IF NOT EXISTS idx_team_members_display_order ON team_members(display_order);
+CREATE INDEX IF NOT EXISTS idx_team_members_position ON team_members(position);
 
 -- ============================================
 -- 5. SERVICES TABLE
 -- For service descriptions and details
 -- ============================================
-CREATE TABLE services (
+CREATE TABLE IF NOT EXISTS services (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -116,15 +117,15 @@ CREATE TABLE services (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_services_slug ON services(slug);
-CREATE INDEX idx_services_active ON services(active);
-CREATE INDEX idx_services_display_order ON services(display_order);
+CREATE INDEX IF NOT EXISTS idx_services_slug ON services(slug);
+CREATE INDEX IF NOT EXISTS idx_services_active ON services(active);
+CREATE INDEX IF NOT EXISTS idx_services_display_order ON services(display_order);
 
 -- ============================================
 -- 6. TESTIMONIALS TABLE
 -- For client testimonials and reviews
 -- ============================================
-CREATE TABLE testimonials (
+CREATE TABLE IF NOT EXISTS testimonials (
   id BIGSERIAL PRIMARY KEY,
   client_name TEXT NOT NULL,
   client_title TEXT,
@@ -140,15 +141,15 @@ CREATE TABLE testimonials (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_testimonials_featured ON testimonials(featured);
-CREATE INDEX idx_testimonials_project_id ON testimonials(project_id);
-CREATE INDEX idx_testimonials_rating ON testimonials(rating);
+CREATE INDEX IF NOT EXISTS idx_testimonials_featured ON testimonials(featured);
+CREATE INDEX IF NOT EXISTS idx_testimonials_project_id ON testimonials(project_id);
+CREATE INDEX IF NOT EXISTS idx_testimonials_rating ON testimonials(rating);
 
 -- ============================================
 -- 7. JOB APPLICATIONS TABLE
 -- For career page job applications
 -- ============================================
-CREATE TABLE job_applications (
+CREATE TABLE IF NOT EXISTS job_applications (
   id BIGSERIAL PRIMARY KEY,
   job_title TEXT NOT NULL,
   position_id TEXT, -- reference to job posting
@@ -166,16 +167,16 @@ CREATE TABLE job_applications (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_job_applications_status ON job_applications(status);
-CREATE INDEX idx_job_applications_position_id ON job_applications(position_id);
-CREATE INDEX idx_job_applications_created_at ON job_applications(created_at DESC);
-CREATE INDEX idx_job_applications_email ON job_applications(email);
+CREATE INDEX IF NOT EXISTS idx_job_applications_status ON job_applications(status);
+CREATE INDEX IF NOT EXISTS idx_job_applications_position_id ON job_applications(position_id);
+CREATE INDEX IF NOT EXISTS idx_job_applications_created_at ON job_applications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_job_applications_email ON job_applications(email);
 
 -- ============================================
 -- 8. JOB POSTINGS TABLE
 -- For open job positions
 -- ============================================
-CREATE TABLE job_postings (
+CREATE TABLE IF NOT EXISTS job_postings (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -191,14 +192,14 @@ CREATE TABLE job_postings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_job_postings_slug ON job_postings(slug);
-CREATE INDEX idx_job_postings_active ON job_postings(active);
+CREATE INDEX IF NOT EXISTS idx_job_postings_slug ON job_postings(slug);
+CREATE INDEX IF NOT EXISTS idx_job_postings_active ON job_postings(active);
 
 -- ============================================
 -- 9. NEWSLETTER SUBSCRIBERS TABLE
 -- For email newsletter subscriptions
 -- ============================================
-CREATE TABLE newsletter_subscribers (
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   id BIGSERIAL PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
   name TEXT,
@@ -209,14 +210,14 @@ CREATE TABLE newsletter_subscribers (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_newsletter_subscribers_email ON newsletter_subscribers(email);
-CREATE INDEX idx_newsletter_subscribers_subscribed ON newsletter_subscribers(subscribed);
+CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_email ON newsletter_subscribers(email);
+CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_subscribed ON newsletter_subscribers(subscribed);
 
 -- ============================================
 -- 10. SETTINGS TABLE
 -- For website configuration and settings
 -- ============================================
-CREATE TABLE settings (
+CREATE TABLE IF NOT EXISTS settings (
   id BIGSERIAL PRIMARY KEY,
   key TEXT NOT NULL UNIQUE,
   value TEXT,
@@ -226,16 +227,16 @@ CREATE TABLE settings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_settings_key ON settings(key);
+CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
 
 -- ============================================
 -- 11. AUDIT LOG TABLE
 -- For tracking changes and admin actions
 -- ============================================
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
   id BIGSERIAL PRIMARY KEY,
   table_name TEXT NOT NULL,
-  record_id BIGINT,
+  record_id TEXT,
   action TEXT NOT NULL, -- 'create', 'update', 'delete'
   user_id TEXT,
   old_values JSONB,
@@ -245,15 +246,15 @@ CREATE TABLE audit_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_audit_logs_table_name ON audit_logs(table_name);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
-CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_table_name ON audit_logs(table_name);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
 
 -- ============================================
 -- 12. ANALYTICS TABLE
 -- For page views and user interactions
 -- ============================================
-CREATE TABLE analytics (
+CREATE TABLE IF NOT EXISTS analytics (
   id BIGSERIAL PRIMARY KEY,
   page_path TEXT NOT NULL,
   page_title TEXT,
@@ -267,13 +268,14 @@ CREATE TABLE analytics (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_analytics_page_path ON analytics(page_path);
-CREATE INDEX idx_analytics_created_at ON analytics(created_at DESC);
-CREATE INDEX idx_analytics_session_id ON analytics(session_id);
-CREATE INDEX idx_analytics_event_type ON analytics(event_type);
+CREATE INDEX IF NOT EXISTS idx_analytics_page_path ON analytics(page_path);
+CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_session_id ON analytics(session_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_event_type ON analytics(event_type);
 
 -- ============================================
 -- ENABLE ROW LEVEL SECURITY
+-- (safe to re-run - enabling RLS twice is not an error)
 -- ============================================
 
 ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
@@ -291,73 +293,91 @@ ALTER TABLE analytics ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- ROW LEVEL SECURITY POLICIES
+-- NOTE: Postgres has no "CREATE POLICY IF NOT EXISTS".
+-- So each policy is DROPped first (safe no-op if it
+-- doesn't exist yet), then CREATEd fresh. This makes
+-- the whole block safe to re-run.
 -- ============================================
 
 -- Contacts: Public can insert their own, only admin can read
+DROP POLICY IF EXISTS "Enable insert for all users" ON contacts;
 CREATE POLICY "Enable insert for all users" ON contacts
   FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Enable read for authenticated users only" ON contacts;
 CREATE POLICY "Enable read for authenticated users only" ON contacts
   FOR SELECT
   USING (auth.role() = 'authenticated');
 
 -- Service Inquiries: Public can insert
+DROP POLICY IF EXISTS "Enable insert for all users" ON service_inquiries;
 CREATE POLICY "Enable insert for all users" ON service_inquiries
   FOR INSERT
   WITH CHECK (true);
 
 -- Projects: Public read only
+DROP POLICY IF EXISTS "Enable read for all users" ON projects;
 CREATE POLICY "Enable read for all users" ON projects
   FOR SELECT
   USING (true);
 
 -- Team Members: Public read only
+DROP POLICY IF EXISTS "Enable read for all users" ON team_members;
 CREATE POLICY "Enable read for all users" ON team_members
   FOR SELECT
   USING (true);
 
 -- Services: Public read only
+DROP POLICY IF EXISTS "Enable read for all users" ON services;
 CREATE POLICY "Enable read for all users" ON services
   FOR SELECT
   USING (true);
 
 -- Testimonials: Public read only
+DROP POLICY IF EXISTS "Enable read for all users" ON testimonials;
 CREATE POLICY "Enable read for all users" ON testimonials
   FOR SELECT
   USING (true);
 
 -- Job Postings: Public read only
+DROP POLICY IF EXISTS "Enable read for all users" ON job_postings;
 CREATE POLICY "Enable read for all users" ON job_postings
   FOR SELECT
   USING (true);
 
 -- Job Applications: Public can insert their own
+DROP POLICY IF EXISTS "Enable insert for all users" ON job_applications;
 CREATE POLICY "Enable insert for all users" ON job_applications
   FOR INSERT
   WITH CHECK (true);
 
 -- Newsletter Subscribers: Public can insert and update their own
+DROP POLICY IF EXISTS "Enable insert for all users" ON newsletter_subscribers;
 CREATE POLICY "Enable insert for all users" ON newsletter_subscribers
   FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Enable update for users based on email" ON newsletter_subscribers;
 CREATE POLICY "Enable update for users based on email" ON newsletter_subscribers
   FOR UPDATE
   USING (true)
   WITH CHECK (true);
 
 -- Analytics: Public can insert
+DROP POLICY IF EXISTS "Enable insert for all users" ON analytics;
 CREATE POLICY "Enable insert for all users" ON analytics
   FOR INSERT
   WITH CHECK (true);
 
 -- Settings: Public read, authenticated users update
+DROP POLICY IF EXISTS "Enable read for all users" ON settings;
 CREATE POLICY "Enable read for all users" ON settings
   FOR SELECT
   USING (true);
 
 -- Audit Logs: Authenticated users only
+DROP POLICY IF EXISTS "Enable read for authenticated users" ON audit_logs;
 CREATE POLICY "Enable read for authenticated users" ON audit_logs
   FOR SELECT
   USING (auth.role() = 'authenticated');

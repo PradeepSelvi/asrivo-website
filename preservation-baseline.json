@@ -1,0 +1,48 @@
+{
+  "success": false,
+  "results": [
+    {
+      "test": "Server Actions Import",
+      "status": "FAIL",
+      "description": "Cannot import admin actions: Cannot find package '@/lib' imported from C:\\Users\\yoges\\OneDrive\\Documents\\Desktop\\asrivo final\\Asrivo-Tech-Web\\lib\\supabase\\admin-actions.ts"
+    },
+    {
+      "test": "Authentication Flow Pattern",
+      "status": "PASS",
+      "description": "Authentication follows expected pattern: auth → profile verification → structured response",
+      "pattern": {
+        "usesSupabaseAuth": true,
+        "verifiesAdminProfile": true,
+        "returnsStructuredResponse": true,
+        "signOutOnUnauthorized": true
+      }
+    },
+    {
+      "test": "Middleware Route Protection",
+      "status": "PASS",
+      "description": "Middleware enforces route protection and role-based access as expected",
+      "pattern": {
+        "protectsAdminRoutes": true,
+        "redirectsUnauthenticatedToLogin": true,
+        "redirectsAuthenticatedFromLogin": true,
+        "enforcesRoleBasedAccess": true,
+        "highOnlyRoutes": [
+          "/admin/admins",
+          "/admin/settings"
+        ],
+        "loginRoute": "/admin/login",
+        "dashboardRoute": "/admin"
+      }
+    },
+    {
+      "test": "Login UI Structure",
+      "status": "PASS",
+      "description": "Login page contains expected form elements: email, password, submit"
+    },
+    {
+      "test": "Database Access",
+      "status": "SKIP",
+      "description": "Environment variables not available for schema check"
+    }
+  ]
+}
