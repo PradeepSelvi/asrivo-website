@@ -53,6 +53,7 @@ function AdminLoginContent() {
     try {
       const supabase = createClient()
       
+      // Sign in with password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -74,10 +75,13 @@ function AdminLoginContent() {
         return
       }
 
-      // Small delay for cookie propagation, then redirect
-      await new Promise(resolve => setTimeout(resolve, 100))
-      window.location.href = '/admin'
-    } catch {
+      // PRODUCTION FIX: Wait longer for cookie propagation (especially on Vercel)
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      // Force a full page reload to ensure cookies are sent to middleware
+      window.location.replace('/admin')
+    } catch (err) {
+      console.error('Login error:', err)
       setErrorMsg('An unexpected error occurred. Please try again.')
       setLoading(false)
     }

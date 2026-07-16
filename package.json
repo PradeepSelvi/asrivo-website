@@ -3,10 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
     "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint .",
-    "start": "next start"
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "pre-commit": "pnpm run type-check && pnpm run lint",
+    "analyze": "ANALYZE=true next build",
+    "clean": "rm -rf .next node_modules/.cache",
+    "prod-test": "NODE_ENV=production next build && next start"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
