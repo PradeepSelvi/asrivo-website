@@ -1,5 +1,6 @@
 import React from 'react'
-import { getCurrentAdmin, signOutAdmin } from '@/lib/supabase/admin-actions'
+import { signOutAdmin } from '@/lib/supabase/admin-actions'
+import { requireAdmin } from '@/lib/auth/admin-guard'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -25,14 +26,7 @@ interface AdminLayoutProps {
 }
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
-  const adminResult = await getCurrentAdmin()
-
-  // Guard routing server-side
-  if (!adminResult.success || !adminResult.user) {
-    redirect('/admin/login')
-  }
-
-  const user = adminResult.user!
+  const user = await requireAdmin()
   const isHigh = user.role === 'high'
 
   const handleSignOut = async () => {

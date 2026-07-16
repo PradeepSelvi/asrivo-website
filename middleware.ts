@@ -4,11 +4,17 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Skip non-admin routes immediately
   if (!pathname.startsWith('/admin')) {
     return NextResponse.next()
   }
 
-  let supabaseResponse = NextResponse.next({ request })
+  // Allow login page without auth check
+  if (pathname === '/admin/login') {
+    return NextResponse.next()
+  }
+
+  let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,30 +26,24 @@ export async function middleware(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            response.cookies.set(name, value, options)
           )
         },
       },
     }
   )
 
-  // Must call getUser() — do NOT use getSession(), it's not safe in middleware
-  const { data: { user }, error } = await supabase.auth.getUser()
+  // Validate session and refresh tokens
+  const { data: { user } } = await supabase.auth.getUser()
 
-  // Always allow login page (don't check auth)
-  if (pathname === '/admin/login') {
-    return supabaseResponse
-  }
-
-  // If no user or error, redirect to login
-  if (!user || error) {
+  // Redirect to login if no valid session
+  if (!user) {
     const url = new URL('/admin/login', request.url)
-    url.searchParams.set('redirected', 'true')
     return NextResponse.redirect(url)
   }
 
-  // User is authenticated, allow access
-  return supabaseResponse
+  // Return response with refreshed cookies
+  return response
 }
 
 export const config = {
