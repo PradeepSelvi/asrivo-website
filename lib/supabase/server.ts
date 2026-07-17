@@ -24,6 +24,13 @@ export const createClient = async () => {
           }
         },
       },
+      auth: {
+        // Disable automatic token refresh in server components
+        // Let middleware handle all token refreshing to avoid race conditions
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false,
+      },
     }
   )
 }

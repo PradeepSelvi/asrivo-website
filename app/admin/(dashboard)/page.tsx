@@ -15,24 +15,35 @@ import Link from 'next/link'
 export default async function AdminDashboard() {
   const supabase = await createClient()
 
-  const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true })
-  const { count: contactsCount } = await supabase.from('contacts').select('*', { count: 'exact', head: true })
-  const { count: inquiriesCount } = await supabase.from('service_inquiries').select('*', { count: 'exact', head: true })
-  const { count: applicationsCount } = await supabase.from('job_applications').select('*', { count: 'exact', head: true })
-  const { count: subscribersCount } = await supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true })
-  const { count: teamCount } = await supabase.from('team_members').select('*', { count: 'exact', head: true })
-
-  const { data: recentContacts } = await supabase
-    .from('contacts')
-    .select('id, name, email, company, created_at, status')
-    .order('created_at', { ascending: false })
-    .limit(5)
-
-  const { data: recentInquiries } = await supabase
-    .from('service_inquiries')
-    .select('id, name, email, service_type, created_at, status')
-    .order('created_at', { ascending: false })
-    .limit(5)
+  // Execute all queries in parallel but use a single client instance
+  // This prevents multiple token refresh attempts
+  const [
+    { count: projectsCount },
+    { count: contactsCount },
+    { count: inquiriesCount },
+    { count: applicationsCount },
+    { count: subscribersCount },
+    { count: teamCount },
+    { data: recentContacts },
+    { data: recentInquiries },
+  ] = await Promise.all([
+    supabase.from('projects').select('*', { count: 'exact', head: true }),
+    supabase.from('contacts').select('*', { count: 'exact', head: true }),
+    supabase.from('service_inquiries').select('*', { count: 'exact', head: true }),
+    supabase.from('job_applications').select('*', { count: 'exact', head: true }),
+    supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true }),
+    supabase.from('team_members').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('contacts')
+      .select('id, name, email, company, created_at, status')
+      .order('created_at', { ascending: false })
+      .limit(5),
+    supabase
+      .from('service_inquiries')
+      .select('id, name, email, service_type, created_at, status')
+      .order('created_at', { ascending: false })
+      .limit(5),
+  ])
 
   const stats = [
     { name: 'Total Projects',         value: projectsCount || 0,    icon: FolderGit, href: '/admin/projects',    color: 'text-primary bg-primary/10' },

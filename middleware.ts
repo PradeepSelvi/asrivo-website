@@ -64,8 +64,34 @@ export async function middleware(request: NextRequest) {
   // CRITICAL: Call getUser() to refresh session
   const { data: { user }, error } = await supabase.auth.getUser()
 
+  // Handle token refresh errors gracefully
+  if (error) {
+    // If it's a refresh token error, clear session and redirect to login
+    if (error.message?.includes('refresh_token') || error.message?.includes('Invalid Refresh Token')) {
+      const loginUrl = new URL('/admin/login', request.url)
+      const redirectResponse = NextResponse.redirect(loginUrl)
+      
+      // Clear all auth cookies
+      const authCookieNames = [
+        'sb-access-token',
+        'sb-refresh-token',
+        'supabase-auth-token'
+      ]
+      
+      authCookieNames.forEach(name => {
+        redirectResponse.cookies.delete(name)
+      })
+      
+      return redirectResponse
+    }
+    
+    // For other errors, also redirect to login
+    const loginUrl = new URL('/admin/login', request.url)
+    return NextResponse.redirect(loginUrl)
+  }
+
   // Redirect to login if no valid session
-  if (!user || error) {
+  if (!user) {
     const loginUrl = new URL('/admin/login', request.url)
     const redirectResponse = NextResponse.redirect(loginUrl)
     
