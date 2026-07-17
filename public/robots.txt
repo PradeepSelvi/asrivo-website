@@ -1,0 +1,10 @@
+# Robots.txt for Asrivo Tech
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml

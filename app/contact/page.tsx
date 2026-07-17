@@ -2,7 +2,7 @@
 
 import React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,6 +18,7 @@ import {
   Send,
   CheckCircle
 } from "lucide-react"
+import { loadRecaptchaScript, executeRecaptcha } from "@/lib/utils/captcha"
 
 const contactInfo = [
   {
@@ -54,6 +55,11 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  // Load reCAPTCHA script on mount
+  useEffect(() => {
+    loadRecaptchaScript()
+  }, [])
+
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   setLoading(true);
@@ -69,15 +75,21 @@ export default function ContactPage() {
   };
 
   try {
+    // Execute reCAPTCHA
+    const captchaToken = await executeRecaptcha('contact_form')
+
     const response = await fetch('/api/contacts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        captchaToken,
+      }),
     });
 
-    const result = await response.json(); // ✅ IMPORTANT
+    const result = await response.json();
 
     if (!response.ok) {
       console.error('Error from server:', result);
