@@ -1,5 +1,13 @@
-.next/
+# Dependencies
 node_modules
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Environment variables
 .env
 .env.local
 .env*.local
@@ -7,7 +15,38 @@ node_modules
 .env.development
 .env.staging
 .env.production
-.env.example
-.env.development.example
-.env.staging.example
-.env.production.example
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Vercel
+.vercel
+
+# Misc
+*.pem
+.turbo

@@ -45,7 +45,6 @@ export default async function TestAuthPage() {
           ) : (
             <div className="text-red-400">
               ❌ No admin profile found
-              {adminResult.error && <div className="mt-2">Error: {adminResult.error}</div>}
             </div>
           )}
         </div>

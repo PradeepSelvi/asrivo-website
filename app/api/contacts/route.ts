@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/mail'
+import { verifyCaptcha } from '@/lib/utils/captcha'
 
 // 👉 GET (optional - to fetch contacts)
 export async function GET(request: NextRequest) {
@@ -39,13 +40,22 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const { email, name, message, company, subject } = body
+    const { email, name, message, company, subject, captchaToken } = body
 
     // ✅ Validation
     if (!email || !name || !message) {
       return NextResponse.json(
         { error: 'Missing required fields: email, name, message' },
         { status: 400 }
+      )
+    }
+
+    // 🤖 CAPTCHA Verification
+    const captchaResult = await verifyCaptcha(captchaToken, 'contact_form')
+    if (!captchaResult.success) {
+      return NextResponse.json(
+        { error: 'Security verification failed. Please try again.' },
+        { status: 403 }
       )
     }
 

@@ -1,133 +1,233 @@
-'use client'
+import { Metadata } from 'next'
 
-import { useEffect } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+export const metadata: Metadata = {
+  title: 'Terms of Service | Asrivo Tech',
+  description: 'Terms of Service for Asrivo Tech website and services',
+}
 
-export default function TermsPage() {
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
+export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl opacity-20" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl opacity-20" />
-      </div>
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold text-foreground mb-6">Terms of Service</h1>
+        
+        <div className="prose prose-slate dark:prose-invert max-w-none">
+          <p className="text-muted-foreground mb-8">
+            Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
 
-      {/* Content */}
-      <div className="relative z-10">
-        {/* Header */}
-        <div className="border-b border-white/10 sticky top-0 bg-black/80 backdrop-blur-md z-50">
-          <div className="max-w-4xl mx-auto px-6 py-6">
-            <Link href="/" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors w-fit">
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Link>
-          </div>
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">1. Agreement to Terms</h2>
+            <p className="text-muted-foreground">
+              By accessing or using the Asrivo Tech website and services ("Services"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our Services.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">2. Description of Services</h2>
+            <p className="text-muted-foreground mb-4">
+              Asrivo Tech provides:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+              <li>Software development services</li>
+              <li>Web and mobile application development</li>
+              <li>Technical consulting</li>
+              <li>IT solutions and services</li>
+              <li>Information about our company, team, and projects</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">3. User Responsibilities</h2>
+            <p className="text-muted-foreground mb-4">
+              When using our Services, you agree to:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+              <li>Provide accurate and complete information</li>
+              <li>Use the Services lawfully and ethically</li>
+              <li>Not attempt to gain unauthorized access to our systems</li>
+              <li>Not transmit malicious code or viruses</li>
+              <li>Not spam, harass, or abuse other users or our team</li>
+              <li>Respect intellectual property rights</li>
+              <li>Comply with all applicable laws and regulations</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">4. Intellectual Property Rights</h2>
+            <p className="text-muted-foreground mb-4">
+              All content on this website, including but not limited to text, graphics, logos, images, software, and code, is the property of Asrivo Tech or its licensors and is protected by copyright, trademark, and other intellectual property laws.
+            </p>
+            <p className="text-muted-foreground">
+              You may not copy, reproduce, distribute, modify, or create derivative works of any content without our express written permission.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">5. Service Agreements</h2>
+            <p className="text-muted-foreground mb-4">
+              <strong>For Client Projects:</strong>
+            </p>
+            <p className="text-muted-foreground mb-4">
+              Specific terms for software development projects, consulting services, and other professional services will be outlined in separate service agreements or statements of work. These Terms serve as a general framework, but project-specific agreements will take precedence for contracted services.
+            </p>
+            <p className="text-muted-foreground">
+              All service agreements must be signed by authorized representatives of both parties before work commences.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">6. Payment Terms</h2>
+            <p className="text-muted-foreground mb-4">
+              For contracted services:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+              <li>Payment terms will be specified in the service agreement</li>
+              <li>Invoices are typically due within 30 days of issuance</li>
+              <li>Late payments may incur interest charges</li>
+              <li>We reserve the right to suspend services for non-payment</li>
+              <li>All fees are non-refundable unless otherwise stated</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">7. Confidentiality</h2>
+            <p className="text-muted-foreground mb-4">
+              We respect the confidentiality of information shared with us. For client projects, confidentiality terms will be outlined in:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2 mb-4">
+              <li>Non-Disclosure Agreements (NDAs)</li>
+              <li>Service agreements</li>
+              <li>Master service agreements</li>
+            </ul>
+            <p className="text-muted-foreground">
+              We commit to protecting client confidential information and not disclosing it to third parties except as required by law or with client permission.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">8. Warranties and Disclaimers</h2>
+            <p className="text-muted-foreground mb-4">
+              <strong>8.1 Website Disclaimer:</strong>
+            </p>
+            <p className="text-muted-foreground mb-4">
+              This website and its content are provided "AS IS" without warranties of any kind, either express or implied. We do not warrant that:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2 mb-4">
+              <li>The website will be uninterrupted or error-free</li>
+              <li>Defects will be corrected</li>
+              <li>The website is free of viruses or harmful components</li>
+              <li>Information provided is accurate or complete</li>
+            </ul>
+            <p className="text-muted-foreground mb-4">
+              <strong>8.2 Service Warranties:</strong>
+            </p>
+            <p className="text-muted-foreground">
+              Warranties for contracted services will be specified in the applicable service agreement.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">9. Limitation of Liability</h2>
+            <p className="text-muted-foreground mb-4">
+              To the maximum extent permitted by law, Asrivo Tech shall not be liable for:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2 mb-4">
+              <li>Indirect, incidental, special, or consequential damages</li>
+              <li>Loss of profits, data, or business opportunities</li>
+              <li>Damages resulting from website use or inability to use</li>
+              <li>Third-party actions or content</li>
+            </ul>
+            <p className="text-muted-foreground">
+              Our total liability for any claims arising from these Terms or use of our Services shall not exceed the amount paid by you to us in the 12 months preceding the claim.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">10. Indemnification</h2>
+            <p className="text-muted-foreground">
+              You agree to indemnify and hold harmless Asrivo Tech, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+              <li>Your use of our Services</li>
+              <li>Your violation of these Terms</li>
+              <li>Your violation of any rights of another party</li>
+              <li>Your violation of applicable laws</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">11. Termination</h2>
+            <p className="text-muted-foreground mb-4">
+              We reserve the right to:
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2 mb-4">
+              <li>Terminate or suspend access to our Services at any time</li>
+              <li>Refuse service to anyone for any reason</li>
+              <li>Modify or discontinue Services without notice</li>
+            </ul>
+            <p className="text-muted-foreground">
+              Upon termination, your right to use our Services ceases immediately. Provisions that should survive termination (including intellectual property rights, disclaimers, and limitations of liability) will remain in effect.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">12. Governing Law and Dispute Resolution</h2>
+            <p className="text-muted-foreground mb-4">
+              These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to conflict of law principles.
+            </p>
+            <p className="text-muted-foreground mb-4">
+              <strong>12.1 Dispute Resolution:</strong>
+            </p>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-2">
+              <li>First, attempt to resolve disputes through good-faith negotiations</li>
+              <li>If unresolved, disputes may be subject to mediation</li>
+              <li>As a last resort, disputes will be resolved through arbitration or courts of [Your Jurisdiction]</li>
+            </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">13. Modifications to Terms</h2>
+            <p className="text-muted-foreground">
+              We reserve the right to modify these Terms at any time. We will notify you of significant changes by posting the updated Terms on this page with a new "Last updated" date. Your continued use of our Services after changes constitutes acceptance of the modified Terms.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">14. Severability</h2>
+            <p className="text-muted-foreground">
+              If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will remain in full force and effect.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">15. Entire Agreement</h2>
+            <p className="text-muted-foreground">
+              These Terms, together with our Privacy Policy and any service agreements, constitute the entire agreement between you and Asrivo Tech regarding use of our Services.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">16. Contact Information</h2>
+            <p className="text-muted-foreground mb-4">
+              If you have questions about these Terms, please contact us:
+            </p>
+            <div className="bg-muted p-6 rounded-lg">
+              <p className="text-foreground"><strong>Asrivo Tech</strong></p>
+              <p className="text-muted-foreground">Email: legal@asrivotech.com</p>
+              <p className="text-muted-foreground">Email (General): contact@asrivotech.com</p>
+              <p className="text-muted-foreground mt-2">
+                We will respond to your inquiry within 7 business days.
+              </p>
+            </div>
+          </section>
+
+          <section className="mb-8 bg-muted p-6 rounded-lg">
+            <p className="text-muted-foreground">
+              <strong>Acknowledgment:</strong> By using our Services, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
+            </p>
+          </section>
         </div>
-
-        {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-6 py-16 lg:py-24">
-          <div className="mb-12 animate-fadeIn">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">Terms of Service</h1>
-            <p className="text-white/60">Last updated: March 16, 2026</p>
-          </div>
-
-          <div className="space-y-12">
-            {[
-              {
-                title: '1. Agreement to Terms',
-                content: 'By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.',
-              },
-              {
-                title: '2. License to Use Website',
-                content: 'Asrivo Tech grants you a limited, non-exclusive, revocable license to make personal use of this website. You may not systematically retrieve data or information from this website to create or compile, directly or indirectly, a collection, compilation, database, or directory without written permission from Asrivo Tech.',
-              },
-              {
-                title: '3. Disclaimer of Warranties',
-                content: 'This website and the materials contained herein are provided on an "as is" basis. Asrivo Tech makes no warranties, expressed or implied, including but not limited to, warranties of merchantability and fitness for a particular purpose. Asrivo Tech does not warrant that the functions contained in the materials will be uninterrupted or error-free, that defects will be corrected, or that this website or the server that makes it available are free of viruses or other harmful components.',
-              },
-              {
-                title: '4. Limitation of Liability',
-                content: 'In no event shall Asrivo Tech, its suppliers, or any contributors be liable for any damages (including, without limitation, lost profits, lost data, or business interruption) arising out of the use or inability to use the materials on Asrivo Tech\'s website, even if we or our authorized representative has been notified orally or in writing of the possibility of such damage.',
-              },
-              {
-                title: '5. Accuracy of Materials',
-                content: 'The materials appearing on Asrivo Tech\'s website could include technical, typographical, or photographic errors. Asrivo Tech does not warrant that any of the materials on its website are accurate, complete, or current. We may make changes to the materials contained on our website at any time without notice.',
-              },
-              {
-                title: '6. Links',
-                content: 'Asrivo Tech has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Asrivo Tech of the site. We recommend that you make your own independent investigation before using any third-party services.',
-              },
-              {
-                title: '7. Modifications',
-                content: 'Asrivo Tech may revise these terms of service at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.',
-              },
-              {
-                title: '8. Governing Law',
-                content: 'These terms and conditions are governed by and construed in accordance with the laws of the jurisdiction in which Asrivo Tech operates, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.',
-              },
-              {
-                title: '9. Prohibited Activities',
-                content: 'You agree not to:',
-                subsections: [
-                  {
-                    items: [
-                      'Violate any applicable laws or regulations',
-                      'Infringe on the intellectual property rights of others',
-                      'Harass, abuse, or threaten others',
-                      'Submit false, misleading, or inaccurate information',
-                      'Attempt to gain unauthorized access to our systems',
-                      'Transmit viruses, malware, or harmful code',
-                      'Interfere with the operation of our website',
-                    ],
-                  },
-                ],
-              },
-              {
-                title: '10. Contact Information',
-                content: 'If you have any questions about these Terms of Service, please contact us at:',
-                subsections: [
-                  {
-                    items: [
-                      'Email: legal@asrivotech.com',
-                      'Website: www.asrivotech.com',
-                    ],
-                  },
-                ],
-              },
-            ].map((section, idx) => (
-              <div key={idx} className="space-y-4 animate-fadeIn" style={{ animationDelay: `${idx * 0.1}s` }}>
-                <h2 className="text-2xl font-bold text-white">{section.title}</h2>
-                <p className="text-white/70 leading-relaxed">{section.content}</p>
-                {section.subsections && (
-                  <div className="space-y-4 pl-6 border-l border-white/20">
-                    {section.subsections.map((sub, subIdx) => (
-                      <div key={subIdx} className="space-y-3">
-                        {(sub as any).subtitle && (
-                          <h3 className="font-semibold text-white/90">{(sub as any).subtitle}</h3>
-                        )}
-                        {sub.items && (
-                          <ul className="space-y-2">
-                            {sub.items.map((item, itemIdx) => (
-                              <li key={itemIdx} className="text-white/70 flex gap-3">
-                                <span className="text-primary mt-1">•</span>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </main>
       </div>
     </div>
   )

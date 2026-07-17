@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { verifyAdminProfile } from '@/lib/supabase/admin-actions'
 import { Lock, Mail, AlertTriangle, Loader2, Eye, EyeOff } from 'lucide-react'
 
 function AdminLoginContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -53,6 +54,7 @@ function AdminLoginContent() {
     try {
       const supabase = createClient()
       
+      // Sign in with password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -74,10 +76,13 @@ function AdminLoginContent() {
         return
       }
 
-      // Small delay for cookie propagation, then redirect
-      await new Promise(resolve => setTimeout(resolve, 100))
-      window.location.href = '/admin'
-    } catch {
+      // Refresh router to get fresh server state
+      router.refresh()
+      
+      // Force a full page reload to ensure cookies are sent to middleware
+      window.location.replace('/admin')
+    } catch (err) {
+      console.error('Login error:', err)
       setErrorMsg('An unexpected error occurred. Please try again.')
       setLoading(false)
     }

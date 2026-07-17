@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ExternalLink } from "lucide-react"
 import { useScrollAnimation, useTilt } from "@/hooks/use-scroll-animation"
@@ -11,6 +12,7 @@ const projects = [
     description: "A comprehensive financial analytics platform with real-time data visualization and AI-powered insights.",
     tags: ["React", "Node.js", "PostgreSQL", "AWS"],
     gradient: "from-blue-500/30 via-indigo-500/20 to-purple-500/30",
+    image: "/images/fintech-dashboard.png",
     href: "/projects#fintech-dashboard",
   },
   {
@@ -18,6 +20,7 @@ const projects = [
     description: "Mobile application for patient management and telemedicine consultations.",
     tags: ["React Native", "Firebase", "AI/ML"],
     gradient: "from-emerald-500/30 via-teal-500/20 to-cyan-500/30",
+    image: "/images/healthcare-app.png",
     href: "/projects#healthcare-app",
   },
   {
@@ -25,6 +28,7 @@ const projects = [
     description: "Scalable multi-vendor marketplace with advanced inventory management.",
     tags: ["Next.js", "Stripe", "MongoDB"],
     gradient: "from-orange-500/30 via-amber-500/20 to-yellow-500/30",
+    image: "/images/ecommerce-platform.png",
     href: "/projects#ecommerce-platform",
   },
   {
@@ -32,6 +36,7 @@ const projects = [
     description: "Enterprise IoT platform for monitoring and controlling industrial equipment.",
     tags: ["Python", "MQTT", "TimescaleDB"],
     gradient: "from-rose-500/30 via-pink-500/20 to-fuchsia-500/30",
+    image: "/images/iot-system.png",
     href: "/projects#iot-system",
   },
 ]
@@ -54,19 +59,30 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
         >
           {/* Animated gradient background */}
           <div className={`aspect-video relative overflow-hidden bg-gradient-to-br ${project.gradient}`}>
-            {/* Animated mesh pattern */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:20px_20px] opacity-50" />
-            
-            {/* Floating elements */}
-            <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-white/10 blur-xl animate-float" />
-            <div className="absolute bottom-4 left-4 w-16 h-16 rounded-full bg-white/10 blur-lg animate-float-reverse delay-300" />
-            
-            {/* Large letter */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-[120px] font-black text-white/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                {project.title.charAt(0)}
-              </span>
-            </div>
+            {project.image ? (
+              <Image 
+                src={project.image} 
+                alt={project.title} 
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110" 
+              />
+            ) : (
+              <>
+                {/* Animated mesh pattern */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:20px_20px] opacity-50" />
+                
+                {/* Floating elements */}
+                <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-white/10 blur-xl animate-float" />
+                <div className="absolute bottom-4 left-4 w-16 h-16 rounded-full bg-white/10 blur-lg animate-float-reverse delay-300" />
+                
+                {/* Large letter */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-[120px] font-black text-white/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                    {project.title.charAt(0)}
+                  </span>
+                </div>
+              </>
+            )}
             
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

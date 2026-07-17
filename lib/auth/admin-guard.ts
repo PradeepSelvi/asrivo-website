@@ -4,6 +4,7 @@
  */
 
 import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 
 export type AdminRole = 'high' | 'low'
@@ -18,11 +19,14 @@ interface AdminGuardOptions {
  * Checks authentication and optionally role level
  */
 export async function requireAdmin(options: AdminGuardOptions = {}) {
-  const { requireRole, redirectTo = '/admin/login' } = options
+  const { requireRole, redirectTo = '/admin/login?error=unauthorized' } = options
   
   const adminResult = await getCurrentAdmin()
   
   if (!adminResult.success || !adminResult.user) {
+    // Sign out before redirecting to prevent redirect loop
+    const supabase = await createClient()
+    await supabase.auth.signOut()
     redirect(redirectTo)
   }
   
