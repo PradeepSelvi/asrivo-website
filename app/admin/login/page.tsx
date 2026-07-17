@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { verifyAdminProfile } from '@/lib/supabase/admin-actions'
 import { Lock, Mail, AlertTriangle, Loader2, Eye, EyeOff } from 'lucide-react'
 
 function AdminLoginContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -75,8 +76,8 @@ function AdminLoginContent() {
         return
       }
 
-      // PRODUCTION FIX: Wait longer for cookie propagation (especially on Vercel)
-      await new Promise(resolve => setTimeout(resolve, 300))
+      // Refresh router to get fresh server state
+      router.refresh()
       
       // Force a full page reload to ensure cookies are sent to middleware
       window.location.replace('/admin')

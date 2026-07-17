@@ -58,6 +58,9 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Middleware checks session validity only, NOT admin role.
+  // Role enforcement is intentionally left to requireAdmin() in the layout
+  // to keep a single source of truth for role logic.
   // CRITICAL: Call getUser() to refresh session
   const { data: { user }, error } = await supabase.auth.getUser()
 
