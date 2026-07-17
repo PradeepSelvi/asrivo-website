@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createProject } from '@/lib/supabase/content-actions'
-import { FolderGit, ArrowLeft, Loader2, Plus, X } from 'lucide-react'
+import { FolderGit, ArrowLeft, Loader2, Plus, X, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
 export default function NewProjectPage() {
@@ -30,6 +30,9 @@ export default function NewProjectPage() {
   const [techInput, setTechInput] = useState('')
   const [technologies, setTechnologies] = useState<string[]>([])
 
+  // Validation errors
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
   const handleAddTech = () => {
     if (techInput.trim() && !technologies.includes(techInput.trim())) {
       setTechnologies([...technologies, techInput.trim()])
@@ -41,21 +44,117 @@ export default function NewProjectPage() {
     setTechnologies(technologies.filter((_, i) => i !== index))
   }
 
+  // Validation helpers
+  const isValidUrl = (url: string): boolean => {
+    if (!url) return true // Empty is valid (optional fields)
+    try {
+      new URL(url)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  const validateField = (field: string, value: string): string | null => {
+    switch (field) {
+      case 'title':
+        if (!value.trim()) return 'Title is required'
+        if (value.length < 3) return 'Title must be at least 3 characters'
+        if (value.length > 200) return 'Title must be less than 200 characters'
+        return null
+      case 'slug':
+        if (!value.trim()) return 'Slug is required'
+        if (!/^[a-z0-9-]+$/.test(value)) return 'Slug can only contain lowercase letters, numbers, and hyphens'
+        if (value.length < 3) return 'Slug must be at least 3 characters'
+        if (value.length > 200) return 'Slug must be less than 200 characters'
+        return null
+      case 'description':
+        if (!value.trim()) return 'Short description is required'
+        if (value.length < 10) return 'Description must be at least 10 characters'
+        if (value.length > 500) return 'Description must be less than 500 characters'
+        return null
+      case 'longDescription':
+        if (value && value.length > 5000) return 'Detailed description must be less than 5000 characters'
+        return null
+      case 'imageUrl':
+      case 'featuredImageUrl':
+      case 'liveUrl':
+      case 'githubUrl':
+        if (value && !isValidUrl(value)) return 'Please enter a valid URL (e.g., https://example.com)'
+        return null
+      case 'displayOrder':
+        const num = parseInt(value)
+        if (isNaN(num) || num < 1) return 'Display order must be a positive number'
+        return null
+      default:
+        return null
+    }
+  }
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {}
+    
+    const titleError = validateField('title', title)
+    if (titleError) newErrors.title = titleError
+    
+    const slugError = validateField('slug', slug)
+    if (slugError) newErrors.slug = slugError
+    
+    const descError = validateField('description', description)
+    if (descError) newErrors.description = descError
+    
+    const longDescError = validateField('longDescription', longDescription)
+    if (longDescError) newErrors.longDescription = longDescError
+    
+    const imageUrlError = validateField('imageUrl', imageUrl)
+    if (imageUrlError) newErrors.imageUrl = imageUrlError
+    
+    const featuredImageUrlError = validateField('featuredImageUrl', featuredImageUrl)
+    if (featuredImageUrlError) newErrors.featuredImageUrl = featuredImageUrlError
+    
+    const liveUrlError = validateField('liveUrl', liveUrl)
+    if (liveUrlError) newErrors.liveUrl = liveUrlError
+    
+    const githubUrlError = validateField('githubUrl', githubUrl)
+    if (githubUrlError) newErrors.githubUrl = githubUrlError
+    
+    const displayOrderError = validateField('displayOrder', displayOrder)
+    if (displayOrderError) newErrors.displayOrder = displayOrderError
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const clearError = (field: string) => {
+    setErrors(prev => {
+      const newErrors = { ...prev }
+      delete newErrors[field]
+      return newErrors
+    })
+  }
+
   // Auto-generate slug from title
   const handleTitleChange = (val: string) => {
     setTitle(val)
-    setSlug(
-      val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '')
-    )
+    clearError('title')
+    const newSlug = val
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '')
+    setSlug(newSlug)
+    clearError('slug')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setErrorMsg(null)
+
+    if (!validateForm()) {
+      setErrorMsg('Please fix the validation errors below')
+      return
+    }
+
+    setLoading(true)
 
     const result = await createProject({
       title,
@@ -105,40 +204,79 @@ export default function NewProjectPage() {
         {/* Core details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Project Title</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">
+              Project Title <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
+                errors.title ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+              }`}
               placeholder="e.g. E-Commerce Platform"
-              required
+              maxLength={200}
             />
+            {errors.title && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.title}
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground">{title.length}/200 characters</p>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Slug (URL Path)</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">
+              Slug (URL Path) <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+              onChange={(e) => {
+                setSlug(e.target.value)
+                clearError('slug')
+              }}
+              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 font-mono ${
+                errors.slug ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+              }`}
               placeholder="e.g. e-commerce-platform"
-              required
+              maxLength={200}
             />
+            {errors.slug && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.slug}
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground">Lowercase letters, numbers, and hyphens only</p>
           </div>
         </div>
 
         {/* Short description */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Short Description</label>
+          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">
+            Short Description <span className="text-red-500">*</span>
+          </label>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-20 resize-none"
+            onChange={(e) => {
+              setDescription(e.target.value)
+              clearError('description')
+            }}
+            className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 h-20 resize-none ${
+              errors.description ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+            }`}
             placeholder="A brief teaser shown in project grids..."
-            required
+            maxLength={500}
           />
+          {errors.description && (
+            <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+              <AlertCircle className="w-3 h-3" />
+              {errors.description}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">{description.length}/500 characters</p>
         </div>
 
         {/* Long description */}
@@ -146,10 +284,23 @@ export default function NewProjectPage() {
           <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Detailed Description</label>
           <textarea
             value={longDescription}
-            onChange={(e) => setLongDescription(e.target.value)}
-            className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-36"
+            onChange={(e) => {
+              setLongDescription(e.target.value)
+              clearError('longDescription')
+            }}
+            className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 h-36 ${
+              errors.longDescription ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+            }`}
             placeholder="Detailed overview about the challenges, architecture, and results..."
+            maxLength={5000}
           />
+          {errors.longDescription && (
+            <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+              <AlertCircle className="w-3 h-3" />
+              {errors.longDescription}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">{longDescription.length}/5000 characters</p>
         </div>
 
         {/* Meta Grid */}
@@ -186,10 +337,21 @@ export default function NewProjectPage() {
             <input
               type="number"
               value={displayOrder}
-              onChange={(e) => setDisplayOrder(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              onChange={(e) => {
+                setDisplayOrder(e.target.value)
+                clearError('displayOrder')
+              }}
+              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
+                errors.displayOrder ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+              }`}
               min="1"
             />
+            {errors.displayOrder && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.displayOrder}
+              </p>
+            )}
           </div>
         </div>
 
@@ -200,10 +362,21 @@ export default function NewProjectPage() {
             <input
               type="url"
               value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              onChange={(e) => {
+                setImageUrl(e.target.value)
+                clearError('imageUrl')
+              }}
+              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
+                errors.imageUrl ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+              }`}
               placeholder="https://..."
             />
+            {errors.imageUrl && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.imageUrl}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -211,10 +384,21 @@ export default function NewProjectPage() {
             <input
               type="url"
               value={featuredImageUrl}
-              onChange={(e) => setFeaturedImageUrl(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              onChange={(e) => {
+                setFeaturedImageUrl(e.target.value)
+                clearError('featuredImageUrl')
+              }}
+              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
+                errors.featuredImageUrl ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+              }`}
               placeholder="https://..."
             />
+            {errors.featuredImageUrl && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.featuredImageUrl}
+              </p>
+            )}
           </div>
         </div>
 
@@ -225,10 +409,21 @@ export default function NewProjectPage() {
             <input
               type="url"
               value={liveUrl}
-              onChange={(e) => setLiveUrl(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              onChange={(e) => {
+                setLiveUrl(e.target.value)
+                clearError('liveUrl')
+              }}
+              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
+                errors.liveUrl ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+              }`}
               placeholder="https://..."
             />
+            {errors.liveUrl && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.liveUrl}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -236,10 +431,21 @@ export default function NewProjectPage() {
             <input
               type="url"
               value={githubUrl}
-              onChange={(e) => setGithubUrl(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              onChange={(e) => {
+                setGithubUrl(e.target.value)
+                clearError('githubUrl')
+              }}
+              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
+                errors.githubUrl ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+              }`}
               placeholder="https://github.com/..."
             />
+            {errors.githubUrl && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.githubUrl}
+              </p>
+            )}
           </div>
         </div>
 
