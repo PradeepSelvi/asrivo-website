@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { 
   FileCode2, 
@@ -32,7 +33,7 @@ const services = [
     id: "software",
     icon: FileCode2,
     title: "Custom Software Development",
-    /*img src="/services/software-development.jpg" alt="Custom Software Development"*/
+    image: "/services/software-development.webp",
     description: "We build tailored software solutions that address your unique business challenges. Our team delivers robust, scalable applications designed to streamline operations and drive growth with your specific needs in mind.",
     features: [
       "Enterprise Application development",
@@ -45,6 +46,7 @@ const services = [
     id: "web",
     icon: Globe,
     title: "Web Application Development",
+    image: "/services/web-development.webp",
     description: "Modern, responsive web applications that deliver exceptional user experiences across all devices. We use the latest technologies to build fast, secure, and scalable web solutions.",
     features: [
       "Progressive Web Apps (PWA)",
@@ -57,6 +59,7 @@ const services = [
     id: "mobile",
     icon: Smartphone,
     title: "Mobile Application Development",
+    image: "/services/mobile-development.webp",
     description: "Native and cross-platform mobile applications for iOS and Android. We create intuitive, high-performance apps that engage users and drive business results.",
     features: [
       "iOS and Android native apps",
@@ -69,6 +72,7 @@ const services = [
     id: "cloud",
     icon: Cloud,
     title: "Cloud & DevOps Solutions",
+    image: "/services/cloud-devops.webp",
     description: "Scalable cloud infrastructure and automated deployment pipelines. We help you leverage the full potential of cloud computing for efficiency and cost savings.",
     features: [
       "Cloud migration and strategy",
@@ -81,6 +85,7 @@ const services = [
     id: "ai",
     icon: Bot,
     title: "Web -Hosting",
+    image: "/services/web-hosting.webp",
     description: "Intelligent automation solutions powered by machine learning and artificial intelligence. Transform your business processes with smart, data-driven systems.",
     features: [
       "Machine learning model development",
@@ -93,6 +98,7 @@ const services = [
     id: "consulting",
     icon: Users,
     title: "Enterprise IT Consulting",
+    image: "/services/enterprise-consulting.webp",
     description: "Strategic technology consulting to guide your digital transformation journey. Our experts help you make informed decisions and optimize your IT investments.",
     features: [
       "Digital transformation strategy",
@@ -105,6 +111,7 @@ const services = [
     id: "data",
     icon: Database,
     title: "Digital-Marketing",
+    image: "/services/digital-marketing.webp",
     description: "Unlock the value of your data with our comprehensive data engineering and analytics services. We build data pipelines and analytics solutions that drive insights.",
     features: [
       "Data warehouse design",
@@ -131,6 +138,7 @@ const services = [
     id: "product",
     icon: Cpu,
     title: "Product Engineering",
+    image: "/services/product-engineering.webp",
     description: "End-to-end product development from concept to launch. We help startups and enterprises build innovative digital products that succeed in the market.",
     features: [
       "Product strategy and roadmapping",
@@ -250,9 +258,21 @@ export default function ServicesPage() {
                   </Button>
                 </div>
                 <div className="relative">
-                  <div className="aspect-video rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-border">
-                    <service.icon className="h-24 w-24 text-primary/20" />
-                  </div>
+                  {service.image ? (
+                    <div className="aspect-video rounded-xl overflow-hidden border border-border relative">
+                      <Image
+                        src={service.image}
+                        alt={`${service.title} Services at AsrivoTech`}
+                        fill
+                        loading="lazy"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-video rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-border">
+                      <service.icon className="h-24 w-24 text-primary/20" />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
