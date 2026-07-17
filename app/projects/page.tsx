@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ExternalLink } from "lucide-react"
 
@@ -19,6 +20,7 @@ const projects = [
     solution: "We built a scalable dashboard using React and Node.js with real-time data streaming, custom visualization components, and ML-powered predictions.",
     results: ["40% faster decision-making", "60% reduction in manual reporting", "99.9% uptime"],
     tags: ["React", "Node.js", "PostgreSQL", "AWS", "Machine Learning"],
+    image: "/images/fintech-dashboard.png",
   },
   {
     id: "healthcare-app",
@@ -29,6 +31,7 @@ const projects = [
     solution: "We developed a cross-platform mobile app with end-to-end encryption, video calling integration, and seamless EHR system integration.",
     results: ["50,000+ active users", "4.8 star rating", "30% increase in patient engagement"],
     tags: ["React Native", "Firebase", "Node.js", "WebRTC", "HIPAA Compliant"],
+    image: "/images/healthcare-app.png",
   },
   {
     id: "ecommerce-platform",
@@ -39,6 +42,7 @@ const projects = [
     solution: "We architected a microservices-based platform with elastic scaling, intelligent search, and automated vendor management tools.",
     results: ["$2M+ monthly transactions", "500+ vendors onboarded", "Sub-second search response"],
     tags: ["Next.js", "Stripe", "MongoDB", "Elasticsearch", "Kubernetes"],
+    image: "/images/ecommerce-platform.png",
   },
   {
     id: "iot-system",
@@ -49,6 +53,7 @@ const projects = [
     solution: "We built a robust IoT platform with custom dashboards, real-time alerting, and machine learning models for predictive maintenance.",
     results: ["35% reduction in downtime", "20% maintenance cost savings", "10,000+ sensors connected"],
     tags: ["Python", "MQTT", "TimescaleDB", "TensorFlow", "AWS IoT"],
+    image: "/images/iot-system.png",
   },
   {
     id: "logistics-platform",
@@ -59,6 +64,7 @@ const projects = [
     solution: "We developed an intelligent platform with route optimization algorithms, real-time tracking, and automated dispatch management.",
     results: ["25% reduction in fuel costs", "40% faster deliveries", "95% customer satisfaction"],
     tags: ["React", "Python", "PostgreSQL", "Google Maps API", "Machine Learning"],
+    image: "/images/logistics-platform.png",
   },
   {
     
@@ -70,6 +76,7 @@ const projects = [
     solution: "We created a feature-rich LMS with video streaming, interactive assessments, and gamification elements to boost engagement.",
     results: ["100,000+ students enrolled", "85% course completion rate", "Available in 15 countries"],
     tags: ["Next.js", "Node.js", "PostgreSQL", "AWS", "Video Streaming"],
+    image: "/images/education-platform.png",
   },
 ]
 
@@ -128,8 +135,17 @@ export default function ProjectsPage() {
                 className="rounded-2xl border border-border bg-background overflow-hidden transition-all hover:shadow-lg hover:border-primary/30"
               >
                 <div className="grid lg:grid-cols-2">
-                  <div className="aspect-video lg:aspect-auto bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8">
-                    <span className="text-8xl font-bold text-primary/10">{project.title.charAt(0)}</span>
+                  <div className="aspect-video lg:aspect-auto bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-8 relative overflow-hidden">
+                    {project.image ? (
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="text-8xl font-bold text-primary/10">{project.title.charAt(0)}</span>
+                    )}
                   </div>
                   <div className="p-8 lg:p-10">
                     <div className="flex flex-wrap gap-2">
