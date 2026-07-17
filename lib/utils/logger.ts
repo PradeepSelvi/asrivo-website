@@ -41,6 +41,7 @@ class Logger {
     if (this.isProduction && (level === 'error' || level === 'warn')) {
       // TODO: Send to your monitoring service (Sentry, LogRocket, etc.)
       // Example: Sentry.captureMessage(message, { level, extra: context })
+      //senetry key requide
       console[level](JSON.stringify(logData))
     }
   }
