@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateProject } from '@/lib/supabase/content-actions'
-import { ArrowLeft, Loader2, Save, X, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, X } from 'lucide-react'
 import Link from 'next/link'
 
 interface EditProjectFormProps {
@@ -34,9 +34,6 @@ export default function EditProjectForm({ project }: EditProjectFormProps) {
   const [techInput, setTechInput] = useState('')
   const [technologies, setTechnologies] = useState<string[]>(project.technologies || [])
 
-  // Validation errors
-  const [errors, setErrors] = useState<Record<string, string>>({})
-
   const handleAddTech = () => {
     if (techInput.trim() && !technologies.includes(techInput.trim())) {
       setTechnologies([...technologies, techInput.trim()])
@@ -48,116 +45,20 @@ export default function EditProjectForm({ project }: EditProjectFormProps) {
     setTechnologies(technologies.filter((_, i) => i !== index))
   }
 
-  // Validation helpers
-  const isValidUrl = (url: string): boolean => {
-    if (!url) return true // Empty is valid (optional fields)
-    try {
-      new URL(url)
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  const validateField = (field: string, value: string): string | null => {
-    switch (field) {
-      case 'title':
-        if (!value.trim()) return 'Title is required'
-        if (value.length < 3) return 'Title must be at least 3 characters'
-        if (value.length > 200) return 'Title must be less than 200 characters'
-        return null
-      case 'slug':
-        if (!value.trim()) return 'Slug is required'
-        if (!/^[a-z0-9-]+$/.test(value)) return 'Slug can only contain lowercase letters, numbers, and hyphens'
-        if (value.length < 3) return 'Slug must be at least 3 characters'
-        if (value.length > 200) return 'Slug must be less than 200 characters'
-        return null
-      case 'description':
-        if (!value.trim()) return 'Short description is required'
-        if (value.length < 10) return 'Description must be at least 10 characters'
-        if (value.length > 500) return 'Description must be less than 500 characters'
-        return null
-      case 'longDescription':
-        if (value && value.length > 5000) return 'Detailed description must be less than 5000 characters'
-        return null
-      case 'imageUrl':
-      case 'featuredImageUrl':
-      case 'liveUrl':
-      case 'githubUrl':
-        if (value && !isValidUrl(value)) return 'Please enter a valid URL (e.g., https://example.com)'
-        return null
-      case 'displayOrder':
-        const num = parseInt(value)
-        if (isNaN(num) || num < 1) return 'Display order must be a positive number'
-        return null
-      default:
-        return null
-    }
-  }
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
-    
-    const titleError = validateField('title', title)
-    if (titleError) newErrors.title = titleError
-    
-    const slugError = validateField('slug', slug)
-    if (slugError) newErrors.slug = slugError
-    
-    const descError = validateField('description', description)
-    if (descError) newErrors.description = descError
-    
-    const longDescError = validateField('longDescription', longDescription)
-    if (longDescError) newErrors.longDescription = longDescError
-    
-    const imageUrlError = validateField('imageUrl', imageUrl)
-    if (imageUrlError) newErrors.imageUrl = imageUrlError
-    
-    const featuredImageUrlError = validateField('featuredImageUrl', featuredImageUrl)
-    if (featuredImageUrlError) newErrors.featuredImageUrl = featuredImageUrlError
-    
-    const liveUrlError = validateField('liveUrl', liveUrl)
-    if (liveUrlError) newErrors.liveUrl = liveUrlError
-    
-    const githubUrlError = validateField('githubUrl', githubUrl)
-    if (githubUrlError) newErrors.githubUrl = githubUrlError
-    
-    const displayOrderError = validateField('displayOrder', displayOrder)
-    if (displayOrderError) newErrors.displayOrder = displayOrderError
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const clearError = (field: string) => {
-    setErrors(prev => {
-      const newErrors = { ...prev }
-      delete newErrors[field]
-      return newErrors
-    })
-  }
-
   const handleTitleChange = (val: string) => {
     setTitle(val)
-    clearError('title')
-    const newSlug = val
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)+/g, '')
-    setSlug(newSlug)
-    clearError('slug')
+    setSlug(
+      val
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '')
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrorMsg(null)
-
-    if (!validateForm()) {
-      setErrorMsg('Please fix the validation errors below')
-      return
-    }
-
     setLoading(true)
+    setErrorMsg(null)
 
     const result = await updateProject(project.id, {
       title,

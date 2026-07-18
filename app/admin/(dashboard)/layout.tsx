@@ -44,6 +44,15 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Job Postings', href: '/admin/jobs', icon: FileText },
   ]
 
+  const crmItems = [
+    { name: 'CRM Dashboard', href: '/admin/crm', icon: LayoutDashboard },
+    { name: 'Leads', href: '/admin/crm/leads', icon: User },
+    { name: 'Deals Pipeline', href: '/admin/crm/deals', icon: Briefcase },
+    { name: 'Activities', href: '/admin/crm/activities', icon: MessageSquare },
+    { name: 'Tasks', href: '/admin/crm/tasks', icon: FileText },
+    { name: 'CRM Settings', href: '/admin/crm/settings', icon: Settings },
+  ]
+
   const inboxItems = [
     { name: 'Contacts', href: '/admin/contacts', icon: Mail },
     { name: 'Service Inquiries', href: '/admin/inquiries', icon: Sparkles },
@@ -87,6 +96,25 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
                     className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
                   >
                     <Icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </div>
+
+            <div className="space-y-1">
+              <p className="px-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                CRM & Sales
+              </p>
+              {crmItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+                  >
+                    <Icon className="w-4 h-4 text-muted-foreground" />
                     {item.name}
                   </Link>
                 )
