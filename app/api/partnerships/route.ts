@@ -16,12 +16,33 @@ export async function POST(request: NextRequest) {
       industry,
       servicesOffered,
       message,
+      agreementDocumentUrl,
+      nocDocumentUrl,
+      proposalDocumentUrl,
+      termsAccepted,
+      termsAcceptedAt,
     } = body
 
     // Validate required fields
     if (!companyName || !contactPerson || !email || !phone || !partnershipType || !companySize || !industry || !servicesOffered || !message) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Validate documents
+    if (!agreementDocumentUrl || !nocDocumentUrl || !proposalDocumentUrl) {
+      return NextResponse.json(
+        { error: 'All document uploads are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate terms acceptance
+    if (!termsAccepted) {
+      return NextResponse.json(
+        { error: 'Terms and conditions must be accepted' },
         { status: 400 }
       )
     }
@@ -46,6 +67,11 @@ export async function POST(request: NextRequest) {
         industry,
         services_offered: servicesOffered,
         message,
+        agreement_document_url: agreementDocumentUrl,
+        noc_document_url: nocDocumentUrl,
+        proposal_document_url: proposalDocumentUrl,
+        terms_accepted: termsAccepted,
+        terms_accepted_at: termsAcceptedAt,
         status: 'new',
       })
       .select()

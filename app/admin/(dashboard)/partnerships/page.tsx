@@ -13,6 +13,8 @@ import {
   Globe,
   Calendar,
   AlertCircle,
+  File,
+  CheckCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -492,6 +494,76 @@ export default function PartnershipsPage() {
                   {selectedPartnership.message}
                 </p>
               </div>
+
+              {/* Documents */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground border-b pb-2">
+                  Submitted Documents
+                </h3>
+                <div className="grid gap-3">
+                  {(selectedPartnership as any).agreement_document_url && (
+                    <a
+                      href={`/api/partnerships/download/${encodeURIComponent((selectedPartnership as any).agreement_document_url)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                        <File className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm">Partnership Agreement</p>
+                        <p className="text-xs text-muted-foreground">Click to download</p>
+                      </div>
+                    </a>
+                  )}
+                  {(selectedPartnership as any).noc_document_url && (
+                    <a
+                      href={`/api/partnerships/download/${encodeURIComponent((selectedPartnership as any).noc_document_url)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                        <File className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm">NOC Document</p>
+                        <p className="text-xs text-muted-foreground">Click to download</p>
+                      </div>
+                    </a>
+                  )}
+                  {(selectedPartnership as any).proposal_document_url && (
+                    <a
+                      href={`/api/partnerships/download/${encodeURIComponent((selectedPartnership as any).proposal_document_url)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                        <File className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm">Proposal Document</p>
+                        <p className="text-xs text-muted-foreground">Click to download</p>
+                      </div>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Terms Acceptance */}
+              {(selectedPartnership as any).terms_accepted && (
+                <div className="flex items-center gap-2 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-green-600">Terms Accepted</p>
+                    <p className="text-xs text-muted-foreground">
+                      Accepted on {new Date((selectedPartnership as any).terms_accepted_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Status Update */}
               <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
