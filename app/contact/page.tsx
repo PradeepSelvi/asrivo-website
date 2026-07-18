@@ -4,6 +4,7 @@ import React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -19,6 +20,19 @@ import {
   CheckCircle
 } from "lucide-react"
 import { loadRecaptchaScript, executeRecaptcha } from "@/lib/utils/captcha"
+
+// Dynamically import LocationMap with SSR disabled
+const LocationMap = dynamic(() => import("@/components/location-map").then(mod => mod.LocationMap), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="text-center">
+        <MapPin className="h-12 w-12 text-primary/30 mx-auto animate-pulse" />
+        <p className="mt-2 text-sm text-muted-foreground">Loading map...</p>
+      </div>
+    </div>
+  ),
+})
 
 const contactInfo = [
   {
@@ -286,17 +300,16 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Map Placeholder */}
+              {/* Map */}
               <div className="mt-8">
                 <h3 className="font-semibold text-foreground mb-4">Our Location</h3>
-                <div className="aspect-video rounded-xl border border-border bg-muted/30 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-primary/30 mx-auto" />
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      123 Tech Park, Silicon Valley<br />
-                      San Francisco, CA 94102
-                    </p>
-                  </div>
+                <div className="h-[400px] rounded-xl border border-border bg-muted/30 overflow-hidden">
+                  <LocationMap
+                    latitude={37.7749}
+                    longitude={-122.4194}
+                    address="123 Tech Park, Silicon Valley\nSan Francisco, CA 94102"
+                    zoom={13}
+                  />
                 </div>
               </div>
             </div>

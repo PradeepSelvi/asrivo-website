@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
 
 interface Setting {
   id: number
@@ -18,9 +20,11 @@ interface Setting {
 }
 
 export default function SettingsPage() {
+  const router = useRouter()
   const [settings, setSettings] = useState<Setting[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [authenticated, setAuthenticated] = useState(false)
   const [socialLinks, setSocialLinks] = useState({
     linkedin: '',
     github: '',
@@ -28,8 +32,27 @@ export default function SettingsPage() {
   })
 
   useEffect(() => {
-    fetchSettings()
+    checkAuth()
   }, [])
+
+  const checkAuth = async () => {
+    try {
+      const supabase = createClient()
+      const { data: { user }, error } = await supabase.auth.getUser()
+
+      if (error || !user) {
+        toast.error('Unauthorized access - Please login')
+        router.push('/') // Redirect to home page
+        return
+      }
+
+      setAuthenticated(true)
+      fetchSettings()
+    } catch (error) {
+      toast.error('Authentication error')
+      router.push('/')
+    }
+  }
 
   const fetchSettings = async () => {
     try {
@@ -79,7 +102,7 @@ export default function SettingsPage() {
     }
   }
 
-  if (loading) {
+  if (loading || !authenticated) {
     return (
       <div className="container mx-auto py-8">
         <div className="flex justify-center">
