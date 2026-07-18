@@ -251,7 +251,7 @@ export default function ServicesPage() {
                     ))}
                   </ul>
                   <Button className="mt-8" asChild>
-                    <Link href="/contact">
+                    <Link href="/services/inquiry">
                       Get Started
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

@@ -1,0 +1,585 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft, ArrowRight, Check, Send, AlertCircle } from 'lucide-react'
+import Link from 'next/link'
+
+export default function ServiceInquiryPage() {
+  const router = useRouter()
+  const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const totalSteps = 4
+
+  // Form state
+  const [formData, setFormData] = useState({
+    // Step 1: Basic Contact Info
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    countryCode: '+91',
+    preferredContact: 'email',
+
+    // Step 2: Project Type & Requirements
+    projectTypes: [] as string[],
+    projectDescription: '',
+    hasExisting: 'no',
+    existingLink: '',
+    targetPlatform: [] as string[],
+    keyFeatures: [] as string[],
+
+    // Step 3: Business Metrics
+    budgetRange: '',
+    timeline: '',
+    targetAudience: '',
+    painPoints: '',
+
+    // Step 4: Optional Info
+    referenceLinks: '',
+    hearAboutUs: '',
+  })
+
+  const handleCheckboxChange = (field: 'projectTypes' | 'targetPlatform' | 'keyFeatures', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(item => item !== value)
+        : [...prev[field], value]
+    }))
+  }
+
+  const validateStep = (step: number): boolean => {
+    setError('')
+    
+    switch (step) {
+      case 1:
+        if (!formData.name.trim()) {
+          setError('Name is required')
+          return false
+        }
+        if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+          setError('Valid email is required')
+          return false
+        }
+        if (!formData.phone.trim()) {
+          setError('Phone number is required')
+          return false
+        }
+        break
+      case 2:
+        if (formData.projectTypes.length === 0) {
+          setError('Please select at least one project type')
+          return false
+        }
+        if (!formData.projectDescription.trim() || formData.projectDescription.length < 20) {
+          setError('Please provide a detailed project description (minimum 20 characters)')
+          return false
+        }
+        break
+      case 3:
+        if (!formData.budgetRange) {
+          setError('Please select a budget range')
+          return false
+        }
+        if (!formData.timeline) {
+          setError('Please select a timeline')
+          return false
+        }
+        break
+    }
+    
+    return true
+  }
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, totalSteps))
+    }
+  }
+
+  const handleBack = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1))
+    setError('')
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!validateStep(currentStep)) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      console.log('Submitting inquiry data:', formData)
+      
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+      console.log('API response:', data)
+
+      if (!response.ok) {
+        // Show the specific error message from the server
+        throw new Error(data.error || 'Failed to submit inquiry. Please try again.')
+      }
+
+      // Redirect to success page
+      router.push('/services/inquiry/success')
+    } catch (err) {
+      console.error('Submission error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to submit inquiry. Please try again later.')
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background py-12 px-4">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <Link href="/services" className="inline-flex items-center gap-2 text-primary hover:underline mb-4">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Services
+          </Link>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Get Started with Your Project</h1>
+          <p className="text-muted-foreground">
+            Tell us about your requirements and we'll get back to you within 24 hours
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            {[1, 2, 3, 4].map((step) => (
+              <div key={step} className="flex items-center flex-1">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                  step < currentStep ? 'bg-green-500 text-white' :
+                  step === currentStep ? 'bg-primary text-white' :
+                  'bg-muted text-muted-foreground'
+                }`}>
+                  {step < currentStep ? <Check className="w-5 h-5" /> : step}
+                </div>
+                {step < 4 && (
+                  <div className={`flex-1 h-1 mx-2 ${
+                    step < currentStep ? 'bg-green-500' : 'bg-muted'
+                  }`} />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>Contact Info</span>
+            <span>Project Details</span>
+            <span>Business Metrics</span>
+            <span>Additional Info</span>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-500">{error}</p>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8">
+          {/* Step 1: Basic Contact Info */}
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-foreground mb-6">Contact Information</h2>
+              
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Your Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="Your Name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Company/Business Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="Your Company Ltd."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="yourname@gmail.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={formData.countryCode}
+                    onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
+                    className="w-32 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  >
+                    <option value="+91">+91 (IN)</option>
+                    <option value="+1">+1 (US)</option>
+                    <option value="+44">+44 (UK)</option>
+                    <option value="+971">+971 (AE)</option>
+                  </select>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="flex-1 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    placeholder="9876543210"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Preferred Contact Method
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {['email', 'call', 'whatsapp'].map((method) => (
+                    <button
+                      key={method}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, preferredContact: method })}
+                      className={`px-4 py-2.5 rounded-lg font-semibold text-sm capitalize transition-all ${
+                        formData.preferredContact === method
+                          ? 'bg-primary text-white'
+                          : 'bg-background border border-border text-foreground hover:border-primary'
+                      }`}
+                    >
+                      {method}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Project Type & Requirements */}
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-foreground mb-6">Project Details</h2>
+              
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Project Type(s) <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    'Web Development',
+                    'Mobile App Development',
+                    'E-commerce',
+                    'CMS',
+                    'UI/UX Design',
+                    'Other'
+                  ].map((type) => (
+                    <label key={type} className="flex items-center gap-2 p-3 bg-background border border-border rounded-lg cursor-pointer hover:border-primary transition-all">
+                      <input
+                        type="checkbox"
+                        checked={formData.projectTypes.includes(type)}
+                        onChange={() => handleCheckboxChange('projectTypes', type)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-foreground">{type}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Project Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={formData.projectDescription}
+                  onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
+                  rows={5}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                  placeholder="Tell us about your project, its goals, and what you're trying to achieve..."
+                />
+                <p className="text-xs text-muted-foreground mt-1">{formData.projectDescription.length} characters (minimum 20)</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Do you have an existing website/app?
+                </label>
+                <div className="flex gap-4 mb-3">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="no"
+                      checked={formData.hasExisting === 'no'}
+                      onChange={(e) => setFormData({ ...formData, hasExisting: e.target.value, existingLink: '' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm text-foreground">No</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="yes"
+                      checked={formData.hasExisting === 'yes'}
+                      onChange={(e) => setFormData({ ...formData, hasExisting: e.target.value })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm text-foreground">Yes</span>
+                  </label>
+                </div>
+                {formData.hasExisting === 'yes' && (
+                  <input
+                    type="url"
+                    value={formData.existingLink}
+                    onChange={(e) => setFormData({ ...formData, existingLink: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    placeholder="https://example.com"
+                  />
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Target Platform
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {['Web', 'iOS', 'Android', 'Both Mobile'].map((platform) => (
+                    <label key={platform} className="flex items-center gap-2 p-3 bg-background border border-border rounded-lg cursor-pointer hover:border-primary transition-all">
+                      <input
+                        type="checkbox"
+                        checked={formData.targetPlatform.includes(platform)}
+                        onChange={() => handleCheckboxChange('targetPlatform', platform)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-foreground">{platform}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Key Features Needed
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    'Authentication',
+                    'Payment Gateway',
+                    'Admin Panel',
+                    'Push Notifications',
+                    'Third-party Integrations',
+                    'Analytics',
+                    'Chat/Messaging',
+                    'File Upload'
+                  ].map((feature) => (
+                    <label key={feature} className="flex items-center gap-2 p-3 bg-background border border-border rounded-lg cursor-pointer hover:border-primary transition-all">
+                      <input
+                        type="checkbox"
+                        checked={formData.keyFeatures.includes(feature)}
+                        onChange={() => handleCheckboxChange('keyFeatures', feature)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-foreground">{feature}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Business Metrics */}
+          {currentStep === 3 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-foreground mb-6">Business Metrics</h2>
+              
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Budget Range <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.budgetRange}
+                  onChange={(e) => setFormData({ ...formData, budgetRange: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                >
+                  <option value="">Select budget range</option>
+                  <option value="<₹50k">Less than ₹50,000</option>
+                  <option value="₹50k-2L">₹50,000 - ₹2,00,000</option>
+                  <option value="₹2L-5L">₹2,00,000 - ₹5,00,000</option>
+                  <option value="₹5L+">₹5,00,000+</option>
+                  <option value="not-sure">Not sure yet</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Timeline/Deadline <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.timeline}
+                  onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                >
+                  <option value="">Select timeline</option>
+                  <option value="asap">ASAP (within 2 weeks)</option>
+                  <option value="1-month">1 month</option>
+                  <option value="1-3-months">1-3 months</option>
+                  <option value="3-6-months">3-6 months</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Target Audience/Users
+                </label>
+                <input
+                  type="text"
+                  value={formData.targetAudience}
+                  onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  placeholder="e.g., B2B SaaS companies, Expected 10,000 users"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Current Pain Points / Goals
+                </label>
+                <textarea
+                  value={formData.painPoints}
+                  onChange={(e) => setFormData({ ...formData, painPoints: e.target.value })}
+                  rows={4}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                  placeholder="What problem are you trying to solve? What are your business goals?"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Optional Info */}
+          {currentStep === 4 && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-foreground mb-6">Additional Information (Optional)</h2>
+              
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Reference Websites/Apps
+                </label>
+                <textarea
+                  value={formData.referenceLinks}
+                  onChange={(e) => setFormData({ ...formData, referenceLinks: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                  placeholder="Share links to websites or apps you like (one per line)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  How did you hear about us?
+                </label>
+                <select
+                  value={formData.hearAboutUs}
+                  onChange={(e) => setFormData({ ...formData, hearAboutUs: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                >
+                  <option value="">Select an option</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="google">Google Search</option>
+                  <option value="referral">Referral</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* Summary */}
+              <div className="mt-8 p-6 bg-background border border-border rounded-lg">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Review Your Information</h3>
+                <div className="space-y-2 text-sm">
+                  <p><span className="font-semibold">Name:</span> {formData.name}</p>
+                  <p><span className="font-semibold">Email:</span> {formData.email}</p>
+                  <p><span className="font-semibold">Phone:</span> {formData.countryCode} {formData.phone}</p>
+                  <p><span className="font-semibold">Project Types:</span> {formData.projectTypes.join(', ')}</p>
+                  <p><span className="font-semibold">Budget:</span> {formData.budgetRange}</p>
+                  <p><span className="font-semibold">Timeline:</span> {formData.timeline}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
+            {currentStep > 1 ? (
+              <button
+                type="button"
+                onClick={handleBack}
+                className="flex items-center gap-2 px-6 py-2.5 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-semibold transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
+            ) : (
+              <div />
+            )}
+
+            {currentStep < totalSteps ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all"
+              >
+                Next
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>Submitting...</>
+                ) : (
+                  <>
+                    Submit Inquiry
+                    <Send className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
