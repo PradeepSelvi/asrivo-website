@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { updateSocialLinks, getSettings } from '@/lib/supabase/actions'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET() {
   try {
+    // Check authentication
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const result = await getSettings()
 
     if (!result.success) {
@@ -23,6 +35,17 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const { linkedin, github, twitter } = body
 

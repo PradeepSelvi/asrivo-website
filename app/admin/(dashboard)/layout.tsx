@@ -19,6 +19,7 @@ import {
   LogOut,
   User,
   ShieldAlert,
+  Handshake,
 } from 'lucide-react'
 
 interface AdminLayoutProps {
@@ -57,6 +58,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Contacts', href: '/admin/contacts', icon: Mail },
     { name: 'Service Inquiries', href: '/admin/inquiries', icon: Sparkles },
     { name: 'Job Applications', href: '/admin/applications', icon: FileUser },
+    { name: 'Partnerships', href: '/admin/partnerships', icon: Handshake },
     { name: 'Subscribers', href: '/admin/subscribers', icon: MailCheck },
   ]
 

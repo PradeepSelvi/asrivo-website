@@ -345,15 +345,28 @@ export default function AboutPage() {
             </p>
          </div>
 
-         <Button
-            className="h-14 px-8 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-500/20"
-            asChild
-         >
-            <Link href="/contact">
-               Start Partnership
-               <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
-         </Button>
+         <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+               variant="outline"
+               className="h-14 px-8 rounded-2xl bg-slate-800/50 hover:bg-slate-800 text-white border-slate-700"
+               asChild
+            >
+               <Link href="/partnership/status">
+                  Check Status
+                  <Eye className="ml-2 w-4 h-4" />
+               </Link>
+            </Button>
+
+            <Button
+               className="h-14 px-8 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-500/20"
+               asChild
+            >
+               <Link href="/partnership">
+                  Start Partnership
+                  <ArrowRight className="ml-2 w-4 h-4" />
+               </Link>
+            </Button>
+         </div>
 
       </div>
 
