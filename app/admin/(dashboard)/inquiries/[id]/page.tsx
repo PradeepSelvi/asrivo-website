@@ -16,7 +16,7 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
   const isHigh = adminResult.user.role === 'high'
 
   const { data: inquiry, error } = await supabase
-    .from('service_inquiries')
+    .from('client_inquiries')
     .select('*')
     .eq('id', id)
     .single()

@@ -1,6 +1,8 @@
 -- Client Inquiries Table for Service Inquiry Form
+-- SAFE VERSION - Handles existing objects gracefully
 -- Run this in Supabase SQL Editor
 
+-- Create table if not exists
 CREATE TABLE IF NOT EXISTS client_inquiries (
   id BIGSERIAL PRIMARY KEY,
   
@@ -9,59 +11,62 @@ CREATE TABLE IF NOT EXISTS client_inquiries (
   company TEXT,
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
-  whatsapp TEXT, -- WhatsApp number (optional, if different from phone)
-  preferred_contact TEXT DEFAULT 'email', -- email, call, whatsapp
+  whatsapp TEXT,
+  preferred_contact TEXT DEFAULT 'email',
   
   -- Project Details
-  project_types TEXT[] NOT NULL, -- ['Web Development', 'Mobile App Development', etc.]
+  project_types TEXT[] NOT NULL,
   project_description TEXT NOT NULL,
   has_existing BOOLEAN DEFAULT false,
   existing_link TEXT,
-  target_platform TEXT[], -- ['Web', 'iOS', 'Android', 'Both Mobile']
-  key_features TEXT[], -- ['Authentication', 'Payment Gateway', etc.]
+  target_platform TEXT[],
+  key_features TEXT[],
   
   -- Business Metrics
-  budget_range TEXT NOT NULL, -- '<₹50k', '₹50k-2L', '₹2L-5L', '₹5L+', 'not-sure'
-  timeline TEXT NOT NULL, -- 'asap', '1-month', '1-3-months', '3-6-months', 'flexible'
+  budget_range TEXT NOT NULL,
+  timeline TEXT NOT NULL,
   target_audience TEXT,
   pain_points TEXT,
   
   -- Optional Information
   reference_links TEXT,
-  hear_about_us TEXT, -- 'linkedin', 'instagram', 'google', 'referral', 'other'
+  hear_about_us TEXT,
   
   -- Status Tracking
-  status TEXT DEFAULT 'new', -- 'new', 'contacted', 'qualified', 'converted', 'rejected'
+  status TEXT DEFAULT 'new',
   assigned_to UUID REFERENCES auth.users(id),
   notes TEXT,
-  converted_to_lead_id BIGINT, -- Reference to CRM lead if converted
+  converted_to_lead_id BIGINT,
   
   -- Metadata
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   
-  -- Indexes
+  -- Constraint
   CONSTRAINT valid_status CHECK (status IN ('new', 'contacted', 'qualified', 'converted', 'rejected'))
 );
 
--- Create indexes for better query performance
+-- Create indexes (IF NOT EXISTS)
 CREATE INDEX IF NOT EXISTS idx_client_inquiries_status ON client_inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_client_inquiries_email ON client_inquiries(email);
 CREATE INDEX IF NOT EXISTS idx_client_inquiries_created_at ON client_inquiries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_client_inquiries_assigned_to ON client_inquiries(assigned_to);
 
--- Enable Row Level Security (RLS)
+-- Enable RLS
 ALTER TABLE client_inquiries ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies
--- Public can insert (submit inquiries)
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Anyone can submit inquiries" ON client_inquiries;
+DROP POLICY IF EXISTS "Admins can view all inquiries" ON client_inquiries;
+DROP POLICY IF EXISTS "Admins can update inquiries" ON client_inquiries;
+
+-- Create RLS Policies
 CREATE POLICY "Anyone can submit inquiries"
   ON client_inquiries
   FOR INSERT
   TO public
   WITH CHECK (true);
 
--- Only admins can view inquiries
 CREATE POLICY "Admins can view all inquiries"
   ON client_inquiries
   FOR SELECT
@@ -73,7 +78,6 @@ CREATE POLICY "Admins can view all inquiries"
     )
   );
 
--- Only admins can update inquiries
 CREATE POLICY "Admins can update inquiries"
   ON client_inquiries
   FOR UPDATE
@@ -85,7 +89,7 @@ CREATE POLICY "Admins can update inquiries"
     )
   );
 
--- Function to automatically update updated_at
+-- Function to update updated_at
 CREATE OR REPLACE FUNCTION update_client_inquiries_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -94,7 +98,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to call the function
+-- Drop and recreate trigger
 DROP TRIGGER IF EXISTS client_inquiries_updated_at_trigger ON client_inquiries;
 CREATE TRIGGER client_inquiries_updated_at_trigger
   BEFORE UPDATE ON client_inquiries
@@ -107,3 +111,4 @@ GRANT SELECT, INSERT ON client_inquiries TO anon;
 
 -- Add comment
 COMMENT ON TABLE client_inquiries IS 'Stores client project inquiries submitted through the Get Started form';
+COMMENT ON COLUMN client_inquiries.whatsapp IS 'WhatsApp number (optional, if different from phone)';

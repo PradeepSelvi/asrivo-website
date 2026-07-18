@@ -19,16 +19,20 @@ export default function ServiceInquiryPage() {
     company: '',
     email: '',
     phone: '',
+    whatsapp: '',
     countryCode: '+91',
+    whatsappCountryCode: '+91',
     preferredContact: 'email',
 
     // Step 2: Project Type & Requirements
     projectTypes: [] as string[],
+    otherProjectType: '', // Manual entry when "Other" is selected
     projectDescription: '',
     hasExisting: 'no',
     existingLink: '',
     targetPlatform: [] as string[],
     keyFeatures: [] as string[],
+    otherKeyFeature: '', // Manual entry when "Other" is selected for features
 
     // Step 3: Business Metrics
     budgetRange: '',
@@ -59,6 +63,10 @@ export default function ServiceInquiryPage() {
           setError('Name is required')
           return false
         }
+        if (!formData.company.trim()) {
+          setError('Company/Business name is required')
+          return false
+        }
         if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
           setError('Valid email is required')
           return false
@@ -71,6 +79,14 @@ export default function ServiceInquiryPage() {
       case 2:
         if (formData.projectTypes.length === 0) {
           setError('Please select at least one project type')
+          return false
+        }
+        if (formData.projectTypes.includes('Other') && !formData.otherProjectType.trim()) {
+          setError('Please specify the project type when selecting "Other"')
+          return false
+        }
+        if (formData.keyFeatures.includes('Other') && !formData.otherKeyFeature.trim()) {
+          setError('Please specify the key feature when selecting "Other"')
           return false
         }
         if (!formData.projectDescription.trim() || formData.projectDescription.length < 20) {
@@ -213,7 +229,7 @@ export default function ServiceInquiryPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">
-                  Company/Business Name
+                  Company/Business Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -260,6 +276,32 @@ export default function ServiceInquiryPage() {
                     placeholder="9876543210"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  WhatsApp Number
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={formData.whatsappCountryCode}
+                    onChange={(e) => setFormData({ ...formData, whatsappCountryCode: e.target.value })}
+                    className="w-32 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  >
+                    <option value="+91">+91 (IN)</option>
+                    <option value="+1">+1 (US)</option>
+                    <option value="+44">+44 (UK)</option>
+                    <option value="+971">+971 (AE)</option>
+                  </select>
+                  <input
+                    type="tel"
+                    value={formData.whatsapp}
+                    onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                    className="flex-1 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    placeholder="9876543210 (optional)"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">If different from phone number</p>
               </div>
 
               <div>
@@ -315,6 +357,19 @@ export default function ServiceInquiryPage() {
                     </label>
                   ))}
                 </div>
+                
+                {/* Show text input when "Other" is selected */}
+                {formData.projectTypes.includes('Other') && (
+                  <div className="mt-3">
+                    <input
+                      type="text"
+                      value={formData.otherProjectType}
+                      onChange={(e) => setFormData({ ...formData, otherProjectType: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      placeholder="Please specify the project type..."
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -400,7 +455,8 @@ export default function ServiceInquiryPage() {
                     'Third-party Integrations',
                     'Analytics',
                     'Chat/Messaging',
-                    'File Upload'
+                    'File Upload',
+                    'Other'
                   ].map((feature) => (
                     <label key={feature} className="flex items-center gap-2 p-3 bg-background border border-border rounded-lg cursor-pointer hover:border-primary transition-all">
                       <input
@@ -413,6 +469,19 @@ export default function ServiceInquiryPage() {
                     </label>
                   ))}
                 </div>
+                
+                {/* Show text input when "Other" is selected */}
+                {formData.keyFeatures.includes('Other') && (
+                  <div className="mt-3">
+                    <input
+                      type="text"
+                      value={formData.otherKeyFeature}
+                      onChange={(e) => setFormData({ ...formData, otherKeyFeature: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      placeholder="Please specify the key feature..."
+                    />
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -432,8 +501,8 @@ export default function ServiceInquiryPage() {
                   className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
                   <option value="">Select budget range</option>
-                  <option value="<₹50k">Less than ₹50,000</option>
-                  <option value="₹50k-2L">₹50,000 - ₹2,00,000</option>
+                  <option value="<₹20k">Less than ₹20,000</option>
+                  <option value="₹20k-2L">₹20,000 - ₹2,00,000</option>
                   <option value="₹2L-5L">₹2,00,000 - ₹5,00,000</option>
                   <option value="₹5L+">₹5,00,000+</option>
                   <option value="not-sure">Not sure yet</option>

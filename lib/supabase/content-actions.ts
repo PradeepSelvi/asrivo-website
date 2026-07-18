@@ -728,7 +728,7 @@ export async function updateInquiryStatus(id: string | number, status: string) {
     const supabase = await createClient()
 
     const { data, error } = await supabase
-      .from('service_inquiries')
+      .from('client_inquiries')
       .update({ status, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -749,7 +749,7 @@ export async function updateInquiryNotes(id: string | number, notes: string) {
     const supabase = await createClient()
 
     const { data, error } = await supabase
-      .from('service_inquiries')
+      .from('client_inquiries')
       .update({ notes, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -779,7 +779,7 @@ export async function deleteInquiry(id: string | number) {
     const supabase = await createClient()
 
     const { error } = await supabase
-      .from('service_inquiries')
+      .from('client_inquiries')
       .delete()
       .eq('id', id)
 

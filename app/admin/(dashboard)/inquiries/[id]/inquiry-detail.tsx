@@ -9,7 +9,7 @@ import Link from 'next/link'
 const STATUS_OPTIONS = [
   { value: 'new', label: 'New', color: 'bg-primary/10 text-primary border-primary/20' },
   { value: 'contacted', label: 'Contacted', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-  { value: 'in-progress', label: 'In Progress', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+  { value: 'qualified', label: 'Qualified', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
   { value: 'converted', label: 'Converted', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
   { value: 'rejected', label: 'Rejected', color: 'bg-destructive/10 text-destructive border-destructive/20' },
 ]
@@ -123,6 +123,17 @@ export default function InquiryDetailClient({ inquiry, isHigh }: { inquiry: any;
             </p>
           </div>
           <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">WhatsApp</label>
+            <p className="text-sm text-foreground flex items-center gap-2">
+              <Phone className="w-4 h-4 text-green-600" /> 
+              {inquiry.whatsapp ? (
+                <a href={`https://wa.me/${inquiry.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-500">
+                  {inquiry.whatsapp}
+                </a>
+              ) : '—'}
+            </p>
+          </div>
+          <div className="space-y-1">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Company</label>
             <p className="text-sm text-foreground flex items-center gap-2">
               <Building className="w-4 h-4 text-muted-foreground" /> {inquiry.company || '—'}
@@ -133,16 +144,24 @@ export default function InquiryDetailClient({ inquiry, isHigh }: { inquiry: any;
         {/* Service Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-3 border-t border-border">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Service Type</label>
-            <p className="text-sm text-foreground flex items-center gap-2">
-              <Briefcase className="w-4 h-4 text-primary" />
-              <span className="capitalize">{inquiry.service_type?.replace(/-/g, ' ') || '—'}</span>
-            </p>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Project Types</label>
+            <div className="flex flex-wrap gap-1">
+              {inquiry.project_types?.map((type: string, idx: number) => (
+                <span key={idx} className="text-xs font-medium bg-primary/10 text-primary/80 border border-primary/20 px-2 py-0.5 rounded-full">
+                  {type}
+                </span>
+              ))}
+              {inquiry.other_project_type && (
+                <span className="text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full">
+                  {inquiry.other_project_type}
+                </span>
+              )}
+            </div>
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Budget</label>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Budget Range</label>
             <p className="text-sm text-foreground flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-400" /> {inquiry.budget || '—'}
+              <DollarSign className="w-4 h-4 text-emerald-400" /> {inquiry.budget_range || '—'}
             </p>
           </div>
           <div className="space-y-1">
@@ -153,12 +172,70 @@ export default function InquiryDetailClient({ inquiry, isHigh }: { inquiry: any;
           </div>
         </div>
 
+        {/* Additional Details */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-3 border-t border-border">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Target Platform</label>
+            <div className="flex flex-wrap gap-1">
+              {inquiry.target_platform?.length > 0 ? inquiry.target_platform.map((platform: string, idx: number) => (
+                <span key={idx} className="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full">
+                  {platform}
+                </span>
+              )) : <span className="text-sm text-muted-foreground">—</span>}
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Key Features</label>
+            <div className="flex flex-wrap gap-1">
+              {inquiry.key_features?.length > 0 ? inquiry.key_features.map((feature: string, idx: number) => (
+                <span key={idx} className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full">
+                  {feature}
+                </span>
+              )) : <span className="text-sm text-muted-foreground">—</span>}
+              {inquiry.other_key_feature && (
+                <span className="text-xs bg-pink-500/10 text-pink-400 border border-pink-500/20 px-2 py-0.5 rounded-full">
+                  {inquiry.other_key_feature}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Project Description */}
-        <div className="space-y-1 pt-3 border-t border-border">
-          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Project Description</label>
-          <p className="text-sm text-foreground whitespace-pre-wrap bg-background/50 rounded-xl p-4 border border-border">
-            {inquiry.project_description || inquiry.message || '—'}
-          </p>
+        <div className="space-y-3 pt-3 border-t border-border">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Project Description</label>
+            <p className="text-sm text-foreground whitespace-pre-wrap bg-background/50 rounded-xl p-4 border border-border">
+              {inquiry.project_description || '—'}
+            </p>
+          </div>
+          
+          {inquiry.target_audience && (
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Target Audience</label>
+              <p className="text-sm text-foreground bg-background/50 rounded-xl p-3 border border-border">
+                {inquiry.target_audience}
+              </p>
+            </div>
+          )}
+          
+          {inquiry.pain_points && (
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pain Points / Goals</label>
+              <p className="text-sm text-foreground whitespace-pre-wrap bg-background/50 rounded-xl p-3 border border-border">
+                {inquiry.pain_points}
+              </p>
+            </div>
+          )}
+          
+          {inquiry.reference_links && (
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Reference Links</label>
+              <p className="text-sm text-foreground whitespace-pre-wrap bg-background/50 rounded-xl p-3 border border-border">
+                {inquiry.reference_links}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground pt-3 border-t border-border">
