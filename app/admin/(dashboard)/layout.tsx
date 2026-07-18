@@ -59,6 +59,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Service Inquiries', href: '/admin/inquiries', icon: Sparkles },
     { name: 'Job Applications', href: '/admin/applications', icon: FileUser },
     { name: 'Partnerships', href: '/admin/partnerships', icon: Handshake },
+    { name: 'Complaints', href: '/admin/complaints', icon: ShieldAlert },
     { name: 'Subscribers', href: '/admin/subscribers', icon: MailCheck },
   ]
 

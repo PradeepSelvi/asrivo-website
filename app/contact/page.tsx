@@ -17,9 +17,18 @@ import {
   Linkedin,
   Github,
   Send,
-  CheckCircle
+  CheckCircle,
+  AlertCircle,
+  ArrowRight
 } from "lucide-react"
 import { loadRecaptchaScript, executeRecaptcha } from "@/lib/utils/captcha"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 // Dynamically import LocationMap with SSR disabled
 const LocationMap = dynamic(() => import("@/components/location-map").then(mod => mod.LocationMap), {
@@ -68,11 +77,45 @@ const social = [
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [messageType, setMessageType] = useState('contact')
+  const [checkingStatus, setCheckingStatus] = useState(false)
+  const [statusEmail, setStatusEmail] = useState('')
+  const [complaints, setComplaints] = useState<any[]>([])
+  const [showStatus, setShowStatus] = useState(false)
 
   // Load reCAPTCHA script on mount
   useEffect(() => {
     loadRecaptchaScript()
   }, [])
+
+  const handleCheckStatus = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!statusEmail) {
+      alert('Please enter your email address')
+      return
+    }
+
+    setCheckingStatus(true)
+    setShowStatus(false)
+
+    try {
+      const response = await fetch(`/api/complaints/status?email=${encodeURIComponent(statusEmail)}`)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch complaints')
+      }
+
+      setComplaints(result.data || [])
+      setShowStatus(true)
+    } catch (error) {
+      console.error('Error checking status:', error)
+      alert(error instanceof Error ? error.message : 'Failed to check status')
+    } finally {
+      setCheckingStatus(false)
+    }
+  }
 
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
@@ -86,6 +129,7 @@ export default function ContactPage() {
     company: formData.get('company')?.toString() || null,
     subject: formData.get('subject')?.toString(),
     message: formData.get('message')?.toString(),
+    type: messageType, // Add message type
   };
 
   try {
@@ -212,6 +256,21 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="messageType">Message Type</Label>
+                    <Select value={messageType} onValueChange={setMessageType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select message type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="feedback">Feedback</SelectItem>
+                        <SelectItem value="query">Query</SelectItem>
+                        <SelectItem value="contact">Contact</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="subject">Subject</Label>
                     <Input
                       id="subject"
@@ -244,6 +303,170 @@ export default function ContactPage() {
                   </Button>
                 </form>
               )}
+
+              {/* Raise a Complaint Section */}
+              <div className="mt-8 rounded-2xl bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 p-8 text-white shadow-2xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+                    <AlertCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold">Raise a Complaint</h3>
+                </div>
+                
+                <p className="text-white/90 mb-6 leading-relaxed">
+                  Clients, partners, and users can file complaints or concerns and track their status. 
+                  No login required - just fill out the form with your details.
+                </p>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-white shrink-0 mt-0.5" />
+                    <p className="text-white/90 text-sm">
+                      <strong className="text-white">Clients</strong> → about service delivery or project issues
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-white shrink-0 mt-0.5" />
+                    <p className="text-white/90 text-sm">
+                      <strong className="text-white">Partners</strong> → regarding partnership agreements or collaboration
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-white shrink-0 mt-0.5" />
+                    <p className="text-white/90 text-sm">
+                      <strong className="text-white">Users</strong> → about website functionality or technical issues
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-white shrink-0 mt-0.5" />
+                    <p className="text-white/90 text-sm">
+                      <strong className="text-white">Anyone</strong> → about billing, support, or general concerns
+                    </p>
+                  </div>
+                </div>
+
+                <Button 
+                  asChild
+                  size="lg"
+                  className="w-full bg-white text-blue-900 hover:bg-white/90 font-semibold shadow-lg"
+                >
+                  <Link href="/complaints/new" className="flex items-center justify-center gap-2">
+                    Raise a Complaint
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Check Complaint Status Section */}
+              <div className="mt-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 text-white shadow-2xl border border-slate-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+                    <CheckCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold">Check Complaint Status</h3>
+                </div>
+                
+                <p className="text-white/80 mb-6 text-sm">
+                  Enter your email to check the status of all your submitted complaints. 
+                  Real-time updates from our admin team.
+                </p>
+
+                <form onSubmit={handleCheckStatus} className="space-y-4">
+                  <div>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={statusEmail}
+                      onChange={(e) => setStatusEmail(e.target.value)}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
+                      required
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit"
+                    size="lg"
+                    className="w-full bg-white/20 text-white hover:bg-white/30 font-semibold backdrop-blur-sm border border-white/30"
+                    disabled={checkingStatus}
+                  >
+                    {checkingStatus ? (
+                      "Checking..."
+                    ) : (
+                      <>
+                        Check Status
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+
+                {/* Status Results */}
+                {showStatus && (
+                  <div className="mt-6 space-y-3">
+                    {complaints.length === 0 ? (
+                      <div className="bg-white/10 border border-white/20 rounded-lg p-6 text-center backdrop-blur-sm">
+                        <AlertCircle className="w-10 h-10 text-white/60 mx-auto mb-2" />
+                        <p className="text-white/80 text-sm">
+                          No complaints found for this email address.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-white/90 text-sm font-medium mb-3">
+                          Found {complaints.length} complaint{complaints.length > 1 ? 's' : ''}:
+                        </p>
+                        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                          {complaints.map((complaint) => (
+                            <div 
+                              key={complaint.id}
+                              className="bg-white/10 border border-white/20 rounded-lg p-4 backdrop-blur-sm hover:bg-white/15 transition-colors"
+                            >
+                              <div className="flex items-start justify-between gap-3 mb-2">
+                                <h4 className="font-semibold text-white text-sm line-clamp-1">
+                                  {complaint.subject}
+                                </h4>
+                                <span className={`shrink-0 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                  complaint.status === 'new' ? 'bg-red-500/30 text-red-200 border border-red-400/30' :
+                                  complaint.status === 'in_progress' ? 'bg-amber-500/30 text-amber-200 border border-amber-400/30' :
+                                  complaint.status === 'resolved' ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/30' :
+                                  'bg-slate-500/30 text-slate-200 border border-slate-400/30'
+                                }`}>
+                                  {complaint.status.replace('_', ' ')}
+                                </span>
+                              </div>
+                              
+                              <p className="text-white/70 text-xs line-clamp-2 mb-3">
+                                {complaint.description}
+                              </p>
+
+                              <div className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-4 text-white/60">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                    complaint.priority === 'urgent' ? 'bg-red-500/20 text-red-300' :
+                                    complaint.priority === 'high' ? 'bg-orange-500/20 text-orange-300' :
+                                    complaint.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                                    'bg-blue-500/20 text-blue-300'
+                                  }`}>
+                                    {complaint.priority}
+                                  </span>
+                                  <span>
+                                    {new Date(complaint.created_at).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                {complaint.category && (
+                                  <span className="text-white/50">
+                                    {complaint.category}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Contact Info */}
