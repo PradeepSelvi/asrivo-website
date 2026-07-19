@@ -64,7 +64,34 @@ export default function ServiceInquiryPage() {
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData)
-        setFormData(parsed)
+        // Merge with default formData to ensure all fields exist
+        setFormData({
+          name: '',
+          company: '',
+          email: '',
+          phone: '',
+          whatsapp: '',
+          countryCode: '+91',
+          whatsappCountryCode: '+91',
+          preferredContact: 'email',
+          projectTypes: [],
+          otherProjectType: '',
+          projectDescription: '',
+          hasExisting: 'no',
+          existingLink: '',
+          targetPlatform: [],
+          keyFeatures: [],
+          otherKeyFeature: '',
+          budgetRange: '',
+          timeline: '',
+          targetAudience: '',
+          painPoints: '',
+          referenceLinks: '',
+          hearAboutUs: '',
+          prdFileUrl: '',
+          prdText: '',
+          ...parsed, // Override with saved values
+        })
         setWasRestored(true)
       } catch (e) {
         console.error('Failed to parse saved form data:', e)
