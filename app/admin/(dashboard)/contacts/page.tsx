@@ -1,78 +1,53 @@
-'use client'
+"use client"
 
 import React, { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { AlertCircle, Mail, User, Building, MessageSquare, Clock, Eye, FileText } from 'lucide-react'
 import Link from 'next/link'
-import {
-  Mail,
-  Eye,
-  Filter,
-  RefreshCw,
-  Building2,
-  Phone,
-  Calendar,
-  MessageSquare,
-  User,
-  CheckCircle2,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
 
 interface Contact {
   id: number
   name: string
   email: string
-  phone: string | null
   company: string | null
-  subject: string | null
+  phone: string | null
+  subject: string
   message: string
-  status: 'unread' | 'read' | 'responded'
+  type: string | null
+  status: string
   created_at: string
+  updated_at: string
 }
 
-export default function ContactsPage() {
+export default function AdminContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [unreadCount, setUnreadCount] = useState(0)
-
-  const supabase = createClient()
-
-  const fetchContacts = async () => {
-    try {
-      setLoading(true)
-      const { data, error } = await supabase
-        .from('contacts')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      const filtered = statusFilter === 'all' 
-        ? data 
-        : data?.filter(c => c.status === statusFilter)
-
-      setContacts(filtered || [])
-      const unread = data?.filter((c: Contact) => c.status === 'unread').length || 0
-      setUnreadCount(unread)
-    } catch (error) {
-      console.error('Error fetching contacts:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const supabase = createClient()
+
+    // Initial fetch
+    const fetchContacts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('contacts')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+        setContacts(data || [])
+      } catch (err: any) {
+        console.error('Error fetching contacts:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchContacts()
 
-    // Set up real-time subscription
+    // Subscribe to realtime changes
     const channel = supabase
       .channel('contacts-changes')
       .on(
@@ -83,257 +58,191 @@ export default function ContactsPage() {
           table: 'contacts',
         },
         (payload) => {
-          console.log('Contact change detected:', payload)
-          
+          console.log('Realtime change detected:', payload)
+
           if (payload.eventType === 'INSERT') {
-            // Show notification for new contact
-            if (Notification.permission === 'granted') {
-              new Notification('New Contact Message', {
-                body: `${(payload.new as Contact).name} sent a message`,
-                icon: '/asrivo.png',
-              })
-            }
+            setContacts((prev) => [payload.new as Contact, ...prev])
+          } else if (payload.eventType === 'UPDATE') {
+            setContacts((prev) =>
+              prev.map((contact) =>
+                contact.id === (payload.new as Contact).id
+                  ? (payload.new as Contact)
+                  : contact
+              )
+            )
+          } else if (payload.eventType === 'DELETE') {
+            setContacts((prev) =>
+              prev.filter((contact) => contact.id !== (payload.old as Contact).id)
+            )
           }
-          
-          fetchContacts()
         }
       )
       .subscribe()
 
-    // Request notification permission
-    if (Notification.permission === 'default') {
-      Notification.requestPermission()
-    }
-
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [statusFilter])
+  }, [])
 
-  const getStatusConfig = (status: string) => {
-    const configs = {
-      unread: { label: 'Unread', color: 'bg-red-500/10 text-red-600 border-red-500/20' },
-      read: { label: 'Read', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' },
-      responded: { label: 'Responded', color: 'bg-green-500/10 text-green-600 border-green-500/20' },
-    }
-    return configs[status as keyof typeof configs] || configs.unread
+  const statusCounts = {
+    unread: contacts.filter((c) => c.status === 'unread').length,
+    read: contacts.filter((c) => c.status === 'read').length,
+    responded: contacts.filter((c) => c.status === 'responded').length,
   }
 
-  const stats = [
-    {
-      label: 'Total Messages',
-      value: contacts.length,
-      icon: MessageSquare,
-      color: 'text-blue-500',
-    },
-    {
-      label: 'Unread',
-      value: contacts.filter(c => c.status === 'unread').length,
-      icon: Mail,
-      color: 'text-red-600',
-    },
-    {
-      label: 'Read',
-      value: contacts.filter(c => c.status === 'read').length,
-      icon: Eye,
-      color: 'text-yellow-600',
-    },
-    {
-      label: 'Responded',
-      value: contacts.filter(c => c.status === 'responded').length,
-      icon: CheckCircle2,
-      color: 'text-green-600',
-    },
-  ]
+  const typeCounts = {
+    feedback: contacts.filter((c) => c.type === 'feedback').length,
+    query: contacts.filter((c) => c.type === 'query').length,
+    contact: contacts.filter((c) => c.type === 'contact').length,
+    other: contacts.filter((c) => c.type === 'other').length,
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading contacts...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Contact Messages</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage and respond to contact form submissions
-          </p>
-        </div>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-foreground tracking-tight">Contact Messages</h1>
+        <p className="text-muted-foreground text-sm mt-1">View and manage contact form submissions with realtime updates.</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <div
-              key={stat.label}
-              className="rounded-xl border bg-card p-6 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    {stat.label}
-                  </p>
-                  <p className="text-3xl font-bold mt-2">{stat.value}</p>
-                </div>
-                <Icon className={`h-10 w-10 ${stat.color}`} />
-              </div>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Filters and Actions */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="unread">Unread</SelectItem>
-              <SelectItem value="read">Read</SelectItem>
-              <SelectItem value="responded">Responded</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-card border border-blue-900/30 rounded-xl p-4">
+          <p className="text-2xl font-bold text-blue-400">{statusCounts.unread}</p>
+          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-semibold">Unread</p>
         </div>
-
-        {unreadCount > 0 && (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/20">
-            {unreadCount} Unread
-          </Badge>
-        )}
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={fetchContacts}
-          disabled={loading}
-          className="ml-auto"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="bg-card border border-amber-900/30 rounded-xl p-4">
+          <p className="text-2xl font-bold text-amber-400">{statusCounts.read}</p>
+          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-semibold">Read</p>
+        </div>
+        <div className="bg-card border border-emerald-900/30 rounded-xl p-4">
+          <p className="text-2xl font-bold text-emerald-400">{statusCounts.responded}</p>
+          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider font-semibold">Responded</p>
+        </div>
       </div>
 
-      {/* Contacts Table */}
-      <div className="rounded-xl border bg-card shadow-sm">
-        {loading ? (
-          <div className="flex items-center justify-center p-12">
-            <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : contacts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center">
-            <MessageSquare className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <p className="text-lg font-medium">No contact messages found</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {statusFilter === 'all' 
-                ? 'Contact messages will appear here when submitted'
-                : `No messages with status "${statusFilter}"`}
-            </p>
+      {/* Type Stats */}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="bg-card border rounded-lg p-3 text-center">
+          <p className="text-lg font-bold text-purple-500">{typeCounts.feedback}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Feedback</p>
+        </div>
+        <div className="bg-card border rounded-lg p-3 text-center">
+          <p className="text-lg font-bold text-blue-500">{typeCounts.query}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Query</p>
+        </div>
+        <div className="bg-card border rounded-lg p-3 text-center">
+          <p className="text-lg font-bold text-green-500">{typeCounts.contact}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Contact</p>
+        </div>
+        <div className="bg-card border rounded-lg p-3 text-center">
+          <p className="text-lg font-bold text-slate-500">{typeCounts.other}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Other</p>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl">
+        {error && (
+          <div className="p-6 text-destructive text-sm">Error: {error}</div>
+        )}
+        {!error && contacts.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground">
+            <Mail className="w-8 h-8 mx-auto mb-2 text-slate-700" />
+            <p className="font-semibold">No contact messages yet.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-muted/50">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-background/60 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Company
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Message
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Contact</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Subject</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {contacts.map((contact) => {
-                  const statusConfig = getStatusConfig(contact.status)
-                  return (
-                    <tr
-                      key={contact.id}
-                      className="hover:bg-muted/50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              {contact.status === 'unread' && (
-                                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                              )}
-                              <p className="font-medium">{contact.name}</p>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
-                              <Mail className="h-3 w-3" />
-                              <span className="truncate max-w-[200px]">{contact.email}</span>
-                            </div>
-                            {contact.phone && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Phone className="h-3 w-3" />
-                                <span>{contact.phone}</span>
-                              </div>
-                            )}
-                          </div>
+                {contacts.map((contact) => (
+                  <tr key={contact.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <div>
+                          <p className="font-semibold text-foreground text-sm">{contact.name}</p>
+                          <p className="text-xs text-muted-foreground">{contact.email}</p>
+                          {contact.company && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                              <Building className="w-3 h-3" />
+                              {contact.company}
+                            </p>
+                          )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {contact.company ? (
-                          <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{contact.company}</span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">—</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 max-w-md">
-                        {contact.subject && (
-                          <p className="font-medium text-sm mb-1">{contact.subject}</p>
-                        )}
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {contact.message}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge className={statusConfig.color}>
-                          {statusConfig.label}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(contact.created_at).toLocaleDateString()}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Link href={`/admin/contacts/${contact.id}`}>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
-                            View
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  )
-                })}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-foreground">{contact.subject}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{contact.message}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      {contact.type ? (
+                        <span className="text-xs bg-muted px-2 py-1 rounded capitalize">{contact.type}</span>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
+                          contact.status === 'unread'
+                            ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
+                            : contact.status === 'read'
+                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                            : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        }`}
+                      >
+                        {contact.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-muted-foreground font-mono">
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        {new Date(contact.created_at).toLocaleDateString()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/admin/contacts/${contact.id}`}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         )}
+      </div>
+
+      {/* Realtime Indicator */}
+      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+        <span>Realtime updates enabled</span>
       </div>
     </div>
   )

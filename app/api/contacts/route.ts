@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const { email, name, message, company, subject, captchaToken } = body
+    const { email, name, message, company, subject, type, captchaToken } = body
 
     // ✅ Validation
     if (!email || !name || !message) {
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
           message,
           company: company || null,
           subject: subject || null,
+          type: type || 'contact',
           created_at: new Date().toISOString(),
         },
       ])

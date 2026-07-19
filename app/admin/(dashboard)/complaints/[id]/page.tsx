@@ -2,9 +2,9 @@ import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { redirect, notFound } from 'next/navigation'
-import ContactDetailClient from './contact-detail'
+import ComplaintDetailClient from './complaint-detail'
 
-export default async function ContactDetailPage({ 
+export default async function ComplaintDetailPage({ 
   params 
 }: { 
   params: Promise<{ id: string }> 
@@ -17,15 +17,17 @@ export default async function ContactDetailPage({
     redirect('/admin/login')
   }
 
-  const { data: contact, error } = await supabase
-    .from('contacts')
+  const isHigh = adminResult.user.role === 'high'
+
+  const { data: complaint, error } = await supabase
+    .from('complaints')
     .select('*')
     .eq('id', id)
     .single()
 
-  if (error || !contact) {
+  if (error || !complaint) {
     notFound()
   }
 
-  return <ContactDetailClient contact={contact} />
+  return <ComplaintDetailClient complaint={complaint} isHigh={isHigh} />
 }
