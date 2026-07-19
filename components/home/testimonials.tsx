@@ -25,6 +25,55 @@ const testimonials = [
     company: "ShopEase",
     rating: 5,
   },
+  {
+    content: "Outstanding service and delivery! The AI-powered analytics dashboard they built has revolutionized how we make business decisions. Highly recommended.",
+    author: "Michael Chen",
+    role: "VP of Technology, DataDrive Inc",
+    company: "DataDrive Inc",
+    rating: 5,
+  },
+  {
+    content: "From concept to deployment, Asrivo Tech demonstrated exceptional technical expertise. Our IoT platform now handles millions of requests seamlessly.",
+    author: "Sarah Johnson",
+    role: "Director of Engineering, SmartHome Solutions",
+    company: "SmartHome Solutions",
+    rating: 5,
+  },
+  {
+    content: "The team's attention to detail and commitment to quality is unmatched. They delivered a scalable cloud infrastructure that supports our rapid growth.",
+    author: "David Kumar",
+    role: "CTO, CloudNine Technologies",
+    company: "CloudNine Technologies",
+    rating: 5,
+  },
+  {
+    content: "Asrivo Tech's blockchain solution provided the security and transparency we needed for our financial platform. Exceptional work from start to finish.",
+    author: "Emily Rodriguez",
+    role: "CEO, FinSecure",
+    company: "FinSecure",
+    rating: 5,
+  },
+  {
+    content: "Their DevOps transformation saved us countless hours and significantly reduced our deployment time. The ROI was evident within the first month.",
+    author: "James Anderson",
+    role: "Head of Infrastructure, TechFlow Systems",
+    company: "TechFlow Systems",
+    rating: 5,
+  },
+  {
+    content: "The custom CRM they developed has streamlined our entire sales process. Intuitive design coupled with powerful features. Couldn't be happier!",
+    author: "Lisa Thompson",
+    role: "Sales Director, GrowthHub",
+    company: "GrowthHub",
+    rating: 5,
+  },
+  {
+    content: "Asrivo Tech delivered beyond expectations. Their microservices architecture improved our application performance by 300%. True professionals!",
+    author: "Mark Williams",
+    role: "Chief Architect, ScaleUp Solutions",
+    company: "ScaleUp Solutions",
+    rating: 5,
+  },
 ]
 
 function TestimonialCard({ testimonial, index }: { testimonial: typeof testimonials[0]; index: number }) {
@@ -114,10 +163,128 @@ export function Testimonials() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} testimonial={testimonial} index={index} />
-          ))}
+        {/* Infinite Auto-Scrolling Carousel */}
+        <div className="mt-16 relative">
+          {/* Gradient overlays for fade effect */}
+          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          
+          <div className="overflow-hidden">
+            <div className="flex gap-8 animate-scroll-testimonials hover:[animation-play-state:paused]">
+              {/* First set of testimonials */}
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={`first-${index}`}
+                  className="flex-shrink-0 w-[400px]"
+                >
+                  <div className="group relative rounded-2xl border border-border bg-card p-8 transition-all duration-700 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2 overflow-hidden h-full">
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    {/* Glow effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl opacity-0 group-hover:opacity-100 blur-lg transition-opacity duration-500 -z-10" />
+                    
+                    <div className="relative z-10">
+                      {/* Quote icon with animation */}
+                      <div className="relative">
+                        <Quote className="h-12 w-12 text-primary/20 transition-all duration-500 group-hover:text-primary/40 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      </div>
+                      
+                      {/* Rating stars */}
+                      <div className="mt-4 flex gap-1">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="h-4 w-4 fill-amber-400 text-amber-400 transition-transform duration-300"
+                            style={{ transitionDelay: `${i * 50}ms` }}
+                          />
+                        ))}
+                      </div>
+                      
+                      <p className="mt-4 text-muted-foreground leading-relaxed text-base line-clamp-4">
+                        &ldquo;{testimonial.content}&rdquo;
+                      </p>
+                      
+                      <div className="mt-8 flex items-center gap-4">
+                        {/* Avatar with animated ring */}
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm scale-110" />
+                          <div className="relative h-14 w-14 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center ring-2 ring-border group-hover:ring-primary/50 transition-all duration-500">
+                            <span className="text-sm font-bold text-primary">
+                              {testimonial.author.split(' ').map(n => n[0]).join('')}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+                            {testimonial.author}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* Duplicate set for seamless loop */}
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={`second-${index}`}
+                  className="flex-shrink-0 w-[400px]"
+                >
+                  <div className="group relative rounded-2xl border border-border bg-card p-8 transition-all duration-700 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2 overflow-hidden h-full">
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    {/* Glow effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl opacity-0 group-hover:opacity-100 blur-lg transition-opacity duration-500 -z-10" />
+                    
+                    <div className="relative z-10">
+                      {/* Quote icon with animation */}
+                      <div className="relative">
+                        <Quote className="h-12 w-12 text-primary/20 transition-all duration-500 group-hover:text-primary/40 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      </div>
+                      
+                      {/* Rating stars */}
+                      <div className="mt-4 flex gap-1">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="h-4 w-4 fill-amber-400 text-amber-400 transition-transform duration-300"
+                            style={{ transitionDelay: `${i * 50}ms` }}
+                          />
+                        ))}
+                      </div>
+                      
+                      <p className="mt-4 text-muted-foreground leading-relaxed text-base line-clamp-4">
+                        &ldquo;{testimonial.content}&rdquo;
+                      </p>
+                      
+                      <div className="mt-8 flex items-center gap-4">
+                        {/* Avatar with animated ring */}
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm scale-110" />
+                          <div className="relative h-14 w-14 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center ring-2 ring-border group-hover:ring-primary/50 transition-all duration-500">
+                            <span className="text-sm font-bold text-primary">
+                              {testimonial.author.split(' ').map(n => n[0]).join('')}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+                            {testimonial.author}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

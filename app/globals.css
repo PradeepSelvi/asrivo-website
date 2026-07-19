@@ -327,3 +327,18 @@
 .stagger-children > *:nth-child(6) { animation-delay: 500ms; }
 .stagger-children > *:nth-child(7) { animation-delay: 600ms; }
 .stagger-children > *:nth-child(8) { animation-delay: 700ms; }
+
+
+/* Testimonials infinite scroll animation */
+@keyframes scroll-testimonials {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-408px * 10));
+  }
+}
+
+.animate-scroll-testimonials {
+  animation: scroll-testimonials 60s linear infinite;
+}
