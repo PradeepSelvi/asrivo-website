@@ -12,6 +12,105 @@ export const metadata: Metadata = {
   description: "Meet the talented professionals behind Asrivo Tech. Our leadership and engineering team is dedicated to delivering exceptional technology solutions.",
 }
 
+/** Curated development team profiles for the featured showcase section */
+const developmentTeamData = [
+  {
+    id: "dev-sj",
+    name: "sivaganesh.J",
+    role: "TL, DATABASE, BACKEND",
+    bio: "Leading backend and database optimization initiatives for robust, scalable application infrastructure.",
+    email: "sivaganesh.j@asrivotech.com",
+    featured: false,
+  },
+  {
+    id: "dev-ks",
+    name: "KARTHIK RAJALEE.S",
+    role: "CLOUD SERVICE DEVELOPER, SOC",
+    bio: "Designing secure, scalable cloud solutions and implementing advanced Security Operations Center protocols.",
+    email: "karthik.s@asrivotech.com",
+    featured: false,
+  },
+  {
+    id: "dev-yr",
+    name: "YOGESHWARAN.R",
+    role: "DEVOPS, AB TESTING, DATABASE",
+    bio: "Driving CI/CD pipelines, data-driven AB testing experimentation, and reliable database operations.",
+    email: "yogeshwaran.r@asrivotech.com",
+    featured: true,
+  },
+  {
+    id: "dev-an",
+    name: "ARIVANANTHAM.N",
+    role: "UI&UX, FRONT END DESIGNER",
+    bio: "Crafting intuitive user interfaces and delightful user experiences with cutting-edge frontend technologies.",
+    email: "arivanantham.n@asrivotech.com",
+    featured: false,
+  },
+]
+
+const managementTeamData = [
+  {
+    id: "mgmt-aka",
+    name: "Aswin K A",
+    role: "Management Head & HR Manager",
+    bio: "Founder managing HR, administration, finance, and operations with strategic leadership and precision",
+    email: "aswin@asrivotech.com",
+    linkedin: "#",
+    github: "#",
+    featured: false,
+  },
+  {
+    id: "mgmt-sb",
+    name: "Siranjeevi B.U",
+    role: "Head - Digital Marketing (SEO, SMO) & HR Executive",
+    bio: "Leading brand growth through expert SEO, SMO strategies, and organizational excellence in talent and HR management.",
+    email: "siranjeevi@asrivotech.com",
+    linkedin: "#",
+    github: "#",
+    featured: true,
+  },
+  {
+    id: "mgmt-pkm",
+    name: "Pradeep Kumar M",
+    role: "Legal & chief techinical developer",
+    bio: "Ensuring regulatory compliance, managing legal risks, protecting company integrity and ethical standards.",
+    email: "pradeep@asrivotech.com",
+    linkedin: "#",
+    github: "#",
+    featured: false,
+  },
+  {
+    id: "mgmt-sjs",
+    name: "Sargunan J.S",
+    role: "Chief Operating Officer",
+    bio: "Strategic operations leader driving efficiency, growth, performance, and scalable business transformation globally.",
+    email: "sargunan@asrivotech.com",
+    linkedin: "#",
+    github: "#",
+    featured: false,
+  },
+  {
+    id: "mgmt-hht",
+    name: "Hari Haran T.G",
+    role: "Full Stack Developer",
+    bio: "Creating intuitive user experiences",
+    email: "hariharan@asrivotech.com",
+    linkedin: "#",
+    github: "#",
+    featured: false,
+  },
+  {
+    id: "mgmt-kkb",
+    name: "Krishan Kumar B.K",
+    role: "Project Manager",
+    bio: "Frontend Developer & Project Manager driving seamless delivery and team coordination.",
+    email: "krishan@asrivotech.com",
+    linkedin: "#",
+    github: "#",
+    featured: false,
+  },
+]
+
 export default async function TeamPage() {
   const teamResult = await getTeamMembers()
   const teamMembers = teamResult.success ? teamResult.data || [] : []
@@ -61,6 +160,37 @@ export default async function TeamPage() {
         </div>
       </section>
 
+      {/* Development Team Section */}
+      <section className="py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+              Development
+            </span>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Our technical Team
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Meet the skilled developers building the next generation of digital solutions.
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {developmentTeamData.map((member) => (
+              <TeamCard
+                key={member.id}
+                name={member.name}
+                role={member.role}
+                bio={member.bio}
+                email={member.email}
+                variant="management"
+                featured={member.featured}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Management Team Section */}
       <section className="py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -69,25 +199,25 @@ export default async function TeamPage() {
               Leadership
             </span>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Leadership & Management Team
+              Management Team
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               Experienced leaders guiding our vision and strategy for success.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-3">
-            {managementTeam.map((member) => (
+          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {managementTeamData.map((member) => (
               <TeamCard
                 key={member.id}
                 name={member.name}
-                role={member.position}
-                image={member.image_url}
+                role={member.role}
                 bio={member.bio}
-                linkedin={member.social_links?.linkedin || member.social_links?.Linkedin}
-                github={member.social_links?.github}
+                linkedin={member.linkedin}
+                github={member.github}
                 email={member.email}
                 variant="management"
+                featured={member.featured}
               />
             ))}
           </div>
