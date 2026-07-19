@@ -62,6 +62,9 @@ export async function POST(request: NextRequest) {
         pain_points: body.painPoints || null,
         reference_links: body.referenceLinks || null,
         hear_about_us: body.hearAboutUs || null,
+        prd_file_url: body.prdFileUrl || null,
+        prd_file_name: body.prdFileName || null,
+        prd_text: body.prdText || null,
         status: 'new',
       })
       .select()

@@ -727,6 +727,16 @@ export async function updateInquiryStatus(id: string | number, status: string) {
     await checkAuthAndPermission() // Any admin can update
     const supabase = await createClient()
 
+    // Get inquiry data before updating
+    const { data: inquiry, error: fetchError } = await supabase
+      .from('client_inquiries')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (fetchError) throw new Error(fetchError.message)
+
+    // Update status
     const { data, error } = await supabase
       .from('client_inquiries')
       .update({ status, updated_at: new Date().toISOString() })
@@ -735,6 +745,24 @@ export async function updateInquiryStatus(id: string | number, status: string) {
       .single()
 
     if (error) throw new Error(error.message)
+
+    // Send email notification to client
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/send-status-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: inquiry.email,
+          name: inquiry.name,
+          company: inquiry.company,
+          status: status,
+          inquiryId: id
+        })
+      })
+    } catch (emailError) {
+      console.error('Failed to send status email:', emailError)
+      // Don't fail the whole operation if email fails
+    }
 
     revalidatePath('/admin/inquiries')
     return { success: true, data }

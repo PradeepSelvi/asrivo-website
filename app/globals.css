@@ -122,6 +122,30 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Ensure all interactive elements show pointer cursor */
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  a,
+  label[for],
+  select,
+  summary,
+  [tabindex]:not([tabindex="-1"]) {
+    @apply cursor-pointer;
+  }
+  
+  /* Disabled elements should show not-allowed cursor */
+  button:disabled,
+  [role="button"]:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled,
+  select:disabled {
+    @apply cursor-not-allowed;
+  }
 }
 
 /* Creative Animations */

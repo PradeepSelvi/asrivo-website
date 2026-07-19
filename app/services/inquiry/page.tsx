@@ -1,15 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Check, Send, AlertCircle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Send, AlertCircle, Upload, File, X } from 'lucide-react'
 import Link from 'next/link'
+
+const FORM_STORAGE_KEY = 'inquiry_form_data'
+const STEP_STORAGE_KEY = 'inquiry_form_step'
 
 export default function ServiceInquiryPage() {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [prdFile, setPrdFile] = useState<File | null>(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [wasRestored, setWasRestored] = useState(false)
+  const [prdInputMethod, setPrdInputMethod] = useState<'upload' | 'write'>('upload')
+  const [canSubmit, setCanSubmit] = useState(false) // Flag to control actual submission
   const totalSteps = 4
 
   // Form state
@@ -43,7 +52,51 @@ export default function ServiceInquiryPage() {
     // Step 4: Optional Info
     referenceLinks: '',
     hearAboutUs: '',
+    prdFileUrl: '', // URL of uploaded PRD file
+    prdText: '', // Manually written PRD
   })
+
+  // Load saved form data on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(FORM_STORAGE_KEY)
+    const savedStep = localStorage.getItem(STEP_STORAGE_KEY)
+    
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData)
+        setFormData(parsed)
+        setWasRestored(true)
+      } catch (e) {
+        console.error('Failed to parse saved form data:', e)
+      }
+    }
+    
+    if (savedStep) {
+      setCurrentStep(parseInt(savedStep, 10))
+    }
+    
+    setIsLoaded(true)
+  }, [])
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData))
+    }
+  }, [formData, isLoaded])
+
+  // Save current step to localStorage
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem(STEP_STORAGE_KEY, currentStep.toString())
+    }
+  }, [currentStep, isLoaded])
+
+  // Clear saved data after successful submission
+  const clearSavedData = () => {
+    localStorage.removeItem(FORM_STORAGE_KEY)
+    localStorage.removeItem(STEP_STORAGE_KEY)
+  }
 
   const handleCheckboxChange = (field: 'projectTypes' | 'targetPlatform' | 'keyFeatures', value: string) => {
     setFormData(prev => ({
@@ -52,6 +105,61 @@ export default function ServiceInquiryPage() {
         ? prev[field].filter(item => item !== value)
         : [...prev[field], value]
     }))
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+    if (!validTypes.includes(file.type)) {
+      setError('Please upload a PDF, DOC, DOCX, or TXT file')
+      return
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB')
+      return
+    }
+
+    setPrdFile(file)
+    setError('')
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const file = e.dataTransfer.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+    if (!validTypes.includes(file.type)) {
+      setError('Please upload a PDF, DOC, DOCX, or TXT file')
+      return
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB')
+      return
+    }
+
+    setPrdFile(file)
+    setError('')
+  }
+
+  const removeFile = () => {
+    setPrdFile(null)
+    setFormData({ ...formData, prdFileUrl: '' })
   }
 
   const validateStep = (step: number): boolean => {
@@ -111,7 +219,9 @@ export default function ServiceInquiryPage() {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, totalSteps))
+      const nextStep = Math.min(currentStep + 1, totalSteps)
+      console.log('Moving from step', currentStep, 'to step', nextStep)
+      setCurrentStep(nextStep)
     }
   }
 
@@ -123,7 +233,22 @@ export default function ServiceInquiryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    console.log('handleSubmit called on step:', currentStep, 'canSubmit:', canSubmit)
+    
+    // Only allow submission if explicitly enabled (from Submit button click)
+    if (!canSubmit) {
+      console.log('Submission blocked - canSubmit flag is false')
+      return
+    }
+    
     if (!validateStep(currentStep)) {
+      setCanSubmit(false) // Reset flag
+      return
+    }
+
+    if (currentStep < totalSteps) {
+      console.log('Not on final step, should not submit')
+      setCanSubmit(false) // Reset flag
       return
     }
 
@@ -131,29 +256,84 @@ export default function ServiceInquiryPage() {
     setError('')
 
     try {
+      let prdFileUrl = ''
+
+      // Upload PRD file if provided
+      if (prdFile) {
+        setUploadingFile(true)
+        const fileFormData = new FormData()
+        fileFormData.append('file', prdFile)
+        fileFormData.append('bucket', 'inquiry-documents')
+        fileFormData.append('folder', 'prds')
+
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: fileFormData,
+        })
+
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json()
+          prdFileUrl = uploadData.url
+        } else {
+          console.error('File upload failed, continuing without file')
+        }
+        setUploadingFile(false)
+      }
+
       console.log('Submitting inquiry data:', formData)
       
       const response = await fetch('/api/inquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          prdFileUrl,
+          prdFileName: prdFile?.name || null,
+        }),
       })
 
       const data = await response.json()
       console.log('API response:', data)
 
       if (!response.ok) {
-        // Show the specific error message from the server
         throw new Error(data.error || 'Failed to submit inquiry. Please try again.')
       }
 
-      // Redirect to success page
+      // Clear saved form data after successful submission
+      clearSavedData()
+      
       router.push('/services/inquiry/success')
     } catch (err) {
       console.error('Submission error:', err)
       setError(err instanceof Error ? err.message : 'Failed to submit inquiry. Please try again later.')
       setIsSubmitting(false)
     }
+  }
+
+  // Prevent Enter key from submitting form except on last step
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === 'Enter') {
+      // Always prevent default Enter behavior
+      e.preventDefault()
+      
+      // If not on last step, trigger Next
+      if (currentStep < totalSteps) {
+        handleNext()
+      }
+      // If on last step, do nothing (user must click Submit button)
+    }
+  }
+
+  // Show loading state while form data is being restored
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-background py-12 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading form...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -169,6 +349,15 @@ export default function ServiceInquiryPage() {
           <p className="text-muted-foreground">
             Tell us about your requirements and we'll get back to you within 24 hours
           </p>
+          
+          {/* Show notification if form was restored */}
+          {(wasRestored && currentStep > 1) && (
+            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <p className="text-sm text-blue-400">
+                ✓ Your progress has been saved. Continue where you left off!
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Progress Bar */}
@@ -208,7 +397,7 @@ export default function ServiceInquiryPage() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="bg-card border border-border rounded-2xl p-8">
           {/* Step 1: Basic Contact Info */}
           {currentStep === 1 && (
             <div className="space-y-6">
@@ -575,6 +764,110 @@ export default function ServiceInquiryPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">
+                  Product Requirements Document (PRD)
+                </label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Share your requirements by uploading a document or writing them below
+                </p>
+
+                {/* Toggle between upload and write */}
+                <div className="flex gap-3 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPrdInputMethod('upload')
+                      setFormData({ ...formData, prdText: '' })
+                    }}
+                    className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                      prdInputMethod === 'upload'
+                        ? 'bg-primary text-white'
+                        : 'bg-background border border-border text-foreground hover:border-primary'
+                    }`}
+                  >
+                    📤 Upload File
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPrdInputMethod('write')
+                      setPrdFile(null)
+                      setFormData({ ...formData, prdFileUrl: '' })
+                    }}
+                    className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                      prdInputMethod === 'write'
+                        ? 'bg-primary text-white'
+                        : 'bg-background border border-border text-foreground hover:border-primary'
+                    }`}
+                  >
+                    ✍️ Write Here
+                  </button>
+                </div>
+
+                {/* Upload Option */}
+                {prdInputMethod === 'upload' && (
+                  <>
+                    {!prdFile ? (
+                      <label 
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer bg-background hover:bg-muted/50 transition-all"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-semibold">Click to upload</span> or drag and drop
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            PDF, DOC, DOCX, or TXT (max 10MB)
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.doc,.docx,.txt"
+                          onChange={handleFileChange}
+                        />
+                      </label>
+                    ) : (
+                      <div className="flex items-center gap-3 p-4 bg-background border border-border rounded-lg">
+                        <File className="w-8 h-8 text-primary flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{prdFile.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {(prdFile.size / 1024).toFixed(2)} KB
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={removeFile}
+                          className="p-2 hover:bg-muted rounded-lg transition-all"
+                        >
+                          <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Write Option */}
+                {prdInputMethod === 'write' && (
+                  <div>
+                    <textarea
+                      value={formData.prdText}
+                      onChange={(e) => setFormData({ ...formData, prdText: e.target.value })}
+                      rows={8}
+                      className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                      placeholder="Write your product requirements here...&#10;&#10;Example:&#10;- User authentication with email and password&#10;- Dashboard with analytics&#10;- Mobile responsive design&#10;- Payment integration (Stripe)&#10;- Real-time notifications"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {(formData.prdText || '').length} characters
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
                   How did you hear about us?
                 </label>
                 <select
@@ -612,7 +905,7 @@ export default function ServiceInquiryPage() {
               <button
                 type="button"
                 onClick={handleBack}
-                className="flex items-center gap-2 px-6 py-2.5 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-semibold transition-all"
+                className="flex items-center gap-2 px-6 py-2.5 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-semibold transition-all cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
@@ -625,7 +918,7 @@ export default function ServiceInquiryPage() {
               <button
                 type="button"
                 onClick={handleNext}
-                className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all"
+                className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all cursor-pointer"
               >
                 Next
                 <ArrowRight className="w-4 h-4" />
@@ -633,10 +926,13 @@ export default function ServiceInquiryPage() {
             ) : (
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting || uploadingFile}
+                onClick={() => setCanSubmit(true)} // Enable submission only when Submit button is clicked
+                className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? (
+                {uploadingFile ? (
+                  <>Uploading file...</>
+                ) : isSubmitting ? (
                   <>Submitting...</>
                 ) : (
                   <>

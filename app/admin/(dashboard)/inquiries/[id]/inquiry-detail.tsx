@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateInquiryStatus, updateInquiryNotes, deleteInquiry } from '@/lib/supabase/content-actions'
 import { ArrowLeft, Clock, Building, Mail, Phone, User, Trash2, Loader2, AlertTriangle, CheckCircle, Save, DollarSign, Timer, Briefcase } from 'lucide-react'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown'
 
 const STATUS_OPTIONS = [
   { value: 'new', label: 'New', color: 'bg-primary/10 text-primary border-primary/20' },
@@ -234,6 +235,46 @@ export default function InquiryDetailClient({ inquiry, isHigh }: { inquiry: any;
               <p className="text-sm text-foreground whitespace-pre-wrap bg-background/50 rounded-xl p-3 border border-border">
                 {inquiry.reference_links}
               </p>
+            </div>
+          )}
+          
+          {inquiry.prd_file_url && (
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">PRD Document (Uploaded)</label>
+              <a
+                href={inquiry.prd_file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 bg-primary/10 border border-primary/20 rounded-xl p-3 transition-all hover:bg-primary/20"
+              >
+                <Briefcase className="w-4 h-4" />
+                <span>{inquiry.prd_file_name || 'Download PRD'}</span>
+              </a>
+            </div>
+          )}
+          
+          {inquiry.prd_text && (
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">PRD (Written)</label>
+              <div className="text-sm text-foreground bg-background/50 rounded-xl p-4 border border-border prose prose-invert prose-sm max-w-none">
+                <ReactMarkdown
+                  components={{
+                    h1: ({ children }) => <h1 className="text-xl font-bold mb-3 mt-4 text-foreground">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-lg font-bold mb-2 mt-3 text-foreground">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-base font-semibold mb-2 mt-2 text-foreground">{children}</h3>,
+                    p: ({ children }) => <p className="mb-2 text-foreground">{children}</p>,
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1 text-foreground">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1 text-foreground">{children}</ol>,
+                    li: ({ children }) => <li className="text-foreground">{children}</li>,
+                    strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
+                    em: ({ children }) => <em className="italic text-foreground">{children}</em>,
+                    code: ({ children }) => <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-primary">{children}</code>,
+                    blockquote: ({ children }) => <blockquote className="border-l-4 border-primary pl-4 italic my-2 text-muted-foreground">{children}</blockquote>,
+                  }}
+                >
+                  {inquiry.prd_text}
+                </ReactMarkdown>
+              </div>
             </div>
           )}
         </div>

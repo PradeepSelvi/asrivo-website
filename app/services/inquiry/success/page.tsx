@@ -1,7 +1,16 @@
+'use client'
+
+import { useEffect } from 'react'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
 
 export default function InquirySuccessPage() {
+  // Clear saved form data when success page loads
+  useEffect(() => {
+    localStorage.removeItem('inquiry_form_data')
+    localStorage.removeItem('inquiry_form_step')
+  }, [])
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
