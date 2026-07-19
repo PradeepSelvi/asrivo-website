@@ -14,6 +14,7 @@ interface TeamCardProps {
   email?: string
   variant?: "management" | "team"
   index?: number
+  featured?: boolean
 }
 
 export function TeamCard({
@@ -26,6 +27,7 @@ export function TeamCard({
   email,
   variant = "team",
   index = 0,
+  featured = false,
 }: TeamCardProps) {
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   const avatarSrc = image?.trim() ? image.trim() : null
@@ -37,11 +39,15 @@ export function TeamCard({
     return (
       <div 
         ref={tiltRef}
-        className="group rounded-2xl border border-border bg-card p-8 transition-all duration-500 hover:shadow-2xl hover:border-primary/30 relative overflow-hidden"
+        className={`group rounded-2xl border bg-card p-8 transition-all duration-500 relative overflow-hidden ${
+          featured 
+            ? 'border-primary/20 shadow-xl shadow-primary/10 hover:shadow-2xl hover:border-primary/40 scale-[1.03] z-10' 
+            : 'border-border hover:shadow-2xl hover:border-primary/30'
+        }`}
         style={{ transform, transition: 'transform 0.1s ease-out' }}
       >
         {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className={`absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 transition-opacity duration-500 ${featured ? 'opacity-50' : 'opacity-0 group-hover:opacity-100'}`} />
         
         {/* Glow effect on hover */}
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl opacity-0 group-hover:opacity-100 blur-lg transition-opacity duration-500 -z-10" />
@@ -50,7 +56,15 @@ export function TeamCard({
           {/* Avatar with animated ring */}
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm scale-110" />
-            <div className="relative h-32 w-32 overflow-hidden rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center ring-4 ring-border group-hover:ring-primary/50 transition-all duration-500 group-hover:scale-105">
+            {/* Featured spotlight glow */}
+            {featured && (
+              <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-accent/40 via-primary/20 to-accent/30 blur-xl opacity-70 animate-pulse" style={{ animationDuration: '3s' }} />
+            )}
+            <div className={`relative h-32 w-32 overflow-hidden rounded-full bg-gradient-to-br flex items-center justify-center transition-all duration-500 ${
+              featured 
+                ? 'from-primary/40 to-accent/40 ring-4 ring-primary/40 shadow-lg shadow-accent/30 group-hover:ring-primary/60 group-hover:scale-110' 
+                : 'from-primary/30 to-accent/30 ring-4 ring-border group-hover:ring-primary/50 group-hover:scale-105'
+            }`}>
                 {showInitials ? (
                   <span className="text-2xl font-bold text-primary select-none">{initials}</span>
                 ) : (
