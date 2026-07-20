@@ -2,11 +2,22 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { 
   Target, Eye, Heart, Sparkles, Users, Award, 
   Building2, Calendar, MapPin, ArrowRight, Quote, ShieldCheck, Zap
 } from "lucide-react"
+
+// Dynamically import LocationMap with SSR disabled for the About page map
+const LocationMap = dynamic(() => import("@/components/location-map").then(mod => mod.LocationMap), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-slate-900">
+      <Building2 className="w-24 h-24 text-blue-500/30 animate-pulse" />
+    </div>
+  ),
+})
 
 /** * COMPONENT: NeonPlexusBackground
  * A high-performance canvas engine that creates a neon particle network.
@@ -151,9 +162,14 @@ export default function AboutPage() {
 
             <div className="relative group">
               <div className="absolute -inset-4 bg-gradient-to-tr from-blue-400 to-indigo-400 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
-              <div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-white/20 flex items-center justify-center">
-                <Building2 className="w-24 h-24 text-blue-500/30" />
-                <div className="absolute bottom-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10">
+              <div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-white/20">
+                <LocationMap
+                  latitude={9.9252}
+                  longitude={78.1198}
+                  address="Asrivo Tech HQ\nMadurai, Tamil Nadu, India"
+                  zoom={13}
+                />
+                <div className="absolute bottom-6 left-6 z-[1000] flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10">
                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                    <span className="text-[10px] text-white font-bold">HQ: Madurai, Tamil Nadu, India</span>
                 </div>
@@ -263,75 +279,39 @@ export default function AboutPage() {
       <div className="grid md:grid-cols-2 gap-5">
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-            <div className="flex items-center gap-4 mb-3">
-               <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center text-xl">
-                  📈
-               </div>
-
-               <div>
-                  <h4 className="font-semibold text-lg">
-                     Performance Marketing
-                  </h4>
-
-                  <p className="text-sm text-slate-400">
-                     Paid campaigns & lead generation
-                  </p>
-               </div>
-            </div>
+            <h4 className="font-semibold text-lg">
+               Performance Marketing
+            </h4>
+            <p className="text-sm text-slate-400 mt-1">
+               Paid campaigns & lead generation
+            </p>
          </div>
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-            <div className="flex items-center gap-4 mb-3">
-               <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-xl">
-                  🌐
-               </div>
-
-               <div>
-                  <h4 className="font-semibold text-lg">
-                     SEO Optimization
-                  </h4>
-
-                  <p className="text-sm text-slate-400">
-                     Improve search visibility & ranking
-                  </p>
-               </div>
-            </div>
+            <h4 className="font-semibold text-lg">
+               SEO Optimization
+            </h4>
+            <p className="text-sm text-slate-400 mt-1">
+               Improve search visibility & ranking
+            </p>
          </div>
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-            <div className="flex items-center gap-4 mb-3">
-               <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-xl">
-                  📱
-               </div>
-
-               <div>
-                  <h4 className="font-semibold text-lg">
-                     Social Media Branding
-                  </h4>
-
-                  <p className="text-sm text-slate-400">
-                     Build audience engagement & reach
-                  </p>
-               </div>
-            </div>
+            <h4 className="font-semibold text-lg">
+               Social Media Branding
+            </h4>
+            <p className="text-sm text-slate-400 mt-1">
+               Build audience engagement & reach
+            </p>
          </div>
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-            <div className="flex items-center gap-4 mb-3">
-               <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-xl">
-                  🚀
-               </div>
-
-               <div>
-                  <h4 className="font-semibold text-lg">
-                     Growth Strategy
-                  </h4>
-
-                  <p className="text-sm text-slate-400">
-                     Scalable digital business solutions
-                  </p>
-               </div>
-            </div>
+            <h4 className="font-semibold text-lg">
+               Growth Strategy
+            </h4>
+            <p className="text-sm text-slate-400 mt-1">
+               Scalable digital business solutions
+            </p>
          </div>
 
       </div>

@@ -47,14 +47,14 @@ const contactInfo = [
   {
     icon: MapPin,
     title: "Office Address",
-    content: "123 Tech Park, Silicon Valley\nSan Francisco, CA 94102, USA",
-    link: "https://maps.google.com",
+    content: "Madurai, Tamil Nadu, India",
+    link: "https://maps.google.com/?q=Madurai,Tamil+Nadu,India",
   },
   {
     icon: Phone,
     title: "Phone Number",
-    content: "+1 (234) 567-890",
-    link: "tel:+1234567890",
+    content: "+91 8122575337",
+    link: "tel:+918122575337",
   },
   {
     icon: Mail,
@@ -528,9 +528,9 @@ export default function ContactPage() {
                 <h3 className="font-semibold text-foreground mb-4">Our Location</h3>
                 <div className="h-[400px] rounded-xl border border-border bg-muted/30 overflow-hidden">
                   <LocationMap
-                    latitude={37.7749}
-                    longitude={-122.4194}
-                    address="123 Tech Park, Silicon Valley\nSan Francisco, CA 94102"
+                    latitude={9.9252}
+                    longitude={78.1198}
+                    address="Madurai, Tamil Nadu, India"
                     zoom={13}
                   />
                 </div>
