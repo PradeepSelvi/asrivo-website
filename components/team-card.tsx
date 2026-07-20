@@ -71,7 +71,7 @@ export function TeamCard({
                   <img
                     src={avatarSrc!}
                     alt={`${name} profile`}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover object-center"
                     onError={() => setImgError(true)}
                   />
                 )}
@@ -148,7 +148,7 @@ export function TeamCard({
               <img
                 src={avatarSrc!}
                 alt={`${name} profile`}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover object-center"
                 onError={() => setImgError(true)}
               />
             )}

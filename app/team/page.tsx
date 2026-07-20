@@ -17,9 +17,12 @@ const developmentTeamData = [
   {
     id: "dev-sj",
     name: "sivaganesh.J",
-    role: "TL, DATABASE, BACKEND",
-    bio: "Leading backend and database optimization initiatives for robust, scalable application infrastructure.",
-    email: "sivaganesh.j@asrivotech.com",
+    role: "Team Lead, DATABASE, BACKEND",
+    bio: "Leading the team, backend and database optimization initiatives for robust, scalable application infrastructure.",
+    image: "/team/sivaganesh j.jpeg",
+    email: "sivaganesh73acm@gmail.com",
+    linkedin: "https://www.linkedin.com/in/sivaganesh-j",
+    github: "https://github.com/sivaganeshj",
     featured: false,
   },
   {
@@ -27,15 +30,21 @@ const developmentTeamData = [
     name: "KARTHIK RAJALEE.S",
     role: "CLOUD SERVICE DEVELOPER, SOC",
     bio: "Designing secure, scalable cloud solutions and implementing advanced Security Operations Center protocols.",
-    email: "karthik.s@asrivotech.com",
+    image: "/team/karthik rajalee.jpeg",
+    email: "vel759894@gmail.com",
+    linkedin: "https://www.linkedin.com/in/karthik-rajalee",
+    github: "https://github.com/Karthik-03901",
     featured: false,
   },
   {
     id: "dev-yr",
     name: "YOGESHWARAN.R",
-    role: "DEVOPS, AB TESTING, DATABASE",
+    role: "DEVOPS, A/B TESTING, DATABASE",
     bio: "Driving CI/CD pipelines, data-driven AB testing experimentation, and reliable database operations.",
-    email: "yogeshwaran.r@asrivotech.com",
+    image: "/team/yogeshwaran.jpeg",
+    email: "yogesh27124@gmail.com",
+    linkedin: "https://www.linkedin.com/in/yogeshwaran-r",
+    github: "https://github.com/Yoge486",
     featured: true,
   },
   {
@@ -43,7 +52,10 @@ const developmentTeamData = [
     name: "ARIVANANTHAM.N",
     role: "UI&UX, FRONT END DESIGNER",
     bio: "Crafting intuitive user interfaces and delightful user experiences with cutting-edge frontend technologies.",
-    email: "arivanantham.n@asrivotech.com",
+    image: "/team/Arivananatham.jpeg",
+    email: "arivananathamn417@gmail.com",
+    linkedin: "https://www.linkedin.com/in/arivanantham-n",
+    github: "https://github.com/arivanantham",
     featured: false,
   },
 ]
@@ -71,12 +83,13 @@ const managementTeamData = [
   },
   {
     id: "mgmt-pkm",
-    name: "Pradeep Kumar M",
+    name: "M.Pradeep Kumar.DCSE",
     role: "Legal & chief techinical developer",
     bio: "Ensuring regulatory compliance, managing legal risks, protecting company integrity and ethical standards.",
-    email: "pradeep@asrivotech.com",
-    linkedin: "#",
-    github: "#",
+    image: "/team/pradeepkumar.jpeg",
+    email: "pradeepselvi126@gmail.com",
+    linkedin: "https://www.linkedin.com/in/pradeep-kumar-3650982a9?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+    github: "https://github.com/Selvipr",
     featured: false,
   },
   {
@@ -182,6 +195,9 @@ export default async function TeamPage() {
                 name={member.name}
                 role={member.role}
                 bio={member.bio}
+                image={member.image}
+                linkedin={member.linkedin}
+                github={member.github}
                 email={member.email}
                 variant="management"
                 featured={member.featured}
@@ -213,6 +229,7 @@ export default async function TeamPage() {
                 name={member.name}
                 role={member.role}
                 bio={member.bio}
+                image={member.image}
                 linkedin={member.linkedin}
                 github={member.github}
                 email={member.email}
