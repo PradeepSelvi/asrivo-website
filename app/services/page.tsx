@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { InquiryStatusChecker } from "@/components/inquiry-status-checker"
 import { 
   FileCode2, 
   Globe, 
@@ -314,6 +315,25 @@ export default function ServicesPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Check Status Section */}
+      <section className="py-20 lg:py-28 bg-gradient-to-br from-muted/30 to-muted/10">
+        <div className="mx-auto max-w-3xl px-4 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+              Track Your Request
+            </span>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Check Inquiry Status
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Enter your email to track the status of your service inquiry
+            </p>
+          </div>
+
+          <InquiryStatusChecker />
         </div>
       </section>
 

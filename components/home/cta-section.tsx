@@ -62,7 +62,7 @@ export function CTASection() {
                 className="h-14 px-10 text-lg bg-primary-foreground text-primary hover:bg-primary-foreground/90 group hover-lift" 
                 asChild
               >
-                <Link href="/contact">
+                <Link href="/services/inquiry">
                   Start a Project
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>

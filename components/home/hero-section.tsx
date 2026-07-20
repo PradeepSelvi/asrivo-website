@@ -171,7 +171,7 @@ export function HeroSection() {
 
             <div className={`flex flex-col sm:flex-row items-center justify-center gap-8 mb-32 transition-all duration-1000 delay-600 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               <Button size="lg" className="h-20 px-14 text-lg font-black rounded-3xl bg-primary hover:bg-primary/90 shadow-[0_20px_40px_rgba(59,130,246,0.3)] group active:scale-95 transition-all" asChild>
-                <Link href="/contact">
+                <Link href="/services/inquiry">
                   Initialize Deployment
                   <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-2" />
                 </Link>
