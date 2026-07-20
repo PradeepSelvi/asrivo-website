@@ -208,7 +208,7 @@ export function Header() {
           </div>
 
           <Button size="sm" className="bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg shadow-blue-500/20 transition-colors" asChild>
-            <Link href="/contact" className="gap-2">
+            <Link href="/services/inquiry" className="gap-2">
               <Sparkles className="h-4 w-4" />
               Get Started
             </Link>
