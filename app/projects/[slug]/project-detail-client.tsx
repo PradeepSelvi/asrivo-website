@@ -155,51 +155,53 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
             </Link>
           </Button>
 
-          <div className="flex items-start justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${getStatusColor(project.status)}`}>
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-3">
+                <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider border ${getStatusColor(project.status)}`}>
                   {project.status}
                 </span>
                 {project.category && (
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                  <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-muted text-muted-foreground">
                     {project.category}
                   </span>
                 )}
               </div>
-              <h1 className="text-4xl font-bold text-foreground mb-3">{project.title}</h1>
-              <p className="text-lg text-muted-foreground mb-4">{project.description}</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 sm:mb-3 break-words">{project.title}</h1>
+              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-3 sm:mb-4 break-words">{project.description}</p>
 
-              <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                 {project.team_size && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="w-4 h-4" />
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                     <span>{project.team_size} Team Members</span>
                   </div>
                 )}
                 {project.duration && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="w-4 h-4" />
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                     <span>{project.duration}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0">
               {project.live_url && (
-                <Button asChild>
+                <Button asChild size="sm" className="text-xs sm:text-sm">
                   <a href={project.live_url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Live Demo
+                    <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                    <span className="hidden sm:inline">Live Demo</span>
+                    <span className="sm:hidden">Demo</span>
                   </a>
                 </Button>
               )}
               {project.github_url && (
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild size="sm" className="text-xs sm:text-sm">
                   <a href={project.github_url} target="_blank" rel="noopener noreferrer">
-                    <Github className="w-4 h-4 mr-2" />
-                    GitHub
+                    <Github className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                    <span className="hidden sm:inline">GitHub</span>
+                    <span className="sm:hidden">Code</span>
                   </a>
                 </Button>
               )}
