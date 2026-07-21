@@ -157,14 +157,6 @@ export default async function ProjectsPage() {
                             View Details
                           </Link>
                         </Button>
-                        {project.live_url && (
-                          <Button variant="outline" asChild>
-                            <a href={project.live_url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-4 h-4 mr-2" />
-                              Live Demo
-                            </a>
-                          </Button>
-                        )}
                       </div>
                     </div>
                   </div>

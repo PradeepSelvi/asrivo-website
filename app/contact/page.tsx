@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { MobileBackButton } from "@/components/mobile-back-button"
 import { 
   MapPin, 
   Phone, 
@@ -167,6 +168,7 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col">
+      <MobileBackButton />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
         <div className="absolute inset-0 -z-10">

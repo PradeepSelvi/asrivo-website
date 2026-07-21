@@ -186,18 +186,9 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
               </div>
             </div>
 
-            <div className="flex gap-2 flex-shrink-0">
-              {project.live_url && (
-                <Button asChild size="sm" className="text-xs sm:text-sm">
-                  <a href={project.live_url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                    <span className="hidden sm:inline">Live Demo</span>
-                    <span className="sm:hidden">Demo</span>
-                  </a>
-                </Button>
-              )}
+            <div className="flex gap-2">
               {project.github_url && (
-                <Button variant="outline" asChild size="sm" className="text-xs sm:text-sm">
+                <Button asChild>
                   <a href={project.github_url} target="_blank" rel="noopener noreferrer">
                     <Github className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                     <span className="hidden sm:inline">GitHub</span>
@@ -211,8 +202,7 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 lg:px-8 py-12">
-        <div className="grid gap-8 lg:grid-cols-3">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8 py-12">\n        <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Featured Image */}

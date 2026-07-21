@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { TeamCard } from "@/components/team-card"
 import { ArrowRight, Linkedin, Github, Mail, MessageCircle } from "lucide-react"
 import { getTeamMembers } from "@/lib/supabase/actions"
+import { MobileBackButton } from "@/components/mobile-back-button"
 
 export const dynamic = "force-dynamic"
 
@@ -32,7 +33,7 @@ const developmentTeamData = [
     bio: "Designing secure, scalable cloud solutions and implementing advanced Security Operations Center protocols.",
     image: "/team/karthik rajalee.jpeg",
     email: "vel759894@gmail.com",
-    linkedin: "https://www.linkedin.com/in/karthik-rajalee",
+    linkedin: "https://www.linkedin.com/in/karthik-saravanavel-18852035a/",
     github: "https://github.com/Karthik-03901",
     featured: false,
   },
@@ -74,7 +75,7 @@ const managementTeamData = [
   {
     id: "mgmt-sb",
     name: "Siranjeevi B.U",
-    role: "Head - Digital Marketing (SEO, SMO) & HR Executive",
+    role: "Digital Marketing (SEO, SMO)",
     bio: "Leading brand growth through expert SEO, SMO strategies, and organizational excellence in talent and HR management.",
     email: "siranjeevi@asrivotech.com",
     linkedin: "#",
@@ -152,6 +153,7 @@ export default async function TeamPage() {
   )
   return (
     <div className="flex flex-col">
+      <MobileBackButton />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
         <div className="absolute inset-0 -z-10">
