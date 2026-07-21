@@ -363,7 +363,7 @@ export default function PartnershipPage() {
                           <Input
                             id="contactPerson"
                             name="contactPerson"
-                            placeholder="John Doe"
+                            placeholder="Your Name"
                             required
                           />
                         </div>
@@ -376,7 +376,7 @@ export default function PartnershipPage() {
                               id="email"
                               name="email"
                               type="email"
-                              placeholder="john@company.com"
+                              placeholder="yourname@company.com"
                               className="pl-10"
                               required
                             />

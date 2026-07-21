@@ -3,6 +3,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { InquiryStatusChecker } from "@/components/inquiry-status-checker"
+import { MobileBackButton } from "@/components/mobile-back-button"
 import { 
   FileCode2, 
   Globe, 
@@ -200,6 +201,7 @@ const process = [
 export default function ServicesPage() {
   return (
     <div className="flex flex-col">
+      <MobileBackButton />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
         <div className="absolute inset-0 -z-10">

@@ -218,31 +218,80 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-background p-6 lg:hidden flex flex-col">
-          <div className="flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-background lg:hidden" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          {/* Header - with top padding for mobile status bar */}
+          <div className="flex items-center justify-between px-6 pt-20 pb-6 border-b border-border">
             <div className="flex items-center gap-2">
                <AsrivoLogoIcon className="h-10 w-10" />
                <span className="font-bold text-foreground text-xl">ASRIVO TECH</span>
             </div>
-            <button onClick={() => setMobileMenuOpen(false)} className="text-foreground"><X /></button>
-          </div>
-          <div className="mt-8 space-y-4 flex-grow">
-            {navigation.map((item) => (
-              <Link key={item.name} href={item.href} className="block text-xl font-medium text-foreground hover:text-[#4fd1ed]" onClick={() => setMobileMenuOpen(false)}>
-                {item.name}
-              </Link>
-            ))}
+            <button 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="text-foreground p-2 hover:bg-muted rounded-lg transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="h-6 w-6" />
+            </button>
           </div>
 
-          <div className="mt-auto pt-6 border-t border-border/40 flex items-center justify-around">
-            <a href="https://linkedin.com" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors">
-              <LinkedInIcon className="h-6 w-6" />
-              <span>LinkedIn</span>
-            </a>
-            <a href="https://www.instagram.com/asrivotech" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors">
-              <InstagramIcon className="h-6 w-6" />
-              <span>Instagram</span>
-            </a>
+          {/* Navigation Links */}
+          <div className="p-6 space-y-1">
+            <Link 
+              href="/" 
+              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link 
+              href="/about" 
+              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link 
+              href="/services" 
+              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Services
+            </Link>
+            <Link 
+              href="/team" 
+              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Team
+            </Link>
+            <Link 
+              href="/projects" 
+              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Projects
+            </Link>
+            <Link 
+              href="/contact" 
+              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+          </div>
+
+          {/* Footer - Fixed at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-border bg-background">
+            <div className="flex items-center justify-around">
+              <a href="https://linkedin.com" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors">
+                <LinkedInIcon className="h-6 w-6" />
+                <span>LinkedIn</span>
+              </a>
+              <a href="https://www.instagram.com/asrivotech" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors">
+                <InstagramIcon className="h-6 w-6" />
+                <span>Instagram</span>
+              </a>
+            </div>
           </div>
         </div>
       )}

@@ -187,16 +187,8 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
             </div>
 
             <div className="flex gap-2">
-              {project.live_url && (
-                <Button asChild>
-                  <a href={project.live_url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Live Demo
-                  </a>
-                </Button>
-              )}
               {project.github_url && (
-                <Button variant="outline" asChild>
+                <Button asChild>
                   <a href={project.github_url} target="_blank" rel="noopener noreferrer">
                     <Github className="w-4 h-4 mr-2" />
                     GitHub

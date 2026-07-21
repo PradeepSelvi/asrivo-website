@@ -158,7 +158,7 @@ export function AboutPreview() {
             </h2>
 
             <p className="mt-8 text-lg leading-8 text-slate-600">
-              Asrivo Tech isn't just a dev shop. We are a **Digital Product Studio** where 
+              Asrivo Tech isn't just a dev shop. We are a Digital Product Studio where 
               performance meets aesthetics. We take the "impossible" ideas and build them into 
               lightning-fast, secure, and beautiful realities.
             </p>
@@ -180,14 +180,14 @@ export function AboutPreview() {
 
             <div className="mt-12 flex flex-col sm:flex-row gap-4">
               <Link
-                href="/portfolio"
+                href="/projects"
                 className="inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-4 text-sm font-bold text-white shadow-lg transition-all hover:bg-slate-800 hover:shadow-xl active:scale-95"
               >
                 View Our Work
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link
-                href="/contact"
+                href="/book-consult"
                 className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/80 px-8 py-4 text-sm font-bold text-slate-900 backdrop-blur-sm transition-all hover:bg-white hover:shadow-md"
               >
                 Book a Consultation
@@ -218,7 +218,7 @@ export function AboutPreview() {
                     <Zap className="h-5 w-5 text-emerald-600" />
                   </div>
                   <p className="text-sm font-medium text-slate-700">
-                    We are currently accepting new projects for **Q3 2026**.
+                    We are currently accepting new projects for Q3 2026.
                   </p>
                </div>
             </div>
