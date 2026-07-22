@@ -84,10 +84,14 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
 ### 4. Set Up Database
-1. Go to Supabase SQL Editor
-2. Run `DATABASE_SCHEMA.sql`
-3. Run `ADMIN_SETUP_MINIMAL.sql`
-4. Run `FIX_RLS.sql`
+Run the schema files in the Supabase SQL Editor (located in `supabase/schema/`):
+1. `supabase/schema/DATABASE_SCHEMA.sql`
+2. `supabase/schema/ADMIN_SETUP_MINIMAL.sql`
+3. `supabase/schema/SUPABASE_FUNCTIONS_AND_ADMINS.sql`
+4. `supabase/schema/SUPABASE_STORAGE_SETUP.sql`
+
+Then apply incremental migrations from `supabase/migrations/` as needed.
+One-off historical fixes and debug scripts are kept in `supabase/archive/` for reference.
 
 ### 5. Run Development Server
 ```bash
@@ -118,29 +122,33 @@ vercel
 
 Or connect your GitHub repository to Vercel for automatic deployments.
 
-See [PRODUCTION_DEPLOYMENT.md](./PRODUCTION_DEPLOYMENT.md) for detailed deployment guide.
+Set the environment variables from `.env.production.example` in the Vercel dashboard before deploying.
 
 ## 🗂️ Project Structure
 
 ```
-asrivo-tech/
+asrivo-website/
 ├── app/                      # Next.js app directory
-│   ├── (public)/            # Public pages
-│   ├── admin/               # Admin panel
-│   │   ├── login/          # Login page
-│   │   └── (dashboard)/    # Dashboard pages
-│   ├── api/                # API routes
-│   ├── error.tsx           # Error boundary
-│   ├── not-found.tsx       # 404 page
-│   └── layout.tsx          # Root layout
-├── lib/                     # Utility libraries
-│   ├── auth/               # Auth guards
-│   ├── supabase/           # Supabase clients & actions
-│   └── utils/              # Utilities (logger, rate-limit)
-├── components/              # React components
-├── public/                  # Static assets
-├── middleware.ts            # Next.js middleware
-└── next.config.mjs         # Next.js configuration
+│   ├── admin/               # Admin panel (login + dashboard route group)
+│   ├── api/                 # API routes
+│   ├── error.tsx            # Error boundary
+│   ├── not-found.tsx        # 404 page
+│   └── layout.tsx           # Root layout
+├── lib/                      # Utility libraries
+│   ├── auth/                # Auth guards
+│   ├── supabase/            # Supabase clients & actions
+│   └── utils/               # Utilities (logger, rate-limit)
+├── components/               # React components
+├── hooks/                    # Shared React hooks
+├── public/                   # Static assets
+├── docs/                     # Project documentation
+├── scripts/                  # Maintenance/utility scripts
+├── supabase/
+│   ├── schema/              # Canonical schema definitions
+│   ├── migrations/          # Incremental migrations
+│   └── archive/             # Historical one-off fixes & debug scripts
+├── middleware.ts             # Next.js middleware
+└── next.config.mjs          # Next.js configuration
 ```
 
 ## 🔐 Admin Panel Routes
@@ -176,10 +184,9 @@ pnpm build
 
 ## 📚 Documentation
 
-- [Production Deployment Guide](./PRODUCTION_DEPLOYMENT.md)
-- [Admin Login Status Report](./ADMIN_LOGIN_STATUS_REPORT.md)
-- [All Fixes Complete](./ALL_FIXES_COMPLETE.md)
-- [Database Schema](./DATABASE_SCHEMA.sql)
+- [Admin Auth Flow](./docs/admin-auth-flow.md)
+- [Database Schema Reference](./docs/DATABASE_SCHEMA.md)
+- [Canonical SQL Schema](./supabase/schema/)
 
 ## 🔧 Scripts
 
@@ -192,7 +199,7 @@ pnpm build
   "lint:fix": "eslint . --fix",
   "type-check": "tsc --noEmit",
   "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-  "clean": "rm -rf .next node_modules/.cache"
+  "clean": "node -e \"...\"  // cross-platform cache clean"
 }
 ```
 

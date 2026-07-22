@@ -23,8 +23,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Allow login page and test-auth without auth check
-  if (pathname === '/admin/login' || pathname === '/admin/test-auth') {
+  // Allow login page without auth check
+  if (pathname === '/admin/login') {
     return NextResponse.next()
   }
 
