@@ -219,7 +219,7 @@ export default function SubscribersPage() {
       </div>
 
       {/* Subscribers Table */}
-      <div className="rounded-xl border bg-card shadow-sm">
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center p-12">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -235,38 +235,29 @@ export default function SubscribersPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Subscribed Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {subscribers.map((subscriber) => (
-                  <tr
-                    key={subscriber.id}
-                    className="hover:bg-muted/50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Mail className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{subscriber.email}</p>
-                        </div>
+          <>
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden lg:grid bg-muted/50 border-b border-border grid-cols-[3fr_120px_180px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Email</span>
+              <span>Status</span>
+              <span>Subscribed Date</span>
+            </div>
+
+            {/* Subscribers List */}
+            <div>
+              {subscribers.map((subscriber) => (
+                <div key={subscriber.id}>
+                  {/* Desktop View */}
+                  <div className="hidden lg:grid grid-cols-[3fr_120px_180px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-5 w-5 text-primary" />
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
+                      <div>
+                        <p className="font-medium text-sm">{subscriber.email}</p>
+                      </div>
+                    </div>
+                    <div>
                       <Badge 
                         className={
                           subscriber.status === 'active'
@@ -276,22 +267,52 @@ export default function SubscribersPage() {
                       >
                         {subscriber.status}
                       </Badge>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      {new Date(subscriber.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="lg:hidden p-4 border-b border-border/50 hover:bg-muted/20 transition-colors space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{subscriber.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge 
+                        className={
+                          subscriber.status === 'active'
+                            ? 'bg-green-500/10 text-green-600 border-green-500/20'
+                            : 'bg-red-500/10 text-red-600 border-red-500/20'
+                        }
+                      >
+                        {subscriber.status}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
                         {new Date(subscriber.created_at).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric'
                         })}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

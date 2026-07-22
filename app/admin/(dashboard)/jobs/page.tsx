@@ -45,38 +45,42 @@ export default async function AdminJobsPage() {
           </div>
         )}
         {jobs?.map((job) => (
-          <div key={job.id} className="bg-card border border-border rounded-2xl p-6 hover:border-border transition-all shadow-lg flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 flex-wrap mb-2">
-                <h3 className="font-bold text-foreground text-base">{job.title}</h3>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${job.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-700 text-muted-foreground'}`}>
-                  {job.active ? 'Hiring' : 'Closed'}
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-muted text-muted-foreground">
-                  {job.employment_type}
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                  {job.experience_level}
-                </span>
+          <div key={job.id} className="bg-card border border-border rounded-2xl p-4 lg:p-6 hover:border-border transition-all shadow-lg">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-2">
+                  <h3 className="font-bold text-foreground text-sm lg:text-base">{job.title}</h3>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${job.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-700 text-muted-foreground'}`}>
+                    {job.active ? 'Hiring' : 'Closed'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap mb-3">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-muted text-muted-foreground">
+                    {job.employment_type}
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                    {job.experience_level}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{job.description}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
+                  {job.location && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{job.location}</span>}
+                  {job.salary_range && <span className="text-emerald-500/70">{job.salary_range}</span>}
+                  <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{new Date(job.created_at).toLocaleDateString()}</span>
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{job.description}</p>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                {job.location && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{job.location}</span>}
-                {job.salary_range && <span className="text-emerald-500/70">{job.salary_range}</span>}
-                <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{new Date(job.created_at).toLocaleDateString()}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Link href={`/admin/jobs/${job.id}/edit`}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all" title="Edit">
-                <Pencil className="w-4 h-4" />
-              </Link>
-              {isHigh && (
-                <Link href={`/admin/jobs/${job.id}/delete`}
-                  className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-red-500/10 transition-all" title="Delete">
-                  <Trash2 className="w-4 h-4" />
+              <div className="flex lg:flex-col items-center gap-2 shrink-0">
+                <Link href={`/admin/jobs/${job.id}/edit`}
+                  className="flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all">
+                  <Pencil className="w-3.5 h-3.5" /> Edit
                 </Link>
-              )}
+                {isHigh && (
+                  <Link href={`/admin/jobs/${job.id}/delete`}
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-red-500/10 transition-all">
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         ))}

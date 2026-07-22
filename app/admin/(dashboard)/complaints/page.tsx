@@ -81,44 +81,44 @@ export default async function AdminComplaintsPage() {
             <p className="font-semibold">No complaints yet.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-background/60 border-b border-border">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">User</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Subject</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Proof</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Priority</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {complaints?.map((complaint) => (
-                  <tr key={complaint.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="font-semibold text-foreground text-sm">{complaint.name}</p>
-                          <p className="text-xs text-muted-foreground">{complaint.email}</p>
-                        </div>
+          <>
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[2fr_2fr_100px_80px_90px_90px_120px_80px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>User</span>
+              <span>Subject</span>
+              <span>Category</span>
+              <span>Proof</span>
+              <span>Priority</span>
+              <span>Status</span>
+              <span>Date</span>
+              <span>Actions</span>
+            </div>
+
+            {/* Complaints List */}
+            <div>
+              {complaints?.map((complaint) => (
+                <div key={complaint.id}>
+                  {/* Desktop View */}
+                  <div className="hidden lg:grid grid-cols-[2fr_2fr_100px_80px_90px_90px_120px_80px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-foreground text-sm">{complaint.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{complaint.email}</p>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-foreground">{complaint.subject}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground text-sm">{complaint.subject}</p>
                       <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{complaint.description}</p>
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+                    <div>
                       {complaint.category ? (
-                        <span className="text-xs bg-muted px-2 py-1 rounded">{complaint.category}</span>
+                        <span className="text-xs font-medium bg-muted px-2.5 py-1 rounded-full">{complaint.category}</span>
                       ) : (
                         <span className="text-muted-foreground text-xs">—</span>
                       )}
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+                    <div>
                       {complaint.proof_document_url ? (
                         <a
                           href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/proof%20of%20complain/${complaint.proof_document_url}`}
@@ -132,9 +132,9 @@ export default async function AdminComplaintsPage() {
                       ) : (
                         <span className="text-muted-foreground text-xs">—</span>
                       )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
+                    </div>
+                    <div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider w-fit ${
                         complaint.priority === 'urgent' ? 'bg-red-500/20 text-red-500 border border-red-500/30' :
                         complaint.priority === 'high' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' :
                         complaint.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :
@@ -142,9 +142,9 @@ export default async function AdminComplaintsPage() {
                       }`}>
                         {complaint.priority}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
+                    </div>
+                    <div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider w-fit ${
                         complaint.status === 'new' ? 'bg-red-500/10 text-destructive border border-red-500/20' :
                         complaint.status === 'in_progress' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
                         complaint.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
@@ -152,14 +152,14 @@ export default async function AdminComplaintsPage() {
                       }`}>
                         {complaint.status.replace('_', ' ')}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-muted-foreground font-mono">
+                    </div>
+                    <div className="text-xs text-muted-foreground font-mono">
                       <span className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5" />
                         {new Date(complaint.created_at).toLocaleDateString()}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+                    <div>
                       <Link
                         href={`/admin/complaints/${complaint.id}`}
                         className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
@@ -167,12 +167,75 @@ export default async function AdminComplaintsPage() {
                         <Eye className="w-3.5 h-3.5" />
                         View
                       </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="lg:hidden p-4 border-b border-border/50 hover:bg-muted/20 transition-colors space-y-3">
+                    <div className="flex items-start gap-2">
+                      <User className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground text-sm">{complaint.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{complaint.email}</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="font-medium text-foreground text-sm">{complaint.subject}</p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{complaint.description}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {complaint.category && (
+                        <span className="text-xs font-medium bg-muted px-2.5 py-1 rounded-full">{complaint.category}</span>
+                      )}
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        complaint.priority === 'urgent' ? 'bg-red-500/20 text-red-500 border border-red-500/30' :
+                        complaint.priority === 'high' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' :
+                        complaint.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :
+                        'bg-blue-500/20 text-blue-500 border border-blue-500/30'
+                      }`}>
+                        {complaint.priority}
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        complaint.status === 'new' ? 'bg-red-500/10 text-destructive border border-red-500/20' :
+                        complaint.status === 'in_progress' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                        complaint.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                        'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                      }`}>
+                        {complaint.status.replace('_', ' ')}
+                      </span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(complaint.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2">
+                      {complaint.proof_document_url && (
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/proof%20of%20complain/${complaint.proof_document_url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-all"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          View Proof
+                        </a>
+                      )}
+                      <Link
+                        href={`/admin/complaints/${complaint.id}`}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-all"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        View Details
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -342,3 +342,61 @@
 .animate-scroll-testimonials {
   animation: scroll-testimonials 60s linear infinite;
 }
+
+
+/* Mobile responsive styles for admin panel */
+@layer utilities {
+  /* Prevent horizontal overflow on mobile */
+  .admin-content {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Mobile-responsive tables */
+  @media (max-width: 1023px) {
+    /* Make tables horizontally scrollable on mobile */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure table doesn't overflow */
+    table {
+      min-width: 100%;
+    }
+
+    /* Make table cells more compact on mobile */
+    th, td {
+      padding: 0.5rem !important;
+      font-size: 0.875rem !important;
+    }
+
+    /* Hide less important columns on mobile */
+    .hide-mobile {
+      display: none !important;
+    }
+
+    /* Stack cards on mobile */
+    .grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Reduce button text on mobile */
+    button span:not(.icon) {
+      font-size: 0.875rem;
+    }
+
+    /* Ensure content fits within viewport */
+    * {
+      max-width: 100%;
+    }
+
+    /* Fix for buttons and inputs */
+    input, button, select, textarea {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
+}

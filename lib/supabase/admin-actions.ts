@@ -67,21 +67,34 @@ export async function verifyAdminProfile(userId: string) {
   }
 }
 
-export const getCurrentAdmin = cache(async () => {
+export async function getCurrentAdmin() {
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    
+    // Get user with error handling
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-    if (!user) return { success: false, user: null }
+    if (userError) {
+      console.error('getCurrentAdmin: Auth error:', userError.message)
+      return { success: false, user: null }
+    }
 
+    if (!user) {
+      return { success: false, user: null }
+    }
+
+    // Get admin profile
     const adminSupabase = await getAdminClient()
-    const { data: profile } = await adminSupabase
+    const { data: profile, error: profileError } = await adminSupabase
       .from('admin_profiles')
       .select('role, email')
       .eq('id', user.id)
       .single()
 
-    if (!profile) return { success: false, user: null }
+    if (profileError || !profile) {
+      console.error('getCurrentAdmin: Profile error:', profileError?.message)
+      return { success: false, user: null }
+    }
 
     return {
       success: true,
@@ -91,10 +104,11 @@ export const getCurrentAdmin = cache(async () => {
         role: profile.role,
       },
     }
-  } catch {
+  } catch (error) {
+    console.error('getCurrentAdmin: Unexpected error:', error)
     return { success: false, user: null }
   }
-})
+}
 
 export async function signOutAdmin() {
   const supabase = await createClient()
@@ -122,34 +136,58 @@ export async function getAdmins() {
 }
 
 export async function addAdmin(email: string, role: 'high' | 'low') {
+  // Verify current admin first - this uses the user's session
   const current = await getCurrentAdmin()
   if (!current.success || current.user?.role !== 'high') {
     return { success: false, error: 'Unauthorized: High role required' }
   }
 
-  const adminSupabase = await getAdminClient()
-  const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
-    email,
-    email_confirm: true,
-    password: 'AdminPassword123!',
-  })
+  try {
+    // Use a completely separate admin client instance
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  if (authError || !authUser.user) {
-    return { success: false, error: authError?.message || 'Failed to create user' }
+    if (!supabaseUrl || !serviceRoleKey) {
+      return { success: false, error: 'Server configuration error' }
+    }
+
+    // Create a fresh admin client for this operation only
+    const { createClient: createSupabaseClient } = await import('@supabase/supabase-js')
+    const adminSupabase = createSupabaseClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+
+    const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
+      email,
+      email_confirm: true,
+      password: 'TempPass123!', // Default temporary password
+    })
+
+    if (authError || !authUser.user) {
+      return { success: false, error: authError?.message || 'Failed to create user' }
+    }
+
+    const { data, error } = await adminSupabase
+      .from('admin_profiles')
+      .insert({ id: authUser.user.id, email, role })
+      .select()
+
+    if (error) {
+      await adminSupabase.auth.admin.deleteUser(authUser.user.id)
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath('/admin/admins')
+    return { success: true, data }
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to create admin' 
+    }
   }
-
-  const { data, error } = await adminSupabase
-    .from('admin_profiles')
-    .insert({ id: authUser.user.id, email, role })
-    .select()
-
-  if (error) {
-    await adminSupabase.auth.admin.deleteUser(authUser.user.id)
-    return { success: false, error: error.message }
-  }
-
-  revalidatePath('/admin/admins')
-  return { success: true, data }
 }
 
 export async function removeAdmin(id: string) {

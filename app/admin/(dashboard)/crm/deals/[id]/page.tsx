@@ -3,8 +3,9 @@ import { Briefcase, DollarSign, Calendar, TrendingUp, Mail, Phone, Building2, Us
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-export default async function DealDetailPage({ params }: { params: { id: string } }) {
-  const dealId = parseInt(params.id)
+export default async function DealDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const dealId = parseInt(id)
   
   const [dealResult, activitiesResult, tasksResult, notesResult] = await Promise.all([
     getDealById(dealId),
