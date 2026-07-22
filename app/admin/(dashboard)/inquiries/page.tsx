@@ -241,7 +241,7 @@ export default function ServiceInquiriesPage() {
       </div>
 
       {/* Inquiries Table */}
-      <div className="rounded-xl border bg-card shadow-sm">
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center p-12">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -257,111 +257,148 @@ export default function ServiceInquiriesPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Company
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Budget
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {inquiries.map((inquiry) => {
-                  const statusConfig = getStatusConfig(inquiry.status)
-                  return (
-                    <tr
-                      key={inquiry.id}
-                      className="hover:bg-muted/50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Building2 className="h-5 w-5 text-primary" />
+          <>
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[2fr_2fr_1.5fr_120px_100px_120px_100px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Company</span>
+              <span>Contact</span>
+              <span>Type</span>
+              <span>Budget</span>
+              <span>Status</span>
+              <span>Date</span>
+              <span>Actions</span>
+            </div>
+
+            {/* Inquiries List */}
+            <div>
+              {inquiries.map((inquiry) => {
+                const statusConfig = getStatusConfig(inquiry.status)
+                return (
+                  <div key={inquiry.id}>
+                    {/* Desktop View */}
+                    <div className="hidden lg:grid grid-cols-[2fr_2fr_1.5fr_120px_100px_120px_100px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Building2 className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm">{inquiry.company || 'Individual'}</p>
+                          <p className="text-xs text-muted-foreground">{inquiry.name}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <span className="truncate">{inquiry.email}</span>
+                        </div>
+                        {inquiry.phone && (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Phone className="h-4 w-4 flex-shrink-0" />
+                            <span>{inquiry.phone}</span>
                           </div>
-                          <div>
-                            <p className="font-medium">{inquiry.company || 'Individual'}</p>
-                            <p className="text-sm text-muted-foreground">{inquiry.name}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-sm">
-                            <Mail className="h-4 w-4 text-muted-foreground" />
-                            <span className="truncate max-w-[200px]">{inquiry.email}</span>
-                          </div>
-                          {inquiry.phone && (
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Phone className="h-4 w-4" />
-                              <span>{inquiry.phone}</span>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
-                          {inquiry.project_types.slice(0, 2).map((type, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs">
-                              {type}
-                            </Badge>
-                          ))}
-                          {inquiry.project_types.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{inquiry.project_types.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium">{inquiry.budget_range}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {inquiry.project_types.slice(0, 2).map((type, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {type}
+                          </Badge>
+                        ))}
+                        {inquiry.project_types.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{inquiry.project_types.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium">{inquiry.budget_range}</span>
+                      </div>
+                      <div>
                         <Badge className={statusConfig.color}>
                           {statusConfig.label}
                         </Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(inquiry.created_at).toLocaleDateString()}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(inquiry.created_at).toLocaleDateString()}
+                      </div>
+                      <div>
                         <Link href={`/admin/inquiries/${inquiry.id}`}>
                           <Button variant="ghost" size="sm">
                             <Eye className="h-4 w-4 mr-2" />
                             View
                           </Button>
                         </Link>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="lg:hidden p-4 border-b border-border/50 hover:bg-muted/20 transition-colors space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Building2 className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground text-sm">{inquiry.company || 'Individual'}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{inquiry.name}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2 text-xs">
+                          <Mail className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                          <span className="truncate">{inquiry.email}</span>
+                        </div>
+                        {inquiry.phone && (
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Phone className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span>{inquiry.phone}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {inquiry.project_types.slice(0, 3).map((type, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {type}
+                          </Badge>
+                        ))}
+                        {inquiry.project_types.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{inquiry.project_types.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 text-xs font-medium">
+                          <DollarSign className="h-3.5 w-3.5 text-green-600" />
+                          {inquiry.budget_range}
+                        </div>
+                        <Badge className={statusConfig.color}>
+                          {statusConfig.label}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(inquiry.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2">
+                        <Link href={`/admin/inquiries/${inquiry.id}`} className="flex-1">
+                          <Button variant="default" size="sm" className="w-full">
+                            <Eye className="h-3.5 w-3.5 mr-2" />
+                            View Details
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
     </div>

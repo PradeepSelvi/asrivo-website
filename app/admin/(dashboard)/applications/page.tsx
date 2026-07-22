@@ -250,7 +250,7 @@ export default function JobApplicationsPage() {
       </div>
 
       {/* Applications Table */}
-      <div className="rounded-xl border bg-card shadow-sm">
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center p-12">
             <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -266,82 +266,153 @@ export default function JobApplicationsPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Applicant
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Position
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Experience
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Documents
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {applications.map((app) => {
-                  const statusConfig = getStatusConfig(app.status)
-                  return (
-                    <tr
-                      key={app.id}
-                      className="hover:bg-muted/50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <FileUser className="h-5 w-5 text-primary" />
+          <>
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[2fr_1.5fr_120px_150px_100px_120px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Applicant</span>
+              <span>Position</span>
+              <span>Experience</span>
+              <span>Documents</span>
+              <span>Status</span>
+              <span>Date</span>
+            </div>
+
+            {/* Applications List */}
+            <div>
+              {applications.map((app) => {
+                const statusConfig = getStatusConfig(app.status)
+                return (
+                  <div key={app.id}>
+                    {/* Desktop View */}
+                    <div className="hidden lg:grid grid-cols-[2fr_1.5fr_120px_150px_100px_120px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <FileUser className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm">{app.full_name}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                            <Mail className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{app.email}</span>
                           </div>
-                          <div>
-                            <p className="font-medium">{app.full_name}</p>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
-                              <Mail className="h-3 w-3" />
-                              <span className="truncate max-w-[200px]">{app.email}</span>
+                          {app.phone && (
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Phone className="h-3 w-3 flex-shrink-0" />
+                              <span>{app.phone}</span>
                             </div>
-                            {app.phone && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Phone className="h-3 w-3" />
-                                <span>{app.phone}</span>
-                              </div>
-                            )}
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-sm font-medium">
+                          {app.position_id && jobTitleMap[String(app.position_id)]
+                            ? jobTitleMap[String(app.position_id)]
+                            : app.job_title || '—'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <GraduationCap className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm">{app.experience_years} years</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        {app.resume_url && (
+                          <a
+                            href={app.resume_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-500"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Resume
+                          </a>
+                        )}
+                        {app.linkedin_url && (
+                          <a
+                            href={app.linkedin_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-500"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            LinkedIn
+                          </a>
+                        )}
+                        {app.portfolio_url && (
+                          <a
+                            href={app.portfolio_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-500"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Portfolio
+                          </a>
+                        )}
+                      </div>
+                      <div>
+                        <Badge className={statusConfig.color}>
+                          {statusConfig.label}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(app.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="lg:hidden p-4 border-b border-border/50 hover:bg-muted/20 transition-colors space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <FileUser className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground text-sm">{app.full_name}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <Mail className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{app.email}</span>
                           </div>
+                          {app.phone && (
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                              <Phone className="h-3 w-3 flex-shrink-0" />
+                              <span>{app.phone}</span>
+                            </div>
+                          )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <Briefcase className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">
-                            {app.position_id && jobTitleMap[String(app.position_id)]
-                              ? jobTitleMap[String(app.position_id)]
-                              : app.job_title || '—'}
-                          </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-sm font-medium">
+                          {app.position_id && jobTitleMap[String(app.position_id)]
+                            ? jobTitleMap[String(app.position_id)]
+                            : app.job_title || '—'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <GraduationCap className="h-3.5 w-3.5 text-blue-600" />
+                          {app.experience_years} years
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <GraduationCap className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm">{app.experience_years} years</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1">
+                        <Badge className={statusConfig.color}>
+                          {statusConfig.label}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(app.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      {(app.resume_url || app.linkedin_url || app.portfolio_url) && (
+                        <div className="flex flex-wrap gap-2">
                           {app.resume_url && (
                             <a
                               href={app.resume_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-500"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-all"
                             >
                               <ExternalLink className="h-3 w-3" />
                               Resume
@@ -352,7 +423,7 @@ export default function JobApplicationsPage() {
                               href={app.linkedin_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-500"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-all"
                             >
                               <ExternalLink className="h-3 w-3" />
                               LinkedIn
@@ -363,31 +434,20 @@ export default function JobApplicationsPage() {
                               href={app.portfolio_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-500"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-500/10 text-purple-600 hover:bg-purple-500/20 transition-all"
                             >
                               <ExternalLink className="h-3 w-3" />
                               Portfolio
                             </a>
                           )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge className={statusConfig.color}>
-                          {statusConfig.label}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(app.created_at).toLocaleDateString()}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
     </div>

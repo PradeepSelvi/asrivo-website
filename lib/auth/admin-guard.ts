@@ -24,9 +24,8 @@ export async function requireAdmin(options: AdminGuardOptions = {}) {
   const adminResult = await getCurrentAdmin()
   
   if (!adminResult.success || !adminResult.user) {
-    // Sign out before redirecting to prevent redirect loop
-    const supabase = await createClient()
-    await supabase.auth.signOut()
+    // Do NOT sign out - just redirect
+    // The user might have a valid session that just needs to be refreshed
     redirect(redirectTo)
   }
   

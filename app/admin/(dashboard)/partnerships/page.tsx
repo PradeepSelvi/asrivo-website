@@ -280,112 +280,124 @@ export default function PartnershipsPage() {
             <p className="text-muted-foreground mt-4">No partnership requests found</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Company
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {partnerships.map((partnership) => (
-                  <tr
-                    key={partnership.id}
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">
-                            {partnership.company_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {partnership.industry}
-                          </p>
-                        </div>
+          <>
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden lg:grid bg-muted/50 border-b border-border grid-cols-[2fr_2fr_1.5fr_140px_120px_100px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Company</span>
+              <span>Contact</span>
+              <span>Type</span>
+              <span>Status</span>
+              <span>Date</span>
+              <span>Actions</span>
+            </div>
+
+            {/* Partnerships List */}
+            <div>
+              {partnerships.map((partnership) => (
+                <div key={partnership.id}>
+                  {/* Desktop View */}
+                  <div className="hidden lg:grid grid-cols-[2fr_2fr_1.5fr_140px_120px_100px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-5 h-5 text-primary" />
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-foreground">
-                        {partnership.contact_person}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {partnership.email}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-foreground capitalize">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-foreground text-sm">{partnership.company_name}</p>
+                        <p className="text-xs text-muted-foreground">{partnership.industry}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground text-sm">{partnership.contact_person}</p>
+                      <p className="text-xs text-muted-foreground">{partnership.email}</p>
+                    </div>
+                    <span className="text-sm text-foreground capitalize">
+                      {partnership.partnership_type.replace('-', ' ')}
+                    </span>
+                    <Select
+                      value={partnership.status}
+                      onValueChange={(value) => {
+                        updateStatus(partnership.id, value)
+                      }}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue>
+                          <Badge
+                            className={`${getStatusColor(partnership.status)} border`}
+                            variant="outline"
+                          >
+                            {partnership.status}
+                          </Badge>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="reviewing">Reviewing</SelectItem>
+                        <SelectItem value="accepted">Accepted</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(partnership.created_at).toLocaleDateString()}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPartnership(partnership)
+                        setDetailsOpen(true)
+                      }}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View
+                    </Button>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="lg:hidden p-4 border-b border-border/50 hover:bg-muted/20 transition-colors space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground text-sm">{partnership.company_name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{partnership.industry}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{partnership.contact_person}</p>
+                        <p className="text-xs text-muted-foreground">{partnership.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-medium bg-muted text-foreground px-2.5 py-1 rounded-full capitalize">
                         {partnership.partnership_type.replace('-', ' ')}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Select
-                        value={partnership.status}
-                        onValueChange={(value) => {
-                          updateStatus(partnership.id, value)
-                        }}
-                      >
-                        <SelectTrigger className="w-[140px]">
-                          <SelectValue>
-                            <Badge
-                              className={`${getStatusColor(partnership.status)} border`}
-                              variant="outline"
-                            >
-                              {partnership.status}
-                            </Badge>
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="reviewing">Reviewing</SelectItem>
-                          <SelectItem value="accepted">Accepted</SelectItem>
-                          <SelectItem value="rejected">Rejected</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm text-muted-foreground">
+                      <Badge className={`${getStatusColor(partnership.status)} border`} variant="outline">
+                        {partnership.status}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
                         {new Date(partnership.created_at).toLocaleDateString()}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4">
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2">
                       <Button
-                        variant="ghost"
+                        variant="default"
                         size="sm"
+                        className="flex-1"
                         onClick={() => {
                           setSelectedPartnership(partnership)
                           setDetailsOpen(true)
                         }}
                       >
-                        <Eye className="w-4 h-4 mr-2" />
-                        View
+                        <Eye className="w-3.5 h-3.5 mr-2" />
+                        View Details
                       </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 

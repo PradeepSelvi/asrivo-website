@@ -22,16 +22,16 @@ import {
   ShieldAlert,
   Handshake,
   Calendar,
-  Menu,
   X,
 } from 'lucide-react'
 
 interface AdminSidebarProps {
   user: { email: string; role: 'high' | 'low' }
+  isMobileMenuOpen: boolean
+  setIsMobileMenuOpen: (open: boolean) => void
 }
 
-export default function AdminSidebar({ user }: AdminSidebarProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+export default function AdminSidebar({ user, isMobileMenuOpen, setIsMobileMenuOpen }: AdminSidebarProps) {
   const router = useRouter()
   const isHigh = user.role === 'high'
 
@@ -92,19 +92,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Mobile Menu Button - Fixed in top left with safe area */}
-      <button
-        onClick={() => setIsMobileMenuOpen(true)}
-        className="lg:hidden fixed z-50 p-2.5 bg-card/95 backdrop-blur-md border-2 border-border rounded-xl shadow-xl hover:bg-muted hover:border-primary/50 transition-all active:scale-95 touch-manipulation"
-        style={{
-          top: 'max(12px, env(safe-area-inset-top))',
-          left: '12px',
-        }}
-        aria-label="Open menu"
-      >
-        <Menu className="w-6 h-6 text-foreground" strokeWidth={2.5} />
-      </button>
-
       {/* Mobile Menu Backdrop */}
       {isMobileMenuOpen && (
         <div
@@ -116,9 +103,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
 
       {/* Sidebar */}
       <aside 
-        className={`w-72 bg-card border-r border-border flex flex-col shrink-0 h-screen transition-transform duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } fixed lg:sticky top-0 z-50 lg:z-auto shadow-2xl lg:shadow-none overflow-hidden`}
+        className={`w-72 bg-card border-l border-border flex flex-col shrink-0 h-screen transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+        } fixed lg:sticky top-0 z-50 lg:z-auto shadow-2xl lg:shadow-none overflow-hidden right-0 lg:left-0`}
         style={{
           paddingTop: 'env(safe-area-inset-top)',
           paddingBottom: 'env(safe-area-inset-bottom)',

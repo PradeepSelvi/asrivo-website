@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { AlertCircle, Mail, User, Building, MessageSquare, Clock, Eye, FileText } from 'lucide-react'
+import { Mail, User, Building, Clock, Eye } from 'lucide-react'
 import Link from 'next/link'
 
 interface Contact {
@@ -162,50 +162,52 @@ export default function AdminContactsPage() {
             <p className="font-semibold">No contact messages yet.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-background/60 border-b border-border">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Subject</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {contacts.map((contact) => (
-                  <tr key={contact.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="font-semibold text-foreground text-sm">{contact.name}</p>
-                          <p className="text-xs text-muted-foreground">{contact.email}</p>
-                          {contact.company && (
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                              <Building className="w-3 h-3" />
-                              {contact.company}
-                            </p>
-                          )}
-                        </div>
+          <>
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[2fr_2fr_100px_90px_120px_80px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Contact</span>
+              <span>Subject</span>
+              <span>Type</span>
+              <span>Status</span>
+              <span>Date</span>
+              <span>Actions</span>
+            </div>
+
+            {/* Contacts List */}
+            <div>
+              {contacts.map((contact) => (
+                <div key={contact.id}>
+                  {/* Desktop View */}
+                  <div className="hidden lg:grid grid-cols-[2fr_2fr_100px_90px_120px_80px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-muted-foreground" />
+                      <div>
+                        <p className="font-semibold text-foreground text-sm">{contact.name}</p>
+                        <p className="text-xs text-muted-foreground">{contact.email}</p>
+                        {contact.company && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <Building className="w-3 h-3" />
+                            {contact.company}
+                          </p>
+                        )}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-foreground">{contact.subject}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground text-sm">{contact.subject}</p>
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{contact.message}</p>
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+                    <div>
                       {contact.type ? (
-                        <span className="text-xs bg-muted px-2 py-1 rounded capitalize">{contact.type}</span>
+                        <span className="text-xs font-medium bg-muted text-foreground px-2.5 py-1 rounded-full capitalize w-fit">
+                          {contact.type}
+                        </span>
                       ) : (
                         <span className="text-muted-foreground text-xs">—</span>
                       )}
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+                    <div>
                       <span
-                        className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider w-fit ${
                           contact.status === 'unread'
                             ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
                             : contact.status === 'read'
@@ -215,14 +217,14 @@ export default function AdminContactsPage() {
                       >
                         {contact.status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-muted-foreground font-mono">
+                    </div>
+                    <div className="text-xs text-muted-foreground font-mono">
                       <span className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5" />
                         {new Date(contact.created_at).toLocaleDateString()}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+                    <div>
                       <Link
                         href={`/admin/contacts/${contact.id}`}
                         className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
@@ -230,12 +232,72 @@ export default function AdminContactsPage() {
                         <Eye className="w-3.5 h-3.5" />
                         View
                       </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="lg:hidden p-4 border-b border-border/50 hover:bg-muted/20 transition-colors space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <User className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <p className="font-semibold text-foreground text-sm">{contact.name}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{contact.email}</p>
+                        {contact.phone && (
+                          <p className="text-xs text-muted-foreground mt-0.5">{contact.phone}</p>
+                        )}
+                        {contact.company && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <Building className="w-3 h-3" />
+                            {contact.company}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <p className="font-medium text-foreground text-sm">{contact.subject}</p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{contact.message}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {contact.type && (
+                        <span className="text-xs font-medium bg-muted text-foreground px-2.5 py-1 rounded-full capitalize">
+                          {contact.type}
+                        </span>
+                      )}
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                          contact.status === 'unread'
+                            ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
+                            : contact.status === 'read'
+                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                            : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        }`}
+                      >
+                        {contact.status}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-mono flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(contact.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2">
+                      <Link
+                        href={`/admin/contacts/${contact.id}`}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-all"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        View Details
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 

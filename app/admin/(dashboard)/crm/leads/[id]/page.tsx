@@ -5,8 +5,9 @@ import { ArrowLeft, Mail, Phone, Building, Globe, TrendingUp, Calendar, User, Me
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-export default async function LeadDetailPage({ params }: { params: { id: string } }) {
-  const leadId = parseInt(params.id)
+export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const leadId = parseInt(id)
   
   const [
     leadResult,
