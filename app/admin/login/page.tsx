@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { verifyAdminProfile } from '@/lib/supabase/admin-actions'
-import { Lock, Mail, AlertTriangle, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Lock, Mail, AlertTriangle, Loader2, Eye, EyeOff, ArrowLeft, Home } from 'lucide-react'
 
 function AdminLoginContent() {
   const searchParams = useSearchParams()
@@ -93,6 +93,16 @@ function AdminLoginContent() {
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
       </div>
+
+      {/* Back to Website Button */}
+      <a
+        href="/"
+        className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border hover:bg-muted transition-all text-sm font-medium text-foreground shadow-sm"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="hidden sm:inline">Back to Website</span>
+        <span className="sm:hidden"><Home className="w-4 h-4" /></span>
+      </a>
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8 flex flex-col items-center">

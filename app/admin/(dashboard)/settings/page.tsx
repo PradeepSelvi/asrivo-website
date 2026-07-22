@@ -1,152 +1,181 @@
-import React from 'react'
-import { getCurrentAdmin, getSettings, updateSetting } from '@/lib/supabase/admin-actions'
+import { requireAdmin } from '@/lib/auth/admin-guard'
 import { redirect } from 'next/navigation'
-import { Settings, Save, AlertTriangle, Bell, Key } from 'lucide-react'
+import Link from 'next/link'
+import { 
+  Settings, 
+  Globe, 
+  Image, 
+  Type, 
+  Palette, 
+  Mail,
+  Shield,
+  Database,
+  FileCode,
+  ArrowRight,
+  Lock
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
-export default async function AdminSettingsPage() {
-  // Server-side gate: only high admins can reach this page
-  const adminResult = await getCurrentAdmin()
-  if (!adminResult.success || adminResult.user?.role !== 'high') {
+export const metadata = {
+  title: 'Settings - Admin Panel',
+  description: 'Manage website settings and configuration',
+}
+
+export default async function SettingsPage() {
+  const user = await requireAdmin()
+  
+  // Only high admins can access settings
+  if (user.role !== 'high') {
     redirect('/admin')
   }
 
-  const settingsResult = await getSettings()
-  const settings = settingsResult.success ? settingsResult.data : []
-
-  // Group settings
-  const companySettings = settings?.filter((s: any) =>
-    ['company_name', 'company_email', 'company_phone', 'company_website', 'office_address', 'office_city', 'office_country', 'timezone', 'support_email', 'careers_email'].includes(s.key)
-  ) ?? []
-  const socialSettings = settings?.filter((s: any) =>
-    ['linkedin_url', 'github_url', 'twitter_url'].includes(s.key)
-  ) ?? []
-  const featureSettings = settings?.filter((s: any) =>
-    ['newsletter_enabled', 'contact_form_enabled', 'service_inquiry_enabled'].includes(s.key)
-  ) ?? []
-  const notificationSettings = settings?.filter((s: any) =>
-    ['admin_notification_emails', 'slack_webhook_url'].includes(s.key)
-  ) ?? []
-  const apiKeySettings = settings?.filter((s: any) =>
-    ['external_api_key_google', 'external_api_key_supabase'].includes(s.key)
-  ) ?? []
-
-  const handleUpdate = async (formData: FormData) => {
-    'use server'
-    const key = formData.get('key') as string
-    const value = formData.get('value') as string
-    await updateSetting(key, value)
-    redirect('/admin/settings?saved=true')
-  }
+  const settingsSections = [
+    {
+      title: 'Site Configuration',
+      description: 'Manage website metadata, SEO, and general settings',
+      icon: Globe,
+      href: '/admin/settings/site',
+      items: ['Site title', 'Meta description', 'Contact info', 'Social links']
+    },
+    {
+      title: 'Homepage Content',
+      description: 'Edit hero section, featured content, and homepage layout',
+      icon: Type,
+      href: '/admin/settings/homepage',
+      items: ['Hero section', 'Featured projects', 'Call-to-action', 'About preview']
+    },
+    {
+      title: 'Media & Assets',
+      description: 'Manage images, logos, and media files',
+      icon: Image,
+      href: '/admin/settings/media',
+      items: ['Logo uploads', 'Favicon', 'Default images', 'Image optimization']
+    },
+    {
+      title: 'Theme & Branding',
+      description: 'Customize colors, fonts, and visual identity',
+      icon: Palette,
+      href: '/admin/settings/theme',
+      items: ['Color scheme', 'Typography', 'Button styles', 'Dark mode']
+    },
+    {
+      title: 'Email Templates',
+      description: 'Configure email notifications and templates',
+      icon: Mail,
+      href: '/admin/settings/email',
+      items: ['SMTP settings', 'Email templates', 'Notification preferences']
+    },
+    {
+      title: 'Security & Access',
+      description: 'Manage authentication and security settings',
+      icon: Shield,
+      href: '/admin/settings/security',
+      items: ['Admin roles', 'API keys', 'Rate limiting', 'CAPTCHA settings']
+    },
+    {
+      title: 'Database Management',
+      description: 'View and manage database tables and relationships',
+      icon: Database,
+      href: '/admin/settings/database',
+      items: ['Backup & restore', 'Data export', 'Table management']
+    },
+    {
+      title: 'Advanced Settings',
+      description: 'Developer tools and advanced configuration',
+      icon: FileCode,
+      href: '/admin/settings/advanced',
+      items: ['Environment variables', 'API endpoints', 'Webhooks', 'Custom scripts']
+    },
+  ]
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Global Settings</h1>
-        <p className="text-muted-foreground text-sm mt-1">Manage website configuration and company information.</p>
-      </div>
-
-      {/* Warning */}
-      <div className="border border-amber-900/40 bg-amber-950/20 rounded-xl px-5 py-4 flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
-        <div>
-          <p className="text-sm font-semibold text-amber-300">High Admin Only</p>
-          <p className="text-xs text-amber-500/80 mt-0.5">
-            Changes made here affect the live website. Only High role admins can modify settings.
-          </p>
+    <div className="flex flex-col">
+      <div className="border-b border-border bg-muted/30 px-4 lg:px-8 py-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+            <Settings className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Settings</h1>
+            <p className="text-sm text-muted-foreground">Manage website configuration and preferences</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-4">
+          <Lock className="w-4 h-4 text-amber-500" />
+          <span className="text-xs font-medium text-amber-600 dark:text-amber-500 bg-amber-500/10 px-2 py-1 rounded">
+            High Admin Only - Full website control
+          </span>
         </div>
       </div>
 
-      {/* Company Info */}
-      <SettingsGroup
-        title="Company Information"
-        icon={<Settings className="w-4 h-4 text-primary" />}
-        settings={companySettings}
-        handleUpdate={handleUpdate}
-      />
-
-      {/* Social Links */}
-      <SettingsGroup
-        title="Social Links"
-        icon={<Settings className="w-4 h-4 text-primary" />}
-        settings={socialSettings}
-        handleUpdate={handleUpdate}
-      />
-
-      {/* Feature Toggles */}
-      <SettingsGroup
-        title="Feature Toggles"
-        icon={<Settings className="w-4 h-4 text-primary" />}
-        settings={featureSettings}
-        handleUpdate={handleUpdate}
-      />
-
-      {/* Notification Preferences */}
-      <SettingsGroup
-        title="Notification Preferences"
-        icon={<Bell className="w-4 h-4 text-amber-400" />}
-        settings={notificationSettings}
-        handleUpdate={handleUpdate}
-      />
-
-      {/* API Keys */}
-      <SettingsGroup
-        title="API Keys & Integrations"
-        icon={<Key className="w-4 h-4 text-emerald-400" />}
-        settings={apiKeySettings}
-        handleUpdate={handleUpdate}
-      />
-    </div>
-  )
-}
-
-function SettingsGroup({
-  title,
-  icon,
-  settings,
-  handleUpdate,
-}: {
-  title: string
-  icon: React.ReactNode
-  settings: any[]
-  handleUpdate: (formData: FormData) => Promise<void>
-}) {
-  return (
-    <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl">
-      <div className="px-6 py-4 border-b border-border flex items-center gap-2">
-        {icon}
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-      </div>
-      <div className="divide-y divide-border">
-        {!settings || settings.length === 0 ? (
-          <p className="p-6 text-muted-foreground text-sm">No settings in this group.</p>
-        ) : (
-          settings.map((setting: any) => (
-            <form key={setting.id} action={handleUpdate} className="flex items-center gap-4 px-6 py-4 hover:bg-muted/10 transition-colors group">
-              <input type="hidden" name="key" value={setting.key} />
-              <div className="flex-1 min-w-0">
-                <label htmlFor={`setting-${setting.key}`} className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
-                  {setting.key.replace(/_/g, ' ')}
-                </label>
-                {setting.description && (
-                  <p className="text-xs text-muted-foreground mb-1">{setting.description}</p>
-                )}
-                <input
-                  id={`setting-${setting.key}`}
-                  name="value"
-                  defaultValue={setting.value || ''}
-                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all font-mono"
-                />
-              </div>
-              <button
-                type="submit"
-                className="shrink-0 flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-foreground text-xs font-semibold px-3 py-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+      <div className="p-4 lg:p-8">
+        <div className="grid gap-6 md:grid-cols-2">
+          {settingsSections.map((section) => {
+            const Icon = section.icon
+            return (
+              <Link
+                key={section.href}
+                href={section.href}
+                className="group relative overflow-hidden rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300"
               >
-                <Save className="w-3.5 h-3.5" />
-                Save
-              </button>
-            </form>
-          ))
-        )}
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    {section.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {section.description}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {section.items.map((item) => (
+                      <span
+                        key={item}
+                        className="text-xs bg-muted px-2 py-1 rounded-md text-muted-foreground"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Hover effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8 p-6 rounded-xl border border-border bg-muted/30">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Button variant="outline" className="justify-start" asChild>
+              <Link href="/admin/admins">
+                <Shield className="w-4 h-4 mr-2" />
+                Manage Admins
+              </Link>
+            </Button>
+            <Button variant="outline" className="justify-start" asChild>
+              <Link href="/admin/settings/database">
+                <Database className="w-4 h-4 mr-2" />
+                Database Backup
+              </Link>
+            </Button>
+            <Button variant="outline" className="justify-start" asChild>
+              <Link href="/admin/settings/security">
+                <Lock className="w-4 h-4 mr-2" />
+                Security Settings
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )
