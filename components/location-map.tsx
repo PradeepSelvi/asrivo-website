@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
+import 'leaflet/dist/leaflet.css'
 
 interface LocationMapProps {
   latitude: number
@@ -27,9 +28,6 @@ export function LocationMap({ latitude, longitude, address, zoom = 15 }: Locatio
 
     // Dynamically import Leaflet only in the browser
     import('leaflet').then((L) => {
-      // Import Leaflet CSS
-      import('leaflet/dist/leaflet.css')
-
       // Double check container hasn't been initialized
       if (mapInstanceRef.current || !mapContainerRef.current) return
 

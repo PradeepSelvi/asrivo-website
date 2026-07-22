@@ -120,7 +120,7 @@ export default async function ProjectsPage() {
                         <div className="mt-4">
                           <h3 className="text-sm font-semibold text-foreground">Results</h3>
                           <ul className="mt-2 flex flex-wrap gap-2">
-                            {project.results.slice(0, 3).map((result, idx) => (
+                            {project.results.slice(0, 3).map((result: string, idx: number) => (
                               <li
                                 key={idx}
                                 className="inline-flex items-center rounded-full bg-accent/20 px-3 py-1 text-xs font-medium text-accent-foreground"
@@ -134,7 +134,7 @@ export default async function ProjectsPage() {
 
                       {project.technologies && project.technologies.length > 0 && (
                         <div className="mt-6 flex flex-wrap gap-2">
-                          {project.technologies.slice(0, 5).map((tag) => (
+                          {project.technologies.slice(0, 5).map((tag: string) => (
                             <span
                               key={tag}
                               className="inline-flex items-center rounded-md border border-border bg-muted/50 px-2 py-1 text-xs text-muted-foreground"

@@ -178,4 +178,14 @@ export default function AdminDebugPage() {
 
         {/* Instructions */}
         <div className="mt-8 bg-slate-800 border border-slate-700 rounded-lg p-6">
-          <h2 cl
+          <h2 className="text-xl font-bold mb-4">Instructions</h2>
+          <div className="space-y-2 text-sm text-slate-300">
+            <p>✅ All green indicators: Authentication is working properly</p>
+            <p>❌ Red indicators: There&apos;s an authentication issue</p>
+            <p>If you see &quot;No session found&quot; or &quot;No user found&quot;, try clearing cookies and logging in again.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

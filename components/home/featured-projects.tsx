@@ -113,7 +113,7 @@ export async function FeaturedProjects() {
     .limit(4)
 
   // If no featured projects or error, fetch first 4 projects
-  let displayProjects = projects
+  let displayProjects = projects || []
   if (!projects || projects.length === 0 || error) {
     const { data: allProjects } = await supabase
       .from('projects')
