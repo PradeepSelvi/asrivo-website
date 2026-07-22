@@ -96,6 +96,18 @@ export function Header() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [lastScrollY, setLastScrollY] = useState(0)
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
@@ -171,10 +183,14 @@ export function Header() {
           </Link>
         </div>
         
-        {/* Mobile Toggle */}
-        <div className="flex lg:hidden">
-          <button onClick={() => setMobileMenuOpen(true)} className="p-2.5 text-foreground">
-            <Menu className="h-6 w-6" />
+        {/* Mobile Toggle - Modern elevated design like admin panel */}
+        <div className="flex lg:hidden z-50 relative">
+          <button 
+            onClick={() => setMobileMenuOpen(true)} 
+            className="p-2.5 bg-card/95 backdrop-blur-md border-2 border-border rounded-xl shadow-xl hover:bg-muted hover:border-primary/50 transition-all active:scale-95 touch-manipulation"
+            aria-label="Open menu"
+          >
+            <Menu className="h-6 w-6 text-foreground" strokeWidth={2.5} />
           </button>
         </div>
         
@@ -218,77 +234,97 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-background lg:hidden" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="fixed inset-0 z-[100] bg-background lg:hidden flex flex-col" style={{ height: '100dvh' }}>
           {/* Header - with top padding for mobile status bar */}
-          <div className="flex items-center justify-between px-6 pt-20 pb-6 border-b border-border">
+          <div 
+            className="flex items-center justify-between px-6 py-5 border-b border-border bg-background/95 backdrop-blur-md shrink-0"
+            style={{ paddingTop: 'max(20px, env(safe-area-inset-top))' }}
+          >
             <div className="flex items-center gap-2">
-               <AsrivoLogoIcon className="h-10 w-10" />
-               <span className="font-bold text-foreground text-xl">ASRIVO TECH</span>
+              <img
+                src="/asrivo.png"
+                alt="Asrivo Tech Logo"
+                className="h-9 w-9 shrink-0"
+              />
+               <span className="font-bold text-foreground text-lg">ASRIVO TECH</span>
             </div>
             <button 
               onClick={() => setMobileMenuOpen(false)} 
-              className="text-foreground p-2 hover:bg-muted rounded-lg transition-colors"
+              className="p-2 bg-muted/50 hover:bg-destructive/10 rounded-xl transition-colors active:scale-95 touch-manipulation"
               aria-label="Close menu"
             >
-              <X className="h-6 w-6" />
+              <X className="h-6 w-6 text-foreground" strokeWidth={2.5} />
             </button>
           </div>
 
-          {/* Navigation Links */}
-          <div className="p-6 space-y-1">
+          {/* Navigation Links - Scrollable area */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4 space-y-2" style={{ WebkitOverflowScrolling: 'touch' }}>
             <Link 
               href="/" 
-              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
               onClick={() => setMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               href="/about" 
-              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link 
               href="/services" 
-              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
               onClick={() => setMobileMenuOpen(false)}
             >
               Services
             </Link>
             <Link 
               href="/team" 
-              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
               onClick={() => setMobileMenuOpen(false)}
             >
               Team
             </Link>
             <Link 
               href="/projects" 
-              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
               onClick={() => setMobileMenuOpen(false)}
             >
               Projects
             </Link>
             <Link 
               href="/contact" 
-              className="block px-4 py-3 text-lg font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-lg transition-colors" 
+              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
             </Link>
           </div>
 
-          {/* Footer - Fixed at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-border bg-background">
+          {/* Footer - Fixed at bottom with safe area padding */}
+          <div 
+            className="px-6 py-4 border-t border-border bg-background/95 backdrop-blur-md shrink-0"
+            style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
+          >
             <div className="flex items-center justify-around">
-              <a href="https://linkedin.com" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors">
-                <LinkedInIcon className="h-6 w-6" />
+              <a 
+                href="https://linkedin.com" 
+                target='_blank' 
+                rel='noopener noreferrer' 
+                className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors active:scale-95 touch-manipulation"
+              >
+                <LinkedInIcon className="h-5 w-5" />
                 <span>LinkedIn</span>
               </a>
-              <a href="https://www.instagram.com/asrivotech" target='_blank' rel='noopener noreferrer' className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors">
-                <InstagramIcon className="h-6 w-6" />
+              <a 
+                href="https://www.instagram.com/asrivotech" 
+                target='_blank' 
+                rel='noopener noreferrer' 
+                className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors active:scale-95 touch-manipulation"
+              >
+                <InstagramIcon className="h-5 w-5" />
                 <span>Instagram</span>
               </a>
             </div>

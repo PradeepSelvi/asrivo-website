@@ -9,6 +9,8 @@ export async function PATCH(
     const body = await request.json()
     const { status, scheduled_date, scheduled_time, meeting_link, notes } = body
 
+    console.log('Update request for consultation:', body)
+
     const { id } = await params
     const supabase = await createClient()
 
@@ -26,18 +28,24 @@ export async function PATCH(
       .single()
 
     if (error) {
-      console.error('Database error:', error)
+      console.error('Database error:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
       return NextResponse.json(
-        { error: 'Failed to update consultation request' },
+        { error: 'Failed to update consultation request', details: error.message },
         { status: 500 }
       )
     }
 
+    console.log('Successfully updated consultation:', data)
     return NextResponse.json({ success: true, data }, { status: 200 })
   } catch (error) {
     console.error('Error updating consultation request:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

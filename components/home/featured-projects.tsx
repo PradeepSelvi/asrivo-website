@@ -1,67 +1,47 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ExternalLink } from "lucide-react"
-import { useScrollAnimation, useTilt } from "@/hooks/use-scroll-animation"
+import { createClient } from "@/lib/supabase/server"
 
-const projects = [
-  {
-    title: "FinTech Dashboard",
-    description: "A comprehensive financial analytics platform with real-time data visualization and AI-powered insights.",
-    tags: ["React", "Node.js", "PostgreSQL", "AWS"],
-    gradient: "from-blue-500/30 via-indigo-500/20 to-purple-500/30",
-    image: "/images/fintech-dashboard.png",
-    href: "/projects#fintech-dashboard",
-  },
-  {
-    title: "Healthcare App",
-    description: "Mobile application for patient management and telemedicine consultations.",
-    tags: ["React Native", "Firebase", "AI/ML"],
-    gradient: "from-emerald-500/30 via-teal-500/20 to-cyan-500/30",
-    image: "/images/healthcare-app.png",
-    href: "/projects#healthcare-app",
-  },
-  {
-    title: "E-commerce Platform",
-    description: "Scalable multi-vendor marketplace with advanced inventory management.",
-    tags: ["Next.js", "Stripe", "MongoDB"],
-    gradient: "from-orange-500/30 via-amber-500/20 to-yellow-500/30",
-    image: "/images/ecommerce-platform.png",
-    href: "/projects#ecommerce-platform",
-  },
-  {
-    title: "IoT Management System",
-    description: "Enterprise IoT platform for monitoring and controlling industrial equipment.",
-    tags: ["Python", "MQTT", "TimescaleDB"],
-    gradient: "from-rose-500/30 via-pink-500/20 to-fuchsia-500/30",
-    image: "/images/iot-system.png",
-    href: "/projects#iot-system",
-  },
-]
+// Gradient presets based on category
+const categoryGradients: Record<string, string> = {
+  'web-development': 'from-blue-500/30 via-indigo-500/20 to-purple-500/30',
+  'mobile-app': 'from-emerald-500/30 via-teal-500/20 to-cyan-500/30',
+  'ecommerce': 'from-orange-500/30 via-amber-500/20 to-yellow-500/30',
+  'iot': 'from-rose-500/30 via-pink-500/20 to-fuchsia-500/30',
+  'ai-ml': 'from-violet-500/30 via-purple-500/20 to-pink-500/30',
+  'default': 'from-slate-500/30 via-gray-500/20 to-zinc-500/30'
+}
 
-function ProjectCard({ project, index }: { project: typeof projects[0]; index: number }) {
-  const { ref: tiltRef, transform } = useTilt(5)
-  const { ref: scrollRef, isVisible } = useScrollAnimation(0.1)
+type Project = {
+  id: number
+  title: string
+  slug: string
+  description: string
+  category: string
+  technologies: string[]
+  image_url?: string
+  featured_image_url?: string
+  status?: string
+}
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const gradient = categoryGradients[project.category] || categoryGradients.default
+  const imageUrl = project.featured_image_url || project.image_url
 
   return (
     <div
-      ref={scrollRef}
-      className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      className="transition-all duration-700 opacity-100 translate-y-0"
       style={{ transitionDelay: `${index * 150}ms` }}
     >
-      <Link href={project.href}>
-        <div
-          ref={tiltRef}
-          className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-all duration-500 hover:shadow-2xl hover:border-primary/30"
-          style={{ transform, transition: 'transform 0.1s ease-out' }}
-        >
+      <Link href={`/projects/${project.slug}`}>
+        <div className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-all duration-500 hover:shadow-2xl hover:border-primary/30">
           {/* Animated gradient background */}
-          <div className={`aspect-video relative overflow-hidden bg-gradient-to-br ${project.gradient}`}>
-            {project.image ? (
+          <div className={`aspect-video relative overflow-hidden bg-gradient-to-br ${gradient}`}>
+            {imageUrl ? (
               <Image 
-                src={project.image} 
+                src={imageUrl} 
                 alt={project.title} 
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110" 
@@ -91,7 +71,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
           <div className="p-6 relative">
             {/* Tags with stagger animation */}
             <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag, tagIndex) => (
+              {project.technologies?.slice(0, 4).map((tag, tagIndex) => (
                 <span
                   key={tag}
                   className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground"
@@ -106,7 +86,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
               {project.title}
             </h3>
             
-            <p className="mt-2 text-muted-foreground leading-relaxed">
+            <p className="mt-2 text-muted-foreground leading-relaxed line-clamp-2">
               {project.description}
             </p>
             
@@ -121,8 +101,27 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
   )
 }
 
-export function FeaturedProjects() {
-  const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
+export async function FeaturedProjects() {
+  const supabase = await createClient()
+  
+  // Fetch featured projects from database (limit to 4)
+  const { data: projects, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('featured', true)
+    .order('display_order', { ascending: true })
+    .limit(4)
+
+  // If no featured projects or error, fetch first 4 projects
+  let displayProjects = projects
+  if (!projects || projects.length === 0 || error) {
+    const { data: allProjects } = await supabase
+      .from('projects')
+      .select('*')
+      .order('display_order', { ascending: true })
+      .limit(4)
+    displayProjects = allProjects || []
+  }
 
   return (
     <section className="py-24 lg:py-32 relative overflow-hidden">
@@ -133,10 +132,7 @@ export function FeaturedProjects() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div 
-          ref={titleRef}
-          className={`flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end transition-all duration-700 ${titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-        >
+        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end transition-all duration-700 opacity-100 translate-y-0">
           <div>
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary uppercase tracking-wider px-4 py-1.5 bg-primary/5 rounded-full">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -157,11 +153,17 @@ export function FeaturedProjects() {
           </Button>
         </div>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2">
-          {projects.map((project, index) => (
-            <ProjectCard key={project.title} project={project} index={index} />
-          ))}
-        </div>
+        {displayProjects.length === 0 ? (
+          <div className="mt-12 text-center py-12 border border-dashed border-border rounded-2xl">
+            <p className="text-muted-foreground">No projects available yet. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="mt-12 grid gap-8 sm:grid-cols-2">
+            {displayProjects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

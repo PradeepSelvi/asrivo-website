@@ -88,6 +88,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 🔔 Send notification to admins
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/admin/send-notification-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact',
+          data: { name, email, company, phone: '', message }
+        })
+      })
+    } catch (notifError) {
+      console.error('Failed to send admin notification:', notifError)
+      // Don't fail the whole operation if notification fails
+    }
+
     // 📧 Send email notification to Admin
     const adminEmail = process.env.ADMIN_EMAIL || process.env.GMAIL_USER
     if (adminEmail) {

@@ -63,13 +63,19 @@ export function ConsultationDetail({ consultation: initialConsultation }: { cons
         }),
       })
 
-      if (!response.ok) throw new Error("Failed to update")
+      const data = await response.json()
 
+      if (!response.ok) {
+        console.error("Update failed:", data)
+        throw new Error(data.error || "Failed to update")
+      }
+
+      alert("Consultation updated successfully!")
       setEditMode(false)
       router.refresh()
     } catch (error) {
       console.error("Error updating consultation:", error)
-      alert("Failed to update consultation")
+      alert(`Failed to update consultation: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setSaving(false)
     }
