@@ -138,19 +138,18 @@ export default function AboutPage() {
           <div className="grid gap-12 lg:grid-cols-2 items-center bg-white/40 backdrop-blur-2xl rounded-[3rem] border border-white/60 p-12 lg:p-20 shadow-2xl shadow-blue-900/5">
             <div className="space-y-8">
               <div className="space-y-4">
-                <span className="text-blue-600 font-bold uppercase tracking-widest text-xs">Our Evolution</span>
-                <h2 className="text-4xl font-bold text-slate-900 leading-tight">From Startup to Global Force</h2>
+                <span className="text-blue-600 font-bold uppercase tracking-widest text-xs">Who We Are</span>
+                <h2 className="text-4xl font-bold text-slate-900 leading-tight">Technology-Driven Innovation</h2>
                 <p className="text-slate-600 text-lg leading-relaxed">
-                  Founded in 2025, Asrivo Tech began with a shared vision: 
-                  to bridge the gap between abstract technology and practical business impact.
+                  We are a technology-driven company building innovative digital products while delivering reliable IT and Digital Marketing solutions. Our goal is to help businesses grow with smart technology, creativity, and quality services.
                 </p>
               </div>
               
               <div className="grid grid-cols-3 gap-8 pt-6">
                 {[
-                  { label: "Founded", val: "2016" },
-                  { label: "Experts", val: "50+" },
-                  { label: "Projects", val: "200+" }
+                  { label: "Founded", val: "2026" },
+                  { label: "Team", val: "10+" },
+                  { label: "Projects", val: "50+" }
                 ].map((stat) => (
                   <div key={stat.label}>
                     <div className="text-3xl font-black text-blue-600">{stat.val}</div>
@@ -179,14 +178,73 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Our Journey Timeline */}
+      <section className="py-20 bg-white/40 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-blue-600 font-bold uppercase tracking-widest text-xs">Our Journey</span>
+            <h2 className="mt-4 text-4xl font-bold text-slate-900">From Vision to Reality</h2>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                year: "2024",
+                title: "The Beginning",
+                desc: "Started as a freelance technology initiative, collaborating with students on real-world technology projects and helping them gain practical industry experience."
+              },
+              {
+                year: "2025",
+                title: "Team Growth",
+                desc: "Expanded our vision by building a structured team, launching training programs, and strengthening expertise across multiple technology domains."
+              },
+              {
+                year: "2026",
+                title: "Official Launch",
+                desc: "Officially established as both a Product-Based and Service-Based company, delivering innovative technology solutions and Digital Marketing services worldwide."
+              },
+              {
+                year: "Future",
+                title: "Global Expansion",
+                desc: "Building AI-powered products, expanding globally, and creating opportunities for the next generation of technology professionals."
+              }
+            ].map((milestone, idx) => (
+              <div key={milestone.year} className="relative p-8 rounded-2xl bg-white border border-slate-100 shadow-lg hover:-translate-y-2 transition-transform duration-500">
+                <div className="absolute -top-4 left-8 px-4 py-1 rounded-full bg-blue-600 text-white font-bold text-sm">
+                  {milestone.year}
+                </div>
+                <h3 className="mt-4 text-xl font-bold text-slate-900">{milestone.title}</h3>
+                <p className="mt-3 text-slate-600 text-sm leading-relaxed">{milestone.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Strategic Pillars */}
       <section className="py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900">Our Foundation</h2>
+          </div>
+
           <div className="grid gap-8 lg:grid-cols-3">
            {[
-              { icon: Target, title: "Our Mission", desc: "Our mission is to empower global growth by transforming innovative ideas into scalable, secure, and user-centric digital products that solve real-world problems through intelligent technology. We focus on building simple yet powerful solutions that create long-term impact, fostering trust and value through future-ready innovation." },
-              { icon: Eye, title: "Our Vision", desc: "Our vision is to evolve from a service-based IT organization into a globally trusted, product-driven technology leader by delivering high-quality proprietary solutions alongside expert services. We achieve this through deep investment in innovation and automation, fostering a culture of accountability to build digital tools that maximize efficiency and growth." },
-              { icon: Heart, title: "Our Values", desc: "Our values center on turning ideas into impactful digital solutions through secure, transparent technology and high-performance products that remain simple to use. We prioritize future-ready scalability and a culture of continuous learning to solve real-world problems with long-term value and ownership." }
+              { 
+                icon: Eye, 
+                title: "Vision", 
+                desc: "Creating technology that empowers businesses, transforms ideas into reality, and builds opportunities for future innovators."
+              },
+              { 
+                icon: Target, 
+                title: "Mission", 
+                desc: "Innovate with purpose. Deliver solutions with excellence. Empower people through knowledge. Grow together with our clients. Build a smarter digital future." 
+              },
+              { 
+                icon: Heart, 
+                title: "Core Values", 
+                desc: "Innovation • Integrity • Quality • Customer Success • Collaboration • Continuous Learning" 
+              }
             ].map((pillar) => (
               <div key={pillar.title} className="p-10 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-blue-900/5 hover:-translate-y-2 transition-transform duration-500">
                 <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-8">
@@ -200,20 +258,50 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Why Choose Us */}
+      <section className="py-20 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-blue-600 font-bold uppercase tracking-widest text-xs">Why Choose Us</span>
+            <h2 className="mt-4 text-4xl font-bold text-slate-900">What Sets Us Apart</h2>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: Sparkles, title: "Product & Service Expertise", desc: "Delivering both innovative digital products and reliable IT services" },
+              { icon: Zap, title: "Custom Technology Solutions", desc: "Tailored solutions designed specifically for your business needs" },
+              { icon: Target, title: "Digital Marketing Excellence", desc: "Complete marketing strategies for business growth and visibility" },
+              { icon: Users, title: "Skilled & Passionate Team", desc: "Experienced professionals dedicated to delivering quality" },
+              { icon: Heart, title: "Client-First Approach", desc: "Your success is our priority in everything we do" },
+              { icon: ShieldCheck, title: "On-Time Delivery", desc: "Reliable project delivery within agreed timelines" }
+            ].map((item) => (
+              <div key={item.title} className="p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-lg transition-shadow">
+                <item.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-slate-600 text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Leadership Quote */}
       <section className="py-20">
         <div className="mx-auto max-w-5xl px-4 lg:px-8">
           <div className="relative text-center p-12 lg:p-24 rounded-[3rem] bg-blue-600 text-white overflow-hidden shadow-2xl">
             <Quote className="absolute top-10 left-10 w-20 h-20 text-white/10 rotate-12" />
-            <p className="relative z-10 text-2xl lg:text-3xl font-medium leading-relaxed italic mb-10">
-              &ldquo;Technology should empower, not complicate. At Asrivo, we build the bridges 
-              that turn complexity into competitive advantage.&rdquo;
-            </p>
-            <div className="flex items-center justify-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold">AK</div>
-              <div className="text-left">
-                <div className="font-bold">Aswin K A</div>
-                <div className="text-xs text-blue-200">CEO & Founder, Asrivo Tech</div>
+            <div className="relative z-10">
+              <span className="text-blue-200 font-bold uppercase tracking-widest text-xs">Founder's Message</span>
+              <p className="mt-6 text-2xl lg:text-3xl font-medium leading-relaxed mb-10">
+                &ldquo;We believe technology should solve real business challenges while creating opportunities for future talent. Our mission is to build innovative products, deliver exceptional services, and empower businesses to grow in the digital era.&rdquo;
+              </p>
+              <div className="flex items-center justify-center gap-4">
+               {/* <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold">PK</div>*/}
+                <div className="text-left">
+                 {/*founder name
+                  <div className="font-bold">Pradeep Kumar</div>
+                  <div className="text-xs text-blue-200">Founder, Asrivo Tech</div>*/}
+                </div>
               </div>
             </div>
           </div>

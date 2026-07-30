@@ -23,11 +23,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file type
-    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+    // Validate file type - support both documents and images
+    const validDocTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+    const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    const validTypes = [...validDocTypes, ...validImageTypes]
+    
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only PDF, DOC, DOCX, and TXT files are allowed' },
+        { error: 'Invalid file type. Only images (JPG, PNG, GIF, WebP) and documents (PDF, DOC, DOCX, TXT) are allowed' },
         { status: 400 }
       )
     }

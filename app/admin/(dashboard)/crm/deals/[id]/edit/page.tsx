@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { getDealById, updateDeal } from '@/lib/supabase/crm-actions'
 import { getCurrencies } from '@/lib/crm/currency-utils'
 import { ArrowLeft, Loader2, Save, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
-export default function EditDealPage({ params }: { params: { id: string } }) {
+export default function EditDealPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params)
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -36,7 +37,7 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
 
     // Load deal data
     async function loadDeal() {
-      const result = await getDealById(parseInt(params.id))
+      const result = await getDealById(parseInt(resolvedParams.id))
       if (result.success && result.data) {
         const deal = result.data
         setDealName(deal.deal_name || '')
@@ -58,7 +59,7 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
       setLoading(false)
     }
     loadDeal()
-  }, [params.id])
+  }, [resolvedParams.id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,7 +79,7 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
       return
     }
 
-    const result = await updateDeal(parseInt(params.id), {
+    const result = await updateDeal(parseInt(resolvedParams.id), {
       deal_name: dealName,
       contact_name: contactName,
       contact_email: contactEmail,
@@ -98,7 +99,7 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
       setErrorMsg(result.error || 'Failed to update deal')
       setSaving(false)
     } else {
-      router.push(`/admin/crm/deals/${params.id}`)
+      router.push(`/admin/crm/deals/${resolvedParams.id}`)
       router.refresh()
     }
   }
@@ -114,7 +115,7 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link href={`/admin/crm/deals/${params.id}`} className="p-2 bg-card border border-border rounded-lg hover:bg-muted">
+        <Link href={`/admin/crm/deals/${resolvedParams.id}`} className="p-2 bg-card border border-border rounded-lg hover:bg-muted">
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <div>
@@ -343,7 +344,7 @@ export default function EditDealPage({ params }: { params: { id: string } }) {
         {/* Actions */}
         <div className="flex items-center gap-3 pt-6 border-t border-border justify-end">
           <Link
-            href={`/admin/crm/deals/${params.id}`}
+            href={`/admin/crm/deals/${resolvedParams.id}`}
             className="bg-muted hover:bg-muted/80 text-foreground px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
           >
             Cancel

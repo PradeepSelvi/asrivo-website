@@ -110,16 +110,16 @@ const services = [
     ],
   },
   {
-    id: "data",
+    id: "digital-marketing",
     icon: Database,
-    title: "Digital-Marketing",
+    title: "Digital Marketing",
     image: "/services/digital-marketing.webp",
-    description: "Unlock the value of your data with our comprehensive data engineering and analytics services. We build data pipelines and analytics solutions that drive insights.",
+    description: "Delivering result-driven digital marketing solutions to enhance brand visibility, generate quality leads, and accelerate business growth.",
     features: [
-      "Data warehouse design",
-      "ETL pipeline development",
-      "Business intelligence dashboards",
-      "Big data solutions",
+      "Search Engine Optimization (SEO) & Search Engine Marketing (SEM)",
+      "Social Media Marketing & Paid Advertising (Meta, Instagram, LinkedIn, Google Ads)",
+      "Branding & Content Marketing",
+      "Lead Generation & Performance Marketing",
     ],
   },
   /*

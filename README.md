@@ -93,7 +93,16 @@ Run the schema files in the Supabase SQL Editor (located in `supabase/schema/`):
 Then apply incremental migrations from `supabase/migrations/` as needed.
 One-off historical fixes and debug scripts are kept in `supabase/archive/` for reference.
 
-### 5. Run Development Server
+### 5. Set Up Storage for Profile Pictures
+```bash
+pnpm run setup-storage
+```
+
+This creates the `user-profiles` storage bucket for avatar and cover images.
+
+**If the automated script doesn't work**, follow manual setup in: `PROFILE-UPLOAD-SETUP.md`
+
+### 6. Run Development Server
 ```bash
 pnpm dev
 ```

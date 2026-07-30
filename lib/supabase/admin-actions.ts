@@ -135,7 +135,7 @@ export async function getAdmins() {
   return error ? { success: false, error: error.message } : { success: true, data }
 }
 
-export async function addAdmin(email: string, role: 'high' | 'low') {
+export async function addAdmin(email: string, role: 'high' | 'low', customPassword?: string) {
   // Verify current admin first - this uses the user's session
   const current = await getCurrentAdmin()
   if (!current.success || current.user?.role !== 'high') {
@@ -143,7 +143,7 @@ export async function addAdmin(email: string, role: 'high' | 'low') {
   }
 
   try {
-    // Use a completely separate admin client instance
+    // Use service role key to create admin - this won't affect the current user's session
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -151,38 +151,73 @@ export async function addAdmin(email: string, role: 'high' | 'low') {
       return { success: false, error: 'Server configuration error' }
     }
 
-    // Create a fresh admin client for this operation only
+    // Create a completely isolated admin client
     const { createClient: createSupabaseClient } = await import('@supabase/supabase-js')
     const adminSupabase = createSupabaseClient(supabaseUrl, serviceRoleKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
+      global: {
+        headers: {
+          // Ensure this client is completely isolated
+          'X-Client-Info': 'admin-management',
+        },
+      },
     })
+
+    // Use custom password or generate a random one
+    const password = customPassword || `Temp${Math.random().toString(36).slice(2)}!Aa1`
+    const isCustomPassword = !!customPassword
 
     const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
       email,
       email_confirm: true,
-      password: 'TempPass123!', // Default temporary password
+      password: password,
+      user_metadata: {
+        created_by: current.user.email,
+        created_at: new Date().toISOString(),
+      },
     })
 
     if (authError || !authUser.user) {
+      console.error('Add admin auth error:', authError)
       return { success: false, error: authError?.message || 'Failed to create user' }
     }
 
+    // Create admin profile
     const { data, error } = await adminSupabase
       .from('admin_profiles')
-      .insert({ id: authUser.user.id, email, role })
+      .insert({ 
+        id: authUser.user.id, 
+        email, 
+        role,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
       .select()
 
     if (error) {
+      console.error('Add admin profile error:', error)
+      // Cleanup: delete the auth user if profile creation failed
       await adminSupabase.auth.admin.deleteUser(authUser.user.id)
       return { success: false, error: error.message }
     }
 
     revalidatePath('/admin/admins')
-    return { success: true, data }
+    
+    // Return different messages based on whether custom password was used
+    const message = isCustomPassword 
+      ? `Admin created successfully with your custom password.`
+      : `Admin created successfully. Temporary password: ${password}`
+    
+    return { 
+      success: true, 
+      data,
+      message
+    }
   } catch (error) {
+    console.error('Add admin unexpected error:', error)
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to create admin' 

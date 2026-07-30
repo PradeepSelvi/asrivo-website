@@ -4,6 +4,8 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Menu, X, Sparkles } from "lucide-react"
+import { AuthButtons } from "@/components/auth-buttons"
+import { MobileAuthButtons } from "@/components/mobile-auth-buttons"
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -14,60 +16,6 @@ const navigation = [
   { name: "Contact", href: "/contact" },
 ]
 
-// --- CREATIVE ASRIVO TECH SVG LOGO ---
-const AsrivoLogoIcon = ({ className }: { className?: string }) => (
-  <svg 
-    viewBox="0 0 100 100" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg" 
-    className={className}
-  >
-    <defs>
-      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#4fd1ed" />
-        <stop offset="100%" stopColor="#2b6cb0" />
-      </linearGradient>
-      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#81e6d9" />
-        <stop offset="100%" stopColor="#4fd1ed" />
-      </linearGradient>
-    </defs>
-    
-    {/* Main Triangle "A" Structure */}
-    <path 
-      d="M50 15L85 85H70L50 40L30 85H15L50 15Z" 
-      fill="url(#logoGrad)" 
-      className="drop-shadow-lg"
-    />
-    <path d="M50 25L75 75H65L50 45L35 75H25L50 25Z" fill="white" fillOpacity="0.2" />
-    
-    {/* Orbital Rings */}
-    <ellipse 
-      cx="50" cy="55" rx="45" ry="12" 
-      stroke="url(#ringGrad)" 
-      strokeWidth="3" 
-      fill="none" 
-      transform="rotate(-15 50 55)"
-      strokeDasharray="140 20"
-    />
-    <ellipse 
-      cx="50" cy="58" rx="35" ry="8" 
-      stroke="#81e6d9" 
-      strokeWidth="2" 
-      fill="none" 
-      transform="rotate(-5 50 58)"
-      opacity="0.6"
-    />
-
-    {/* Tech Particles/Dots */}
-    <circle cx="75" cy="25" r="2.5" fill="#81e6d9" />
-    <circle cx="82" cy="35" r="1.5" fill="#4fd1ed" />
-    <circle cx="88" cy="28" r="1.2" fill="#81e6d9" opacity="0.8" />
-    <circle cx="70" cy="38" r="1" fill="#4fd1ed" />
-  </svg>
-)
-
-// --- SOCIAL ICONS ---
 const LinkedInIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill="#0A66C2" />
@@ -75,28 +23,28 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 )
 
 const InstagramIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="rg" cx="30%" cy="100%" r="150%">
-        <stop offset="0%" stopColor="#f09433" />
-        <stop offset="25%" stopColor="#e6683c" />
-        <stop offset="50%" stopColor="#dc2743" />
-        <stop offset="75%" stopColor="#cc2366" />
-        <stop offset="100%" stopColor="#bc1888" />
-      </radialGradient>
-    </defs>
-    <path fill="url(#rg)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-  </svg>
+  <div className={`${className} relative`} style={{ 
+    background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
+    borderRadius: '6px',
+    padding: '2px'
+  }}>
+    <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="white">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+    </svg>
+  </div>
 )
 
-export function Header() {
+interface HeaderProps {
+  settings?: Record<string, string>
+}
+
+export function Header({ settings }: HeaderProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [visible, setVisible] = useState(true)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [lastScrollY, setLastScrollY] = useState(0)
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden'
@@ -111,16 +59,11 @@ export function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      
-      // Determine if scrolled past threshold
       setScrolled(currentScrollY > 20)
       
-      // Show navbar when scrolling up, hide when scrolling down
       if (currentScrollY < lastScrollY || currentScrollY < 100) {
-        // Scrolling up or near top - show navbar
         setVisible(true)
       } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down and past threshold - hide navbar
         setVisible(false)
       }
       
@@ -155,8 +98,6 @@ export function Header() {
       style={{ transition: "transform 0.3s ease-in-out, background-color 0.5s, border-color 0.5s" }}
     >
       <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
-        
-        {/* Animated Background Blur Glow */}
         <div 
           className="pointer-events-none absolute inset-0 -z-10 opacity-50 transition-transform duration-700 ease-out"
           style={{ transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)` }}
@@ -164,7 +105,6 @@ export function Header() {
            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#4fd1ed15_0%,transparent_70%)]" />
         </div>
 
-        {/* --- LOGO SECTION --- */}
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2 sm:gap-3 group">
             <img
@@ -183,7 +123,6 @@ export function Header() {
           </Link>
         </div>
         
-        {/* Mobile Toggle - Modern elevated design like admin panel */}
         <div className="flex lg:hidden z-50 relative">
           <button 
             onClick={() => setMobileMenuOpen(true)} 
@@ -194,7 +133,6 @@ export function Header() {
           </button>
         </div>
         
-        {/* Desktop Nav */}
         <div className="hidden lg:flex lg:gap-x-1">
           {navigation.map((item) => (
             <Link
@@ -212,16 +150,23 @@ export function Header() {
           ))}
         </div>
         
-        {/* Desktop Actions Area with Real Icons */}
         <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-5">
-          <div className="flex items-center gap-3 border-r pr-5 border-border/40">
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110 active:scale-95">
-              <LinkedInIcon className="h-5 w-5" />
-            </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110 active:scale-95">
-              <InstagramIcon className="h-5 w-5" />
-            </a>
-          </div>
+          {settings && (
+            <div className="flex items-center gap-3 border-r pr-5 border-border/40">
+              {settings.social_linkedin && (
+                <a href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110 active:scale-95">
+                  <LinkedInIcon className="h-5 w-5" />
+                </a>
+              )}
+              {settings.social_instagram && (
+                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110 active:scale-95">
+                  <InstagramIcon className="h-5 w-5" />
+                </a>
+              )}
+            </div>
+          )}
+
+          <AuthButtons />
 
           <Button size="sm" className="bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg shadow-blue-500/20 transition-colors" asChild>
             <Link href="/services/inquiry" className="gap-2">
@@ -232,21 +177,15 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[100] bg-background lg:hidden flex flex-col" style={{ height: '100dvh' }}>
-          {/* Header - with top padding for mobile status bar */}
           <div 
             className="flex items-center justify-between px-6 py-5 border-b border-border bg-background/95 backdrop-blur-md shrink-0"
             style={{ paddingTop: 'max(20px, env(safe-area-inset-top))' }}
           >
             <div className="flex items-center gap-2">
-              <img
-                src="/asrivo.png"
-                alt="Asrivo Tech Logo"
-                className="h-9 w-9 shrink-0"
-              />
-               <span className="font-bold text-foreground text-lg">ASRIVO TECH</span>
+              <img src="/asrivo.png" alt="Asrivo Tech Logo" className="h-9 w-9 shrink-0" />
+              <span className="font-bold text-foreground text-lg">ASRIVO TECH</span>
             </div>
             <button 
               onClick={() => setMobileMenuOpen(false)} 
@@ -257,77 +196,58 @@ export function Header() {
             </button>
           </div>
 
-          {/* Navigation Links - Scrollable area */}
           <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4 space-y-2" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <Link 
-              href="/" 
-              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/about" 
-              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link 
-              href="/services" 
-              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Services
-            </Link>
-            <Link 
-              href="/team" 
-              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Team
-            </Link>
-            <Link 
-              href="/projects" 
-              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Projects
-            </Link>
-            <Link 
-              href="/contact" 
-              className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
+            {navigation.map((item) => (
+              <Link 
+                key={item.name}
+                href={item.href} 
+                className="block px-4 py-3 text-base font-semibold text-foreground bg-muted/50 hover:bg-[#4fd1ed] hover:text-white rounded-xl transition-colors active:scale-98 touch-manipulation" 
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
           </div>
 
-          {/* Footer - Fixed at bottom with safe area padding */}
           <div 
-            className="px-6 py-4 border-t border-border bg-background/95 backdrop-blur-md shrink-0"
+            className="px-6 py-4 border-t border-border bg-background/95 backdrop-blur-md shrink-0 space-y-3"
             style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
           >
-            <div className="flex items-center justify-around">
-              <a 
-                href="https://linkedin.com" 
-                target='_blank' 
-                rel='noopener noreferrer' 
-                className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors active:scale-95 touch-manipulation"
-              >
-                <LinkedInIcon className="h-5 w-5" />
-                <span>LinkedIn</span>
-              </a>
-              <a 
-                href="https://www.instagram.com/asrivotech" 
-                target='_blank' 
-                rel='noopener noreferrer' 
-                className="flex items-center gap-2 text-sm font-medium hover:text-[#1FA2E1] transition-colors active:scale-95 touch-manipulation"
-              >
-                <InstagramIcon className="h-5 w-5" />
-                <span>Instagram</span>
-              </a>
-            </div>
+            <MobileAuthButtons onNavigate={() => setMobileMenuOpen(false)} />
+            
+            <Button size="lg" className="w-full bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg" asChild>
+              <Link href="/services/inquiry" onClick={() => setMobileMenuOpen(false)}>
+                <Sparkles className="h-5 w-5 mr-2" />
+                Get Started
+              </Link>
+            </Button>
+            
+            {settings && (
+              <div className="flex items-center justify-around gap-4 pt-2">
+                {settings.social_linkedin && (
+                  <a 
+                    href={settings.social_linkedin} 
+                    target='_blank' 
+                    rel='noopener noreferrer' 
+                    className="flex items-center gap-3 text-sm font-medium text-foreground hover:text-[#0A66C2] transition-colors active:scale-95 touch-manipulation"
+                  >
+                    <LinkedInIcon className="h-6 w-6 shrink-0" />
+                    <span>LinkedIn</span>
+                  </a>
+                )}
+                {settings.social_instagram && (
+                  <a 
+                    href={settings.social_instagram} 
+                    target='_blank' 
+                    rel='noopener noreferrer' 
+                    className="flex items-center gap-3 text-sm font-medium text-foreground hover:opacity-80 transition-opacity active:scale-95 touch-manipulation"
+                  >
+                    <InstagramIcon className="h-6 w-6 shrink-0" />
+                    <span>Instagram</span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

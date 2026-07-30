@@ -1,6 +1,6 @@
 ﻿import React from 'react'
 import { getDeals } from '@/lib/supabase/crm-actions'
-import { Building2 } from 'lucide-react'
+import { Building2, Eye } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function CRMDealsPage() {
@@ -21,12 +21,22 @@ export default async function CRMDealsPage() {
         {deals && deals.length > 0 ? (
           <div className="space-y-3">
             {deals.map((deal: any) => (
-              <Link key={deal.id} href={`/admin/crm/deals/${deal.id}`} className="block p-4 bg-muted/20 hover:bg-muted/40 rounded-lg transition-colors">
-                <div className="font-semibold text-foreground">{deal.title}</div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  {deal.currency} {deal.value?.toLocaleString()} • {deal.stage}
-                </div>
-              </Link>
+              <div key={deal.id} className="flex items-center justify-between p-4 bg-muted/20 hover:bg-muted/40 rounded-lg transition-colors">
+                <Link href={`/admin/crm/deals/${deal.id}`} className="flex-1">
+                  <div className="font-semibold text-foreground">{deal.deal_name}</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {deal.company_name && <span>{deal.company_name} • </span>}
+                    {deal.currency} {deal.deal_value?.toLocaleString()} • {deal.stage}
+                  </div>
+                </Link>
+                <Link 
+                  href={`/admin/crm/deals/${deal.id}`}
+                  className="ml-4 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-sm transition-all flex items-center gap-2 shrink-0"
+                >
+                  <Eye className="w-4 h-4" />
+                  View
+                </Link>
+              </div>
             ))}
           </div>
         ) : (

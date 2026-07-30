@@ -1,6 +1,8 @@
+'use client'
+
 import Link from "next/link"
-import Image from "next/image"
-import { Linkedin, Github, Mail, MapPin, Phone } from "lucide-react"
+import { Linkedin, Github, Mail, MapPin, Phone, Instagram, Twitter } from "lucide-react"
+import { useEffect, useState } from "react"
 
 const navigation = {
   company: [
@@ -13,6 +15,7 @@ const navigation = {
     { name: "Mobile Applications", href: "/services#mobile" },
     { name: "Cloud & DevOps", href: "/services#cloud" },
     { name: "AI & Automation", href: "/services#ai" },
+    { name: "Digital Marketing", href: "/services/digital-marketing" },
     { name: "IT Consulting", href: "/services#consulting" },
   ],
   resources: [
@@ -26,13 +29,41 @@ const navigation = {
   ],
 }
 
-const social = [
-  { name: "LinkedIn", href: "https://linkedin.com/company/asrivotech", icon: Linkedin },
-  { name: "GitHub", href: "https://github.com/asrivotech", icon: Github },
-  { name: "Email", href: "mailto:info.asrivotech@gmail.com", icon: Mail },
-]
+// Default settings
+const defaultSettings = {
+  site_name: 'Asrivo Tech',
+  site_tagline: "TURNING IDEAS INTO INTELLIGENT SOLUTIONS",
+  contact_email: 'info@asrivotech.com',
+  contact_phone: '+91 8122575337',
+  contact_address: 'Madurai, Tamil Nadu, India',
+  social_linkedin: 'https://linkedin.com/company/asrivotech',
+  social_github: 'https://github.com/asrivotech',
+  social_instagram: 'https://instagram.com/asrivotech',
+  social_twitter: 'https://twitter.com/asrivotech',
+}
 
 export function Footer() {
+  const [settings, setSettings] = useState(defaultSettings)
+
+  useEffect(() => {
+    // Fetch settings from API
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) {
+          setSettings(prev => ({ ...prev, ...data.data }))
+        }
+      })
+      .catch(err => console.error('Error loading settings:', err))
+  }, [])
+  
+  const social = [
+    { name: "LinkedIn", href: settings.social_linkedin, icon: Linkedin },
+    { name: "GitHub", href: settings.social_github, icon: Github },
+    { name: "Instagram", href: settings.social_instagram, icon: Instagram },
+    { name: "Twitter", href: settings.social_twitter, icon: Twitter },
+    { name: "Email", href: `mailto:${settings.contact_email}`, icon: Mail },
+  ].filter(item => item.href) // Only show links that are configured
   return (
     <>
       <footer className="border-t border-white/10 bg-black text-white">
@@ -54,8 +85,7 @@ export function Footer() {
               </Link>
               
               <p className="mt-4 text-sm text-zinc-400 leading-relaxed">
-                TURNING IDEAS INTO INTELLIGENT SOLUTIONS. 
-                Engineering digital innovation for modern businesses.
+                {settings.site_tagline || 'TURNING IDEAS INTO INTELLIGENT SOLUTIONS'}
               </p>
 
               <div className="mt-6 flex gap-4">
@@ -108,19 +138,19 @@ export function Footer() {
                 <li className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-[#00AEEF] mt-0.5 shrink-0" />
                   <span className="text-sm text-zinc-400">
-                    Madurai TamilNadu, India<br />
+                    {settings.contact_address}
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-[#00AEEF] shrink-0" />
-                  <a href="tel:+918122575337" className="text-sm text-zinc-400 hover:text-[#00AEEF]">
-                    +91 8122575337
+                  <a href={`tel:${settings.contact_phone.replace(/\s/g, '')}`} className="text-sm text-zinc-400 hover:text-[#00AEEF]">
+                    {settings.contact_phone}
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-[#00AEEF] shrink-0" />
-                  <a href="mailto:info@asrivotech.com" className="text-sm text-zinc-400 hover:text-[#00AEEF]">
-                    info.asrivotech@gmail.com
+                  <a href={`mailto:${settings.contact_email}`} className="text-sm text-zinc-400 hover:text-[#00AEEF]">
+                    {settings.contact_email}
                   </a>
                 </li>
               </ul>
@@ -131,7 +161,7 @@ export function Footer() {
           <div className="mt-12 border-t border-white/10 pt-8">
             <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
               <p className="text-sm text-zinc-500" suppressHydrationWarning>
-                &copy; {new Date().getFullYear()} Asrivo Tech. All rights reserved.
+                &copy; {new Date().getFullYear()} {settings.site_name}. All rights reserved.
               </p>
               <div className="flex gap-6">
                 <Link href="/privacy" className="text-sm text-zinc-500 hover:text-[#00AEEF]">

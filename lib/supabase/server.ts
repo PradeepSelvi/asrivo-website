@@ -14,9 +14,9 @@ export const createClient = async () => {
         },
         setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
+            cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options)
-            )
+            })
           } catch {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
@@ -28,6 +28,8 @@ export const createClient = async () => {
         // Let middleware handle token refreshing
         persistSession: true,
         detectSessionInUrl: false,
+        autoRefreshToken: true,
+        flowType: 'pkce',
       },
     }
   )

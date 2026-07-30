@@ -17,7 +17,7 @@ const teamMembers = [
   },
   {
     name: "Siranjeevi B.U",
-    role: "Head - Digital Marketing (SEO, SMO) & HR Executive",
+    role: "Digital Marketing (SEO, SMO)",
     image: "/team/siranjeevi.jpg",
     bio: "Leading brand growth through expert SEO, SMO strategies, and organizational excellence in talent and HR management.",
     linkedin: "https://www.linkedin.com/in/siranjeevi-bu/",

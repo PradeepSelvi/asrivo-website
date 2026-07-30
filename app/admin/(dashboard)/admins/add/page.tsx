@@ -8,7 +8,12 @@ import AddAdminForm from './add-admin-form'
 export default async function AddAdminPage() {
   // Server-side gate: only high admins can reach this page
   const adminResult = await getCurrentAdmin()
-  if (!adminResult.success || adminResult.user?.role !== 'high') {
+  
+  if (!adminResult.success || !adminResult.user) {
+    redirect('/admin/login?error=unauthorized')
+  }
+  
+  if (adminResult.user.role !== 'high') {
     redirect('/admin')
   }
 
@@ -16,13 +21,14 @@ export default async function AddAdminPage() {
     'use server'
     
     const email = formData.get('email') as string
+    const password = formData.get('password') as string
     const role = formData.get('role') as 'high' | 'low'
 
-    const result = await addAdmin(email, role)
+    const result = await addAdmin(email, role, password || undefined)
 
+    // Don't redirect automatically - let the user see the generated password
     if (result.success) {
       revalidatePath('/admin/admins')
-      redirect('/admin/admins')
     }
 
     return result

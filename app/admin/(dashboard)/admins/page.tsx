@@ -1,6 +1,7 @@
 import React from 'react'
 import { getCurrentAdmin, getAdmins } from '@/lib/supabase/admin-actions'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { Shield, ShieldCheck, ShieldOff, UserPlus, Trash2, User, AlertTriangle } from 'lucide-react'
 
 export default async function AdminManageAdminsPage() {
@@ -41,13 +42,13 @@ export default async function AdminManageAdminsPage() {
             <ShieldCheck className="w-4 h-4 text-primary" />
             Current Admin Accounts ({admins?.length || 0})
           </h2>
-          <a
+          <Link
             href="/admin/admins/add"
             className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-foreground text-xs font-semibold px-3 py-2 rounded-lg transition-all"
           >
             <UserPlus className="w-3.5 h-3.5" />
             Add Admin
-          </a>
+          </Link>
         </div>
         <div className="divide-y divide-border">
           {!admins || admins.length === 0 ? (
@@ -85,20 +86,20 @@ export default async function AdminManageAdminsPage() {
                   </span>
                   {admin.id !== currentUserId && (
                     <div className="flex items-center gap-2">
-                      <a
+                      <Link
                         href={`/admin/admins/${admin.id}/change-role`}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
                         title="Change role"
                       >
                         <ShieldOff className="w-4 h-4" />
-                      </a>
-                      <a
+                      </Link>
+                      <Link
                         href={`/admin/admins/${admin.id}/remove`}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-red-500/10 transition-all"
                         title="Remove admin"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </a>
+                      </Link>
                     </div>
                   )}
                 </div>

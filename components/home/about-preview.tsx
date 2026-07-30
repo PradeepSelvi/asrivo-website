@@ -60,8 +60,12 @@ function AnimatedStat({ icon: Icon, value, label, description, delay }: {
   delay: number;
 }) {
   const { ref, isVisible } = useScrollAnimation(0.2)
-  const numericValue = parseInt(value.replace(/\D/g, ''))
-  const suffix = value.replace(/\d/g, '')
+  
+  // Check if value contains a slash (like "24/7")
+  const hasSlash = value.includes('/')
+  const numericValue = hasSlash ? parseInt(value.split('/')[0]) : parseInt(value.replace(/\D/g, ''))
+  const suffix = hasSlash ? '/' + value.split('/')[1] : value.replace(/\d/g, '')
+  
   const { count, startAnimation } = useCountUp(numericValue, 2000)
 
   useEffect(() => {
