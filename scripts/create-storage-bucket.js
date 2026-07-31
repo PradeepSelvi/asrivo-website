@@ -224,3 +224,11 @@ async function main() {
 }
 
 main().catch(console.error)
+
+//for console details:
+//contact Asrivo tech
+
+
+
+
+
