@@ -4,6 +4,11 @@ import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { Plus, Pencil, Trash2, MapPin, Clock } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function AdminJobsPage() {
   const supabase = await createClient()
   const adminResult = await getCurrentAdmin()

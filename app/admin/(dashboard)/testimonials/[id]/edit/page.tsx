@@ -4,6 +4,11 @@ import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { notFound, redirect } from 'next/navigation'
 import EditTestimonialForm from './edit-form'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 interface EditTestimonialPageProps {
   params: Promise<{ id: string }>
 }

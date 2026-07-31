@@ -4,6 +4,11 @@ import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { redirect, notFound } from 'next/navigation'
 import ComplaintDetailClient from './complaint-detail'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function ComplaintDetailPage({ 
   params 
 }: { 

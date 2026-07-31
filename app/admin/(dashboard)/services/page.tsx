@@ -5,6 +5,11 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import ServicesDndTable from './services-dnd-table'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function AdminServicesPage() {
   const supabase = await createClient()
   const adminResult = await getCurrentAdmin()

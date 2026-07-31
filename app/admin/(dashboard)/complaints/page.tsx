@@ -3,6 +3,11 @@ import { createClient } from '@/lib/supabase/server'
 import { AlertCircle, Clock, Eye, User, FileText } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function AdminComplaintsPage() {
   const supabase = await createClient()
 

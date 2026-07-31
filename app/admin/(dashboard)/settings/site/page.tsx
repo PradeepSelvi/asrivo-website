@@ -6,6 +6,11 @@ import { ArrowLeft, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SiteSettingsForm } from './site-settings-form'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export const metadata = {
   title: 'Site Configuration - Admin Panel',
 }

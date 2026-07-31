@@ -5,6 +5,11 @@ import { createClient } from '@/lib/supabase/client'
 import { Mail, User, Building, Clock, Eye } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 interface Contact {
   id: number
   name: string

@@ -7,6 +7,11 @@ import { getCurrencies, getDefaultCurrency } from '@/lib/crm/currency-utils'
 import { ArrowLeft, Loader2, Save } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default function NewDealPage() {
   const router = useRouter()
   const searchParams = useSearchParams()

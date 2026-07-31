@@ -3,6 +3,11 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import EditServiceForm from './edit-form'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 interface EditServicePageProps {
   params: Promise<{ id: string }>
 }

@@ -5,6 +5,11 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import AddAdminForm from './add-admin-form'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function AddAdminPage() {
   // Server-side gate: only high admins can reach this page
   const adminResult = await getCurrentAdmin()

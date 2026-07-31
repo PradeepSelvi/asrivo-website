@@ -6,6 +6,11 @@ import { createJobPosting } from '@/lib/supabase/content-actions'
 import { ArrowLeft, Loader2, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default function NewJobPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
