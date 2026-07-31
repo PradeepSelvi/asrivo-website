@@ -4,6 +4,11 @@ import Link from 'next/link'
 import { Bell, Mail, MessageSquare, Calendar, FileUser, Handshake, ShieldAlert, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export const metadata = {
   title: 'Notifications - Admin Panel',
   description: 'View all client requests and notifications',

@@ -7,6 +7,11 @@ import { getCurrencies } from '@/lib/crm/currency-utils'
 import { ArrowLeft, Loader2, Save, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default function EditDealPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
   const router = useRouter()

@@ -4,6 +4,11 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Shield, ShieldCheck, ShieldOff, UserPlus, Trash2, User, AlertTriangle } from 'lucide-react'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function AdminManageAdminsPage() {
   // Server-side gate: only high admins can reach this page
   const adminResult = await getCurrentAdmin()

@@ -5,6 +5,11 @@ import Link from 'next/link'
 import { ArrowLeft, Save, Eye, Sparkles, ImageIcon, Type, Layout } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export const metadata = {
   title: 'Homepage Settings - Admin Panel',
 }

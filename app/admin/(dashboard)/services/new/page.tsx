@@ -6,6 +6,11 @@ import { createService } from '@/lib/supabase/content-actions'
 import { ArrowLeft, Loader2, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default function NewServicePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)

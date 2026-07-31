@@ -5,6 +5,11 @@ import { Plus, User } from 'lucide-react'
 import Link from 'next/link'
 import TeamDndList from './team-dnd-list'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function AdminTeamPage() {
   const supabase = await createClient()
   const adminResult = await getCurrentAdmin()

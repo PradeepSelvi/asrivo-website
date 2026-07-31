@@ -5,6 +5,11 @@ import { Settings, DollarSign, Save, Plus, X, AlertCircle, Edit, Check } from 'l
 import { getCurrencies } from '@/lib/crm/currency-utils'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 interface Currency {
   code: string
   symbol: string

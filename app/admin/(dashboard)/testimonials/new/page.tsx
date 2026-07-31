@@ -4,6 +4,11 @@ import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { redirect } from 'next/navigation'
 import NewTestimonialForm from './new-form'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function NewTestimonialPage() {
   // Gate check
   const adminResult = await getCurrentAdmin()

@@ -5,6 +5,11 @@ import { notFound, redirect } from 'next/navigation'
 import { ShieldAlert, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 interface ChangeRolePageProps {
   params: Promise<{ id: string }>
 }

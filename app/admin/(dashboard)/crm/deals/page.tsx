@@ -3,6 +3,11 @@ import { getDeals } from '@/lib/supabase/crm-actions'
 import { Building2, Eye } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function CRMDealsPage() {
   const { data: deals } = await getDeals()
 

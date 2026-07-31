@@ -4,6 +4,11 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Calendar, Phone, Mail, MessageSquare, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react"
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export const metadata = {
   title: "Consultations - Admin",
   description: "Manage consultation requests",

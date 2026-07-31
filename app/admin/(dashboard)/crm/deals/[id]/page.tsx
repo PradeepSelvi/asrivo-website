@@ -3,6 +3,11 @@ import { Briefcase, DollarSign, Calendar, TrendingUp, Mail, Phone, Building2, Us
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function DealDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const dealId = parseInt(id)

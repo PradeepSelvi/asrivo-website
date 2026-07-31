@@ -4,6 +4,11 @@ import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { redirect, notFound } from 'next/navigation'
 import InquiryDetailClient from './inquiry-detail'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export default async function InquiryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()

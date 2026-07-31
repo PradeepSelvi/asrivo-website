@@ -16,6 +16,11 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export const metadata = {
   title: 'Settings - Admin Panel',
   description: 'Manage website settings and configuration',

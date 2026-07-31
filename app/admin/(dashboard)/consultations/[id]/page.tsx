@@ -2,6 +2,11 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 import { ConsultationDetail } from "./consultation-detail"
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 export const metadata = {
   title: "Consultation Details - Admin",
   description: "View and manage consultation request details",

@@ -5,6 +5,11 @@ import { getLeads } from '@/lib/supabase/crm-actions'
 import { User, Mail, Building, Phone, TrendingUp, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation errors
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 type LeadStatus = 'all' | 'new' | 'contacted' | 'qualified' | 'hot'
 
 export default function CRMLeadsPage() {
