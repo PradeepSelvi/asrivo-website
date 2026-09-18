@@ -137,17 +137,6 @@ export function HeroSection() {
             className="max-w-5xl mx-auto transition-transform duration-1000 ease-out"
             style={{ transform: `translate3d(${mousePos.x * -0.15}px, ${mousePos.y * -0.15}px, 0)` }}
           >
-            {/* Company Logo */}
-            <div className={`flex justify-center mb-8 transition-all duration-1000 ${mounted ? 'opacity-100' : 'opacity-0 -translate-y-4'}`}>
-              <div className="relative group">
-                <img
-                  src="/asrivo.png"
-                  alt="Asrivo Tech Logo"
-                  className="h-44 sm:h-56 md:h-64 w-auto rounded-3xl object-contain shadow-2xl border border-white/10 transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-blue-500/30 rounded-3xl blur-2xl -z-10 scale-105 opacity-70 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </div>
 
             {/* Status Badge */}
             <div className={`inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/90 border border-primary/10 shadow-2xl mb-12 transition-all duration-1000 ${mounted ? 'opacity-100' : 'opacity-0 -translate-y-6'}`}>
