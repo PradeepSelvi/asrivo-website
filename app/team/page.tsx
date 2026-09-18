@@ -62,7 +62,7 @@ const developmentTeamData = [
   {
     id: "dev-an",
     name: "ARIVANANTHAM.N",
-    role: "UI&UX, FRONT END DESIGNER",
+    role: "UI&UX, FRONT END DESIGNER (UNAVAILABLE)",
     bio: "Crafting intuitive user interfaces and delightful user experiences with cutting-edge frontend technologies.",
     image: "/team/Arivananatham.jpeg",
     email: "arivananathamn417@gmail.com",
@@ -78,9 +78,10 @@ const managementTeamData = [
     name: "Aswin K A",
     role: "Management Head & HR Manager",
     bio: "Founder managing HR, administration, finance, and operations with strategic leadership and precision",
-    email: "aswin@asrivotech.com",
-    linkedin: "#",
-    github: "#",
+    image: "/team/aswin.jpeg",
+    email: "kaaswin4503@gmail.com",
+    linkedin: "https://www.linkedin.com/in/aswin-k-a-77581a249",
+    github: "https://github.com/Aswin4532003",
     featured: false,
   },
   {
@@ -88,9 +89,10 @@ const managementTeamData = [
     name: "Siranjeevi B.U",
     role: "Digital Marketing (SEO, SMO)",
     bio: "Leading brand growth through expert SEO, SMO strategies, and organizational excellence in talent and HR management.",
-    email: "siranjeevi@asrivotech.com",
-    linkedin: "#",
-    github: "#",
+    image: "/team/siranjeevi.jpeg",
+    email: "siranjeevi.uthaman@gmail.com",
+    linkedin: "https://www.linkedin.com/in/siranjeevi-bu/",
+    github: "https://github.com/siranjj",
     featured: true,
   },
   {
@@ -109,9 +111,10 @@ const managementTeamData = [
     name: "Sargunan J.S",
     role: "Chief Operating Officer",
     bio: "Strategic operations leader driving efficiency, growth, performance, and scalable business transformation globally.",
-    email: "sargunan@asrivotech.com",
-    linkedin: "#",
-    github: "#",
+    image: "/team/sargunan.jpeg",
+    email: "sargunanitl01@gmail.com",
+    linkedin: "https://www.linkedin.com/in/sargunan-j-s-28915b2a9/",
+    github: "https://github.com/Sargunan-js",
     featured: false,
   },
   {
@@ -120,8 +123,8 @@ const managementTeamData = [
     role: "Full Stack Developer",
     bio: "Creating intuitive user experiences",
     email: "hariharan@asrivotech.com",
-    linkedin: "#",
-    github: "#",
+    linkedin: "https://www.linkedin.com/in/hariharan-t-g-51013a284/",
+    github: "https://github.com/21Hari",
     featured: false,
   },
   {
@@ -130,8 +133,8 @@ const managementTeamData = [
     role: "Project Manager",
     bio: "Frontend Developer & Project Manager driving seamless delivery and team coordination.",
     email: "krishan@asrivotech.com",
-    linkedin: "#",
-    github: "#",
+    linkedin: "https://www.linkedin.com/in/krishan-kumar-b-k/",
+    github: "https://github.com/krishankumar",
     featured: false,
   },
 ]
@@ -147,7 +150,7 @@ export default async function TeamPage() {
 
   const managementTeam = teamMembers.filter(member =>
     managementOverrideIds.includes(member.id) ||
-    member.position?.toLowerCase().includes('management') || 
+    member.position?.toLowerCase().includes('management') ||
     member.position?.toLowerCase().includes('manager') ||
     member.position?.toLowerCase().includes('head') ||
     member.position?.toLowerCase().includes('officer') ||
@@ -159,7 +162,7 @@ export default async function TeamPage() {
     member.position?.toLowerCase().includes('director')
   )
 
-  const engineeringTeam = teamMembers.filter(member => 
+  const engineeringTeam = teamMembers.filter(member =>
     !managementTeam.includes(member)
   )
   return (
@@ -179,7 +182,7 @@ export default async function TeamPage() {
               Meet the Experts Behind Asrivo Tech
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Our talented team of professionals combines deep technical expertise with a passion 
+              Our talented team of professionals combines deep technical expertise with a passion
               for innovation to deliver exceptional solutions for our clients.
             </p>
           </div>
@@ -256,37 +259,37 @@ export default async function TeamPage() {
 
       {/* Engineering Team Section - only render if there are engineering members */}
       {engineeringTeam.length > 0 && (
-      <section className="bg-muted/30 py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Engineering
-            </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Our Core Engineering Team
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Talented engineers building innovative solutions with cutting-edge technologies.
-            </p>
-          </div>
+        <section className="bg-muted/30 py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                Engineering
+              </span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Our Core Engineering Team
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Talented engineers building innovative solutions with cutting-edge technologies.
+              </p>
+            </div>
 
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {engineeringTeam.map((member) => (
-              <TeamCard
-                key={member.id}
-                name={member.name}
-                role={member.position}
-                image={member.image_url}
-                bio={member.bio}
-                linkedin={member.social_links?.linkedin || member.social_links?.Linkedin}
-                github={member.social_links?.github}
-                email={member.email}
-                variant="team"
-              />
-            ))}
+            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {engineeringTeam.map((member) => (
+                <TeamCard
+                  key={member.id}
+                  name={member.name}
+                  role={member.position}
+                  image={member.image_url}
+                  bio={member.bio}
+                  linkedin={member.social_links?.linkedin || member.social_links?.Linkedin}
+                  github={member.social_links?.github}
+                  email={member.email}
+                  variant="team"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {/* Company Contact Card */}
@@ -321,9 +324,9 @@ export default async function TeamPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">LinkedIn</p>
-                    <a 
-                      href="https://linkedin.com/company/asrivotech" 
-                      target="_blank" 
+                    <a
+                      href="https://linkedin.com/company/asrivotech"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium text-foreground hover:text-primary"
                     >
@@ -337,9 +340,9 @@ export default async function TeamPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">GitHub</p>
-                    <a 
-                      href="https://github.com/asrivotech" 
-                      target="_blank" 
+                    <a
+                      href="https://github.com/asrivotech"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium text-foreground hover:text-primary"
                     >
@@ -353,9 +356,9 @@ export default async function TeamPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">WhatsApp</p>
-                    <a 
-                      href="https://wa.me/1234567890" 
-                      target="_blank" 
+                    <a
+                      href="https://wa.me/1234567890"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium text-foreground hover:text-primary"
                     >
@@ -386,7 +389,7 @@ export default async function TeamPage() {
               Want to Join Our Team?
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
-              We&apos;re always looking for talented individuals who are passionate about technology 
+              We&apos;re always looking for talented individuals who are passionate about technology
               and innovation. Check out our open positions.
             </p>
 

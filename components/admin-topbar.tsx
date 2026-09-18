@@ -54,9 +54,16 @@ export function AdminTopbar({
                 >
                     <Menu className="h-5 w-5" />
                 </Button>
-                <span className="font-semibold text-sm" style={{ color: "#0A2463" }}>
-                    ASCIRVO
-                </span>
+                <div className="flex items-center gap-2">
+                    <img
+                        src="/asrivo.png"
+                        alt="Asrivo Tech Logo"
+                        className="h-6 w-6 rounded-md object-cover shrink-0 shadow-sm"
+                    />
+                    <span className="font-bold text-sm tracking-tight" style={{ color: "#0A2463" }}>
+                        ASRIVO TECH
+                    </span>
+                </div>
                 <Badge variant="secondary" className="text-[10px]">
                     Admin
                 </Badge>

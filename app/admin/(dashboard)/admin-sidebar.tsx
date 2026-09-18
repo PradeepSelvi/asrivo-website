@@ -114,12 +114,17 @@ export default function AdminSidebar({ user, isMobileMenuOpen, setIsMobileMenuOp
         {/* Header/Logo - Fixed at top */}
         <div className="p-5 border-b border-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-tr from-primary to-accent rounded-lg flex items-center justify-center shadow-md">
-              <ShieldAlert className="w-4 h-4 text-white" />
+            <img
+              src="/asrivo.png"
+              alt="Asrivo Tech Logo"
+              className="w-8 h-8 rounded-lg object-cover shadow-sm shrink-0 border border-border/50"
+            />
+            <div className="flex flex-col">
+              <span className="font-bold text-sm tracking-tight text-foreground leading-tight">
+                ASRIVO TECH
+              </span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Admin Portal</span>
             </div>
-            <span className="font-bold text-lg tracking-tight text-foreground">
-              Admin Panel
-            </span>
           </div>
           
           {/* Close button for mobile */}

@@ -25,11 +25,9 @@ export const createClient = async () => {
         },
       },
       auth: {
-        // Let middleware handle token refreshing
-        persistSession: true,
+        persistSession: false,
         detectSessionInUrl: false,
-        autoRefreshToken: true,
-        flowType: 'pkce',
+        autoRefreshToken: false,
       },
     }
   )

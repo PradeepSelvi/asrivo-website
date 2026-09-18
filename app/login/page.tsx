@@ -116,9 +116,13 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8 flex flex-col items-center">
-          <div className="w-12 h-12 bg-gradient-to-tr from-primary to-accent rounded-xl flex items-center justify-center shadow-lg mb-4">
-            <Lock className="w-6 h-6 text-primary-foreground" />
-          </div>
+          <Link href="/" className="mb-4 inline-block group" title="Return to home">
+            <img
+              src="/asrivo.png"
+              alt="Asrivo Tech Logo"
+              className="w-16 h-16 rounded-2xl object-cover shadow-lg border border-border/50 group-hover:scale-105 transition-transform"
+            />
+          </Link>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Welcome Back
           </h1>
