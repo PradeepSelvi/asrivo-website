@@ -20,10 +20,17 @@ export function MobileAuthButtons({ onNavigate }: MobileAuthButtonsProps) {
   useEffect(() => {
     const supabase = createClient()
     
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      setLoading(false)
-    })
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }) => {
+        setUser(user)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.warn('Auth session check error:', err)
+        setUser(null)
+        setLoading(false)
+      })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)

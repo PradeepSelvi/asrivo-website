@@ -102,25 +102,32 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 }
 
 export async function FeaturedProjects() {
-  const supabase = await createClient()
-  
-  // Fetch featured projects from database (limit to 4)
-  const { data: projects, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('featured', true)
-    .order('display_order', { ascending: true })
-    .limit(4)
+  let displayProjects: Project[] = []
 
-  // If no featured projects or error, fetch first 4 projects
-  let displayProjects = projects || []
-  if (!projects || projects.length === 0 || error) {
-    const { data: allProjects } = await supabase
+  try {
+    const supabase = await createClient()
+    
+    // Fetch featured projects from database (limit to 4)
+    const { data: projects, error } = await supabase
       .from('projects')
       .select('*')
+      .eq('featured', true)
       .order('display_order', { ascending: true })
       .limit(4)
-    displayProjects = allProjects || []
+
+    // If no featured projects or error, fetch first 4 projects
+    if (projects && projects.length > 0) {
+      displayProjects = projects
+    } else if (!error) {
+      const { data: allProjects } = await supabase
+        .from('projects')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .limit(4)
+      displayProjects = allProjects || []
+    }
+  } catch (err) {
+    console.warn('Unable to load featured projects from Supabase:', err)
   }
 
   return (

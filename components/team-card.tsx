@@ -85,6 +85,18 @@ export function TeamCard({
             {name}
           </h3>
           <p className="text-sm font-medium text-primary">{role}</p>
+
+          {email && (
+            <a
+              href={`mailto:${email}`}
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-normal text-muted-foreground hover:text-primary transition-colors max-w-full px-3 py-1 rounded-full bg-muted/60 hover:bg-muted border border-border/60"
+              title={`Send email to ${email}`}
+            >
+              <Mail className="h-3.5 w-3.5 text-primary shrink-0" />
+              <span className="truncate">{email}</span>
+            </a>
+          )}
+
           {bio && (
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{bio}</p>
           )}
@@ -116,8 +128,9 @@ export function TeamCard({
             {email && (
               <a
                 href={`mailto:${email}`}
+                title={email}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#EA4335] hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-[#EA4335]/30"
-                aria-label={`Email ${name}`}
+                aria-label={`Email ${name} at ${email}`}
               >
                 <Mail className="h-5 w-5" />
               </a>
@@ -192,8 +205,9 @@ export function TeamCard({
           {email && (
             <a
               href={`mailto:${email}`}
+              title={email}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#EA4335] hover:text-white hover:scale-110"
-              aria-label={`Email ${name}`}
+              aria-label={`Email ${name} at ${email}`}
             >
               <Mail className="h-4 w-4" />
             </a>

@@ -15,10 +15,17 @@ export function AuthButtons() {
     const supabase = createClient()
     
     // Get initial session
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      setLoading(false)
-    })
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }) => {
+        setUser(user)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.warn('Auth session check error:', err)
+        setUser(null)
+        setLoading(false)
+      })
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

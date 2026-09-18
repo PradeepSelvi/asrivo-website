@@ -76,11 +76,11 @@ export function Footer() {
                 <img 
                   src="/asrivo.png" 
                   alt="Asrivo Tech Logo" 
-                  className="shrink-0 h-16 w-16 transition-transform group-hover:scale-110"
+                  className="shrink-0 h-14 w-14 rounded-xl object-cover shadow-lg border border-white/10 transition-transform duration-300 group-hover:scale-105"
                 />
                 
                 <span className="text-xl sm:text-2xl font-semibold tracking-tight">
-                  Asrivo<span className="font-light">Tech</span>
+                  Asrivo<span className="font-light text-[#4fd1ed]">Tech</span>
                 </span>
               </Link>
               

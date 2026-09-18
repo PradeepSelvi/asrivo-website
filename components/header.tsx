@@ -110,11 +110,11 @@ export function Header({ settings }: HeaderProps = {}) {
             <img
               src="/asrivo.png"
               alt="Asrivo Tech Logo"
-              className="h-11 w-11 sm:h-13 sm:w-13 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+              className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-cover shrink-0 shadow-sm border border-border/50 transition-transform duration-300 group-hover:scale-105"
             />
             <div className="flex flex-col min-w-0">
-              <span className="text-lg sm:text-xl font-medium tracking-tight text-foreground whitespace-nowrap">
-                Asrivo<span className="font-bold">Tech</span>
+              <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground whitespace-nowrap">
+                Asrivo<span className="font-light text-primary">Tech</span>
               </span>
               <span className="text-[7px] font-extrabold uppercase tracking-[0.3em] text-muted-foreground/80 whitespace-nowrap">
                 PVT LTD • Intelligent Solutions
@@ -183,9 +183,9 @@ export function Header({ settings }: HeaderProps = {}) {
             className="flex items-center justify-between px-6 py-5 border-b border-border bg-background/95 backdrop-blur-md shrink-0"
             style={{ paddingTop: 'max(20px, env(safe-area-inset-top))' }}
           >
-            <div className="flex items-center gap-2">
-              <img src="/asrivo.png" alt="Asrivo Tech Logo" className="h-9 w-9 shrink-0" />
-              <span className="font-bold text-foreground text-lg">ASRIVO TECH</span>
+            <div className="flex items-center gap-2.5">
+              <img src="/asrivo.png" alt="Asrivo Tech Logo" className="h-9 w-9 rounded-xl object-cover shadow-sm shrink-0 border border-border/50" />
+              <span className="font-bold text-foreground text-lg tracking-tight">ASRIVO TECH</span>
             </div>
             <button 
               onClick={() => setMobileMenuOpen(false)} 

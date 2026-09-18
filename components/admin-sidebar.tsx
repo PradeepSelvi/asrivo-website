@@ -90,6 +90,25 @@ export function AdminSidebar({
             )}
             style={{ backgroundColor: "#0A2463" }}
         >
+            {/* Brand Header */}
+            <div className="px-4 py-4 border-b border-white/10 flex items-center gap-3">
+                <img
+                    src="/asrivo.png"
+                    alt="Asrivo Tech Logo"
+                    className="h-8 w-8 rounded-lg object-cover shrink-0 shadow-sm border border-white/20"
+                />
+                {!collapsed && (
+                    <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-white text-sm tracking-wide truncate">
+                            ASRIVO TECH
+                        </span>
+                        <span className="text-[10px] text-[#CBD5E1]/70 tracking-wider uppercase">
+                            Admin Portal
+                        </span>
+                    </div>
+                )}
+            </div>
+
             {/* Dashboard link — top level, no group */}
             <div className="px-2 pt-4">
                 <Link
