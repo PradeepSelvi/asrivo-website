@@ -34,7 +34,7 @@ const defaultSettings = {
   site_name: 'Asrivo Tech',
   site_tagline: "TURNING IDEAS INTO INTELLIGENT SOLUTIONS",
   contact_email: 'info@asrivotech.com',
-  contact_phone: '+91 8122575337',
+  contact_phone: '+91 9976422558',
   contact_address: 'Madurai, Tamil Nadu, India',
   social_linkedin: 'https://linkedin.com/company/asrivotech',
   social_github: 'https://github.com/asrivotech',
@@ -51,7 +51,17 @@ export function Footer() {
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data) {
-          setSettings(prev => ({ ...prev, ...data.data }))
+          const incoming = data.data
+          // Keep our defaults for address and phone if the DB still has old placeholder values
+          const STALE_ADDRESSES = ['123 Tech Street San Francisco, CA 94105', '123 Tech Street', 'San Francisco']
+          const STALE_PHONES = ['+1 (555) 123-4567', '+1 555 123-4567']
+          if (STALE_ADDRESSES.some(s => incoming.contact_address?.includes(s))) {
+            delete incoming.contact_address
+          }
+          if (STALE_PHONES.some(s => incoming.contact_phone?.includes(s))) {
+            delete incoming.contact_phone
+          }
+          setSettings(prev => ({ ...prev, ...incoming }))
         }
       })
       .catch(err => console.error('Error loading settings:', err))

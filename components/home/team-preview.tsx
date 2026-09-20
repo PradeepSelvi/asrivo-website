@@ -1,12 +1,13 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Linkedin, Github, Mail, ArrowRight } from "lucide-react"
 import { useScrollAnimation, useTilt } from "@/hooks/use-scroll-animation"
 
 const teamMembers = [
- {
+  {
     name: "Aswin K A",
     role: "Management Head & HR Manager",
     image: "/team/aswin.jpeg",
@@ -25,11 +26,11 @@ const teamMembers = [
     email: "siranjeevi.uthaman@gmail.com",
   },
   {
-    name: "Pradeep Kumar M",
-    role: "Legal & Compliance Officer",
+    name: "M.Pradeep Kumar.DCSE",
+    role: "Legal & Chief Technical Developer",
     image: "/team/pradeepkumar.jpeg",
     bio: "Ensuring regulatory compliance, managing legal risks, protecting company integrity and ethical standards.",
-    linkedin: "https://www.linkedin.com/in/pradeep-kumar-m/",
+    linkedin: "https://www.linkedin.com/in/pradeep-kumar-3650982a9?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
     github: "https://github.com/Selvipr",
     email: "pradeepselvi126@gmail.com",
   },
@@ -42,30 +43,36 @@ const teamMembers = [
     github: "https://github.com/Sargunan-js",
     email: "sargunanitl01@gmail.com",
   },
-   {
-    name: "Hari Haran T.G",
-    role: "Full Stack Developer",
-    image: "/team/david.jpg",
-    bio: "Creating intuitive user experiences",
-    linkedin: "https://www.linkedin.com/in/hariharan-t-g-51013a284/",
-    github: "https://github.com/21Hari",
-    email: "hariharan@asrivotech.com",
+  {
+    id: "dev-sj",
+    name: "sivaganesh.J",
+    role: "TEAM LEAD, DATABASE, BACKEND",
+    bio: "Leading the team, backend and database optimization initiatives for robust, scalable application infrastructure.",
+    image: "/team/sivaganesh j.jpeg",
+    email: "sivaganesh73acm@gmail.com",
+    linkedin: "https://www.linkedin.com/in/sivaganesh-j",
+    github: "https://github.com/sivaganeshj",
+    featured: false,
   },
   {
     name: "Krishan Kumar B.K",
     role: "Project Manager",
-    image: "/team/krishan.jpg",
+    image: "",
     bio: "Frontend Developer & Project Manager driving seamless delivery and team coordination.",
     linkedin: "https://www.linkedin.com/in/krishan-kumar-b-k/",
     github: "https://github.com/krishankumar",
     email: "krishan@asrivotech.com",
   },
 ]
+
 function TeamMemberCard({ member, index }: { member: typeof teamMembers[0]; index: number }) {
   const { ref: tiltRef, transform } = useTilt(6)
   const { ref: scrollRef, isVisible } = useScrollAnimation(0.1)
+  const [imgError, setImgError] = useState(false)
 
-  const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 4)
+  const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 3)
+  const avatarSrc = member.image?.trim() ? member.image.trim() : null
+  const showInitials = !avatarSrc || imgError
 
   return (
     <div
@@ -89,9 +96,18 @@ function TeamMemberCard({ member, index }: { member: typeof teamMembers[0]; inde
           <div className="relative mx-auto w-fit">
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm scale-110" />
             <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center ring-4 ring-border group-hover:ring-primary/50 transition-all duration-500 group-hover:scale-105">
-              <span className="text-3xl font-bold text-primary transition-transform duration-500 group-hover:scale-110">
-                {initials}
-              </span>
+              {showInitials ? (
+                <span className="text-3xl font-bold text-primary transition-transform duration-500 group-hover:scale-110">
+                  {initials}
+                </span>
+              ) : (
+                <img
+                  src={avatarSrc!}
+                  alt={`${member.name} profile`}
+                  className="h-full w-full object-cover object-center"
+                  onError={() => setImgError(true)}
+                />
+              )}
             </div>
             {/* Floating particles */}
             <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary/50 opacity-0 group-hover:opacity-100 animate-float transition-opacity duration-500" />

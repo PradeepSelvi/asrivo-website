@@ -59,17 +59,7 @@ const developmentTeamData = [
     github: "https://github.com/thamaraiselvan",
     featured: false,
   },
-  {
-    id: "dev-an",
-    name: "ARIVANANTHAM.N",
-    role: "UI&UX, FRONT END DESIGNER (UNAVAILABLE)",
-    bio: "Crafting intuitive user interfaces and delightful user experiences with cutting-edge frontend technologies.",
-    image: "/team/Arivananatham.jpeg",
-    email: "arivananathamn417@gmail.com",
-    linkedin: "https://www.linkedin.com/in/arivanantham-n",
-    github: "https://github.com/arivanantham",
-    featured: false,
-  },
+  
 ]
 
 const managementTeamData = [
@@ -117,16 +107,7 @@ const managementTeamData = [
     github: "https://github.com/Sargunan-js",
     featured: false,
   },
-  {
-    id: "mgmt-hht",
-    name: "Hari Haran T.G",
-    role: "Full Stack Developer",
-    bio: "Creating intuitive user experiences",
-    email: "hariharan@asrivotech.com",
-    linkedin: "https://www.linkedin.com/in/hariharan-t-g-51013a284/",
-    github: "https://github.com/21Hari",
-    featured: false,
-  },
+  
   {
     id: "mgmt-kkb",
     name: "Krishan Kumar B.K",
