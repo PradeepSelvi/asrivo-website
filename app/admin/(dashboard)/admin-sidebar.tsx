@@ -23,6 +23,7 @@ import {
   Handshake,
   Calendar,
   X,
+  Layout,
 } from 'lucide-react'
 
 interface AdminSidebarProps {
@@ -58,6 +59,7 @@ export default function AdminSidebar({ user, isMobileMenuOpen, setIsMobileMenuOp
 
   const menuItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Page Content', href: '/admin/content', icon: Layout },
     { name: 'Projects', href: '/admin/projects', icon: FolderGit },
     { name: 'Services', href: '/admin/services', icon: Briefcase },
     { name: 'Team Members', href: '/admin/team', icon: Users },
