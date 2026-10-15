@@ -38,7 +38,18 @@ export async function getSiteSettings(category?: string) {
     
     const { data, error } = await query
     
-    if (error) throw new Error(error.message)
+    if (error) {
+      // Return empty array gracefully when the table doesn't exist yet
+      if (
+        error.code === 'PGRST116' ||
+        error.message?.includes('does not exist') ||
+        error.message?.includes('relation') ||
+        error.code === '42P01'
+      ) {
+        return { success: true, data: [] as any[] }
+      }
+      throw new Error(error.message)
+    }
     
     return { success: true, data }
   } catch (error: any) {
@@ -57,7 +68,19 @@ export async function getSiteSetting(category: string, key: string) {
       .eq('key', key)
       .single()
     
-    if (error) throw new Error(error.message)
+    if (error) {
+      // Return null gracefully when the table doesn't exist yet or row not found
+      if (
+        error.code === 'PGRST116' ||
+        error.code === 'PGRST100' ||
+        error.message?.includes('does not exist') ||
+        error.message?.includes('relation') ||
+        error.code === '42P01'
+      ) {
+        return { success: true, data: null }
+      }
+      throw new Error(error.message)
+    }
     
     return { success: true, data: data.value }
   } catch (error: any) {

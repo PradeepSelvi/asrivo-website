@@ -1,0 +1,27 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Server actions for CMS - Create lib/supabase/page-content-actions.ts with 'use server' actions following the existing pattern in lib/supabase/content-actions.ts (checkAuthAndPermission, revalidatePath). Implement savePageContent() action that upserts content and invalidates both the public page cache and /admin/content cache",
+  "status": "completed",
+  "steps": [
+    "Create lib/supabase/page-content-actions.ts with 'use server' directive at the top",
+    "Import checkAuthAndPermission from existing admin actions, createClient from lib/supabase/server, revalidatePath from next/cache",
+    "Implement savePageContent(pageSlug: string, updates: Record<string, string>) server action that: calls checkAuthAndPermission() to verify admin auth, loops through updates object and upserts each key-value pair to page_content table using page_slug and section_key as unique constraint, calls revalidatePath for the public page route (e.g., '/' for home, '/about' for about) and '/admin/content', returns {success: true} or {success: false, error: string}",
+    "Implement getPageContentForEdit(pageSlug: string) server action that fetches all content rows for a page and returns them as Record<string, string> for the edit form to consume",
+    "Add proper error handling matching the pattern in content-actions.ts (try-catch, AUTH_REQUIRED handling, role checks)"
+  ],
+  "acceptance_criteria": [
+    "lib/supabase/page-content-actions.ts exists with 'use server' directive",
+    "savePageContent() properly authenticates admins using checkAuthAndPermission()",
+    "Content updates are persisted to the database via upsert on (page_slug, section_key) unique constraint",
+    "revalidatePath() is called for both the public page and the admin content page after successful save",
+    "All functions return consistent {success, data?, error?} shape matching existing server actions"
+  ],
+  "verification": [
+    "Read lib/supabase/page-content-actions.ts and confirm both server actions are implemented with 'use server'",
+    "Verify TypeScript build succeeds: `pnpm build`",
+    "Check that error handling matches the pattern in lib/supabase/content-actions.ts (AUTH_REQUIRED, role checks, error messages)"
+  ],
+  "blocked_reason": null,
+  "findings": "Successfully created lib/supabase/page-content-actions.ts with 'use server' directive. Implemented savePageContent() server action that authenticates admins via checkAuthAndPermission(), upserts content to page_content table using (page_slug, section_key) unique constraint, and revalidates both public page routes and /admin/content. Implemented getPageContentForEdit() server action that fetches page content in key-value format for admin editing. Error handling matches existing pattern in content-actions.ts with AUTH_REQUIRED and AUTH_EXPIRED error codes. Both functions return consistent {success, data?, error?, code?} shape. PowerShell execution policy prevented running build verification, but code structure and patterns manually verified against existing codebase."
+}

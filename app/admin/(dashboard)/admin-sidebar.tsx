@@ -230,9 +230,6 @@ export default function AdminSidebar({ user, isMobileMenuOpen, setIsMobileMenuOp
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold truncate text-foreground">{user.email}</p>
-              <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${isHigh ? 'bg-red-500/20 text-destructive border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
-                {user.role}
-              </span>
             </div>
           </div>
 

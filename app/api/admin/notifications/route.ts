@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch new partnership requests
     const { data: partnerships } = await supabase
-      .from('partnership_requests')
+      .from('partnerships')
       .select('id, company_name, contact_person, created_at, status')
       .eq('status', 'new')
       .order('created_at', { ascending: false })

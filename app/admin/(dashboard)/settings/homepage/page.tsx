@@ -2,13 +2,12 @@ import { requireAdmin } from '@/lib/auth/admin-guard'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ArrowLeft, Save, Eye, Sparkles, ImageIcon, Type, Layout } from 'lucide-react'
+import { ArrowLeft, Eye, Layout } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { HomepageSettingsForm } from './homepage-settings-form'
 
-// Force dynamic rendering to prevent static generation errors
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
 
 export const metadata = {
   title: 'Homepage Settings - Admin Panel',
@@ -16,19 +15,28 @@ export const metadata = {
 
 export default async function HomepageSettingsPage() {
   const user = await requireAdmin()
-  
+
   if (user.role !== 'high') {
     redirect('/admin')
   }
 
   const supabase = await createClient()
 
-  // Fetch homepage settings (you'll need to create this table)
+  // Fetch homepage settings — returns [] if table doesn't exist yet
   const { data: settings } = await supabase
     .from('site_settings')
     .select('*')
-    .eq('key', 'homepage')
-    .single()
+    .eq('category', 'homepage')
+
+  // Convert array to key → value map
+  const settingsMap = (settings ?? []).reduce((acc, setting) => {
+    try {
+      acc[setting.key] = JSON.parse(setting.value)
+    } catch {
+      acc[setting.key] = setting.value
+    }
+    return acc
+  }, {} as Record<string, any>)
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -62,209 +70,15 @@ export default async function HomepageSettingsPage() {
       </div>
 
       <div className="flex-1 p-4 lg:p-8">
-        <div className="max-w-5xl mx-auto space-y-8">
-          
-          {/* Hero Section */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-blue-500" />
-              </div>
-              <h2 className="text-xl font-semibold text-foreground">Hero Section</h2>
+        <div className="max-w-5xl mx-auto">
+          {Object.keys(settingsMap).length === 0 && (
+            <div className="mb-6 p-4 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 text-sm">
+              <strong>Note:</strong> No homepage settings found in the database. The form shows default values.
+              To persist changes, first apply <code className="font-mono bg-amber-500/10 px-1 rounded">supabase/schema/SITE_SETTINGS_SCHEMA.sql</code> in your Supabase SQL Editor.
+              See <code className="font-mono bg-amber-500/10 px-1 rounded">supabase/migrations/apply_site_settings_schema.md</code> for instructions.
             </div>
-
-            <form className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Main Headline
-                </label>
-                <input
-                  type="text"
-                  name="hero_title"
-                  defaultValue="Building Tomorrow's Digital Solutions"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  placeholder="Enter hero headline"
-                />
-                <p className="text-xs text-muted-foreground">Main heading displayed on the homepage</p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Subheadline
-                </label>
-                <textarea
-                  name="hero_subtitle"
-                  rows={3}
-                  defaultValue="We transform ideas into powerful digital experiences through innovative software solutions."
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                  placeholder="Enter hero subheadline"
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Primary CTA Text
-                  </label>
-                  <input
-                    type="text"
-                    name="hero_cta_primary"
-                    defaultValue="Start Your Project"
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Secondary CTA Text
-                  </label>
-                  <input
-                    type="text"
-                    name="hero_cta_secondary"
-                    defaultValue="View Our Work"
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  />
-                </div>
-              </div>
-            </form>
-          </div>
-
-          {/* Featured Projects Section */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                <Layout className="w-4 h-4 text-purple-500" />
-              </div>
-              <h2 className="text-xl font-semibold text-foreground">Featured Projects</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Project Display</p>
-                  <p className="text-xs text-muted-foreground mt-1">Currently showing projects marked as "featured"</p>
-                </div>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/admin/projects">
-                    Manage Projects
-                  </Link>
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Section Title
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Featured Projects"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Section Description
-                </label>
-                <textarea
-                  rows={2}
-                  defaultValue="Explore some of our recent projects that showcase our expertise and innovation."
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* About Preview Section */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center">
-                <Type className="w-4 h-4 text-green-500" />
-              </div>
-              <h2 className="text-xl font-semibold text-foreground">About Section</h2>
-            </div>
-
-            <form className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Section Title
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Why Choose Asrivo Tech"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Description
-                </label>
-                <textarea
-                  rows={4}
-                  defaultValue="We are a team of passionate developers and designers committed to delivering exceptional digital solutions."
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                />
-              </div>
-            </form>
-          </div>
-
-          {/* CTA Section */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center">
-                <ImageIcon className="w-4 h-4 text-orange-500" />
-              </div>
-              <h2 className="text-xl font-semibold text-foreground">Call-to-Action Section</h2>
-            </div>
-
-            <form className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  CTA Headline
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Ready to Build Something Amazing?"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  CTA Description
-                </label>
-                <textarea
-                  rows={2}
-                  defaultValue="Let's discuss your project and turn your vision into reality."
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Button Text
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Get Started Today"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                />
-              </div>
-            </form>
-          </div>
-
-          {/* Save Button */}
-          <div className="sticky bottom-0 py-4 bg-background/80 backdrop-blur-sm border-t border-border">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                Changes will be visible immediately after saving
-              </p>
-              <Button size="lg">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-            </div>
-          </div>
+          )}
+          <HomepageSettingsForm initialSettings={settingsMap} />
         </div>
       </div>
     </div>

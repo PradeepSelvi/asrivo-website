@@ -5,8 +5,13 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, Rocket } from "lucide-react"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 
-export function CTASection() {
+export function CTASection({ settings }: { settings?: Record<string, string> }) {
   const { ref, isVisible } = useScrollAnimation()
+  
+  const title = settings?.cta_title || "Let's Build Your Next Product Together"
+  const description = settings?.cta_description || 
+    'Ready to transform your ideas into reality? Our team is here to help you build innovative solutions that drive your business forward.'
+  const buttonText = settings?.cta_button || 'Start a Project'
 
   return (
     <section className="bg-muted/30 py-24 lg:py-32">
@@ -41,18 +46,16 @@ export function CTASection() {
             </div>
 
             <h2 className="text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl text-balance">
-              Let&apos;s Build Your Next
+              {title}
               <span className="block mt-2">
                 <span className="relative inline-block">
-                  Product Together
                   <Sparkles className="absolute -top-4 -right-6 h-6 w-6 text-accent animate-pulse" />
                 </span>
               </span>
             </h2>
             
             <p className="mx-auto mt-8 max-w-2xl text-lg text-primary-foreground/80 leading-relaxed">
-              Ready to transform your ideas into reality? Our team is here to help you build 
-              innovative solutions that drive your business forward.
+              {description}
             </p>
             
             <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -63,7 +66,7 @@ export function CTASection() {
                 asChild
               >
                 <Link href="/services/inquiry">
-                  Start a Project
+                  {buttonText}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>

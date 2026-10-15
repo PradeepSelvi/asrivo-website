@@ -1,0 +1,24 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Fix three data-integrity and routing bugs: (1) service-inquiry route inserts into wrong table causing admin data loss; (2) notifications page/API query non-existent 'partnership_requests' table instead of 'partnerships'; (3) subscribers CSV export calls a missing API route. These three fixes are independent of each other and of FEAT-002/003.",
+  "status": "pending",
+  "steps": [
+    "FIX 1 — Rewrite app/api/service-inquiry/route.ts POST handler to insert into 'client_inquiries' instead of 'service_inquiries'. Field mapping from the form payload to client_inquiries columns: name→name, company→company, email→email, phone→phone (required in client_inquiries), service_type maps to project_types as TEXT[] [service_type], project_description→project_description (required), timeline→timeline, budget→budget_range, status→status='new'. Fields in client_inquiries that have no form input (whatsapp, preferred_contact, has_existing, target_platform, key_features, target_audience, pain_points, reference_links, hear_about_us) should be set to null or their column defaults. The GET handler in the same file also reads service_inquiries — change it to read client_inquiries. Keep existing captcha and service_type validation logic unchanged.",
+    "FIX 2 — In app/api/admin/notifications/route.ts, change the 'partnership_requests' string to 'partnerships' (line ~144, the supabase.from() call in the partnerships section). Also update the select fields to match the actual 'partnerships' table columns. Look at app/admin/(dashboard)/partnerships/page.tsx or the create_partnerships_table.sql migration to confirm the partnerships table columns (company_name, contact_person, status are confirmed from the notifications page.tsx). In app/admin/(dashboard)/notifications/page.tsx, change the supabase.from('partnership_requests') call to supabase.from('partnerships') — this is in the Promise.all array around line 40.",
+    "FIX 4 — Create app/api/subscribers/export/route.ts as a GET handler. It must: (a) create a Supabase server client, (b) query newsletter_subscribers selecting id, email, name, status, created_at ordered by created_at desc, (c) build a CSV string with header row 'id,email,name,status,subscribed_date' and one row per subscriber, escaping commas in values with quotes, (d) return a NextResponse with body=csvString, Content-Type='text/csv', Content-Disposition='attachment; filename=subscribers.csv'. No authentication check needed since the admin page already guards access client-side — but add a basic service role check via createClient() to keep data protected."
+  ],
+  "acceptance_criteria": [
+    "Service inquiry form submissions (/services/inquiry → /api/service-inquiry) now appear in the admin /admin/inquiries panel (which reads client_inquiries)",
+    "The notifications page /admin/notifications shows Partnership Requests section with real data instead of always 0",
+    "The 'Export CSV' button on /admin/subscribers triggers a file download instead of a 404 error",
+    "pnpm run type-check passes with no new errors"
+  ],
+  "verification": [
+    "pnpm run type-check — zero TypeScript errors",
+    "pnpm run build — builds successfully",
+    "Manually test: GET /api/subscribers/export returns a 200 with Content-Type: text/csv"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

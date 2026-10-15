@@ -7,149 +7,41 @@ import { getTeamMembers } from "@/lib/supabase/actions"
 import { MobileBackButton } from "@/components/mobile-back-button"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: "Our Team - Asrivo Tech",
   description: "Meet the talented professionals behind Asrivo Tech. Our leadership and engineering team is dedicated to delivering exceptional technology solutions.",
 }
 
-/** Curated development team profiles for the featured showcase section */
-const developmentTeamData = [
-  {
-    id: "dev-sj",
-    name: "sivaganesh.J",
-    role: "TEAM LEAD, DATABASE, BACKEND",
-    bio: "Leading the team, backend and database optimization initiatives for robust, scalable application infrastructure.",
-    image: "/team/sivaganesh j.jpeg",
-    email: "sivaganesh73acm@gmail.com",
-    linkedin: "https://www.linkedin.com/in/sivaganesh-j",
-    github: "https://github.com/sivaganeshj",
-    featured: false,
-  },
-  {
-    id: "dev-ks",
-    name: "KARTHIK RAJALEE.S",
-    role: "CLOUD SERVICE DEVELOPER, SOC",
-    bio: "Designing secure, scalable cloud solutions and implementing advanced Security Operations Center protocols.",
-    image: "/team/karthik rajalee.jpeg",
-    email: "vel759894@gmail.com",
-    linkedin: "https://www.linkedin.com/in/karthik-saravanavel-18852035a/",
-    github: "https://github.com/Karthik-03901",
-    featured: false,
-  },
-  {
-    id: "dev-yr",
-    name: "YOGESHWARAN.R",
-    role: "DEVOPS, A/B TESTING, DATABASE",
-    bio: "Driving CI/CD pipelines, data-driven AB testing experimentation, and reliable database operations.",
-    image: "/team/yogeshwaran.jpeg",
-    email: "yogesh27124@gmail.com",
-    linkedin: "https://www.linkedin.com/in/yogeshwaran-ramesh",
-    github: "https://github.com/Yoge486",
-    featured: true,
-  },
-  {
-    id: "dev-ts",
-    name: "THAMARAI SELVAN",
-    role: "FULL STACK DEVELOPER",
-    bio: "Building end-to-end web applications with modern technologies and best practices for optimal performance.",
-    image: "/team/thamaraiselvan.jpeg",
-    email: "thamaraiselvan232007@gmail.com",
-    linkedin: "https://www.linkedin.com/in/thamarai-selvan",
-    github: "https://github.com/thamaraiselvan",
-    featured: false,
-  },
-  
-]
-
-const managementTeamData = [
-  {
-    id: "mgmt-aka",
-    name: "Aswin K A",
-    role: "Management Head & HR Manager",
-    bio: "Founder managing HR, administration, finance, and operations with strategic leadership and precision",
-    image: "/team/aswin.jpeg",
-    email: "kaaswin4503@gmail.com",
-    linkedin: "https://www.linkedin.com/in/aswin-k-a-77581a249",
-    github: "https://github.com/Aswin4532003",
-    featured: false,
-  },
-  {
-    id: "mgmt-sb",
-    name: "Siranjeevi B.U",
-    role: "Digital Marketing (SEO, SMO)",
-    bio: "Leading brand growth through expert SEO, SMO strategies, and organizational excellence in talent and HR management.",
-    image: "/team/siranjeevi.jpeg",
-    email: "siranjeevi.uthaman@gmail.com",
-    linkedin: "https://www.linkedin.com/in/siranjeevi-bu/",
-    github: "https://github.com/siranjj",
-    featured: true,
-  },
-  {
-    id: "mgmt-pkm",
-    name: "M.Pradeep Kumar.DCSE",
-    role: "Legal & chief techinical developer",
-    bio: "Ensuring regulatory compliance, managing legal risks, protecting company integrity and ethical standards.",
-    image: "/team/pradeepkumar.jpeg",
-    email: "pradeepselvi126@gmail.com",
-    linkedin: "https://www.linkedin.com/in/pradeep-kumar-3650982a9?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
-    github: "https://github.com/Selvipr",
-    featured: false,
-  },
-  {
-    id: "mgmt-sjs",
-    name: "Sargunan J.S",
-    role: "Chief Operating Officer",
-    bio: "Strategic operations leader driving efficiency, growth, performance, and scalable business transformation globally.",
-    image: "/team/sargunan.jpeg",
-    email: "sargunanitl01@gmail.com",
-    linkedin: "https://www.linkedin.com/in/sargunan-j-s-28915b2a9/",
-    github: "https://github.com/Sargunan-js",
-    featured: false,
-  },
-  
-  {
-    id: "mgmt-kkb",
-    name: "Krishan Kumar B.K",
-    role: "Project Manager",
-    bio: "Frontend Developer & Project Manager driving seamless delivery and team coordination.",
-      image: "/team/KRISHNAKUMAR.jpeg",
-    email: "Krishnakumarbkcse@gmail.com",
-    linkedin: "https://www.linkedin.com/in/krishan-kumar-b-k/",
-    github: "https://github.com/krishankumar",
-    featured: false,
-  },
-]
-
 export default async function TeamPage() {
   const teamResult = await getTeamMembers()
   const teamMembers = teamResult.success ? teamResult.data || [] : []
 
-  // Separate management and engineering team members
-  // managementOverrideIds: member IDs that should always appear in Leadership & Management
-  // regardless of their position title (e.g. technical leads who are part of leadership)
-  const managementOverrideIds = [4] // Hariharan T G
+  // Filter active members only
+  const activeMembers = teamMembers.filter(member => member.active)
 
-  const managementTeam = teamMembers.filter(member =>
-    managementOverrideIds.includes(member.id) ||
-    member.position?.toLowerCase().includes('management') ||
-    member.position?.toLowerCase().includes('manager') ||
-    member.position?.toLowerCase().includes('head') ||
-    member.position?.toLowerCase().includes('officer') ||
-    member.position?.toLowerCase().includes('ceo') ||
-    member.position?.toLowerCase().includes('cto') ||
-    member.position?.toLowerCase().includes('coo') ||
-    member.position?.toLowerCase().includes('hr') ||
-    member.position?.toLowerCase().includes('founder') ||
-    member.position?.toLowerCase().includes('director')
+  // Separate management and engineering/development team members
+  const managementKeywords = [
+    'management', 'manager', 'head', 'officer', 'ceo', 'cto', 'coo', 
+    'cfo', 'hr', 'founder', 'director', 'president', 'vp', 'chief',
+    'legal', 'marketing', 'operations', 'project manager'
+  ]
+
+  const managementTeam = activeMembers.filter(member =>
+    managementKeywords.some(keyword => 
+      member.position?.toLowerCase().includes(keyword)
+    )
   )
 
-  const engineeringTeam = teamMembers.filter(member =>
+  const developmentTeam = activeMembers.filter(member =>
     !managementTeam.includes(member)
   )
+
   return (
     <div className="flex flex-col">
       <MobileBackButton />
+      
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
         <div className="absolute inset-0 -z-10">
@@ -171,104 +63,89 @@ export default async function TeamPage() {
         </div>
       </section>
 
-      {/* Development Team Section */}
-      <section className="py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Development
-            </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Our technical Team
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Meet the skilled developers building the next generation of digital solutions.
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {developmentTeamData.map((member) => (
-              <TeamCard
-                key={member.id}
-                name={member.name}
-                role={member.role}
-                bio={member.bio}
-                image={member.image}
-                linkedin={member.linkedin}
-                github={member.github}
-                email={member.email}
-                variant="management"
-                featured={member.featured}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Management Team Section */}
-      <section className="py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Leadership
-            </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Management Team
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Experienced leaders guiding our vision and strategy for success.
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {managementTeamData.map((member) => (
-              <TeamCard
-                key={member.id}
-                name={member.name}
-                role={member.role}
-                bio={member.bio}
-                image={member.image}
-                linkedin={member.linkedin}
-                github={member.github}
-                email={member.email}
-                variant="management"
-                featured={member.featured}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Engineering Team Section - only render if there are engineering members */}
-      {engineeringTeam.length > 0 && (
-        <section className="bg-muted/30 py-20 lg:py-28">
+      {managementTeam.length > 0 && (
+        <section className="py-20 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Engineering
+                Leadership
               </span>
               <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                Our Core Engineering Team
+                Management Team
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Talented engineers building innovative solutions with cutting-edge technologies.
+                Experienced leaders guiding our vision and strategy for success.
               </p>
             </div>
 
-            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {engineeringTeam.map((member) => (
+            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {managementTeam.map((member) => (
                 <TeamCard
                   key={member.id}
                   name={member.name}
                   role={member.position}
-                  image={member.image_url}
                   bio={member.bio}
+                  image={member.image_url}
+                  linkedin={member.social_links?.linkedin || member.social_links?.Linkedin}
+                  github={member.social_links?.github}
+                  email={member.email}
+                  variant="management"
+                  featured={member.featured}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Development Team Section */}
+      {developmentTeam.length > 0 && (
+        <section className={`py-20 lg:py-28 ${managementTeam.length > 0 ? 'bg-muted/30' : ''}`}>
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                Development
+              </span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Our Technical Team
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Meet the skilled developers building the next generation of digital solutions.
+              </p>
+            </div>
+
+            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {developmentTeam.map((member) => (
+                <TeamCard
+                  key={member.id}
+                  name={member.name}
+                  role={member.position}
+                  bio={member.bio}
+                  image={member.image_url}
                   linkedin={member.social_links?.linkedin || member.social_links?.Linkedin}
                   github={member.social_links?.github}
                   email={member.email}
                   variant="team"
+                  featured={member.featured}
                 />
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Empty State */}
+      {activeMembers.length === 0 && (
+        <section className="py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Team Coming Soon
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                We're building our team. Check back soon to meet our talented professionals!
+              </p>
             </div>
           </div>
         </section>
@@ -339,12 +216,12 @@ export default async function TeamPage() {
                   <div>
                     <p className="text-sm text-muted-foreground">WhatsApp</p>
                     <a
-                      href="https://wa.me/1234567890"
+                      href="https://wa.me/918125257537"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium text-foreground hover:text-primary"
                     >
-                      81252575337
+                      +91 81252 57537
                     </a>
                   </div>
                 </div>
@@ -374,7 +251,14 @@ export default async function TeamPage() {
               We&apos;re always looking for talented individuals who are passionate about technology
               and innovation. Check out our open positions.
             </p>
-
+            <div className="mt-8">
+              <Button size="lg" variant="secondary" asChild>
+                <Link href="/careers">
+                  View Open Positions
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

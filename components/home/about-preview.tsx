@@ -102,8 +102,12 @@ function AnimatedStat({ icon: Icon, value, label, description, delay }: {
 /** * MAIN COMPONENT: AboutPreview
  * A full-screen width section with floating background orbs and glass panels.
  */
-export function AboutPreview() {
+export function AboutPreview({ settings }: { settings?: Record<string, string> }) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
+
+  // Extract settings with fallbacks
+  const title = settings?.about_title || 'Why Choose Asrivo Tech'
+  const description = settings?.about_description || "Asrivo Tech isn't just a dev shop. We are a Digital Product Studio where performance meets aesthetics. We take the \"impossible\" ideas and build them into lightning-fast, secure, and beautiful realities."
 
   const highlights = [
   { icon: Briefcase, value: "6+", label: "Core Services", description: "Comprehensive technology solutions for modern businesses." },
@@ -155,16 +159,14 @@ export function AboutPreview() {
             </div>
             
             <h2 className="mt-8 text-5xl font-extrabold tracking-tight text-slate-900 sm:text-6xl">
-              Engineering the <br />
+              {title.split(' ').slice(0, -2).join(' ')} <br />
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                Next Digital Frontier
+                {title.split(' ').slice(-2).join(' ')}
               </span>
             </h2>
 
             <p className="mt-8 text-lg leading-8 text-slate-600">
-              Asrivo Tech isn't just a dev shop. We are a Digital Product Studio where 
-              performance meets aesthetics. We take the "impossible" ideas and build them into 
-              lightning-fast, secure, and beautiful realities.
+              {description}
             </p>
 
             {/* Feature Grid - Glass Cards */}

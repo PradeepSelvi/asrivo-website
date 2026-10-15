@@ -54,17 +54,27 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
 
     const { data, error } = await supabase
-      .from('service_inquiries')
+      .from('client_inquiries')
       .insert({
         email,
         name,
         company,
         phone: phone || null,
-        service_type,
+        project_types: [service_type],
         project_description: project_description || null,
         timeline: timeline || null,
-        budget: budget || null,
+        budget_range: budget || null,
         status: 'new',
+        // Fields with no form input — left as null / column defaults
+        whatsapp: null,
+        preferred_contact: null,
+        has_existing: null,
+        target_platform: null,
+        key_features: null,
+        target_audience: null,
+        pain_points: null,
+        reference_links: null,
+        hear_about_us: null,
       })
       .select()
 
@@ -98,7 +108,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
 
     const { data: inquiries, error } = await supabase
-      .from('service_inquiries')
+      .from('client_inquiries')
       .select('*')
       .order('created_at', { ascending: false })
 

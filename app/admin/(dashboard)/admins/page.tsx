@@ -2,7 +2,7 @@ import React from 'react'
 import { getCurrentAdmin, getAdmins } from '@/lib/supabase/admin-actions'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Shield, ShieldCheck, ShieldOff, UserPlus, Trash2, User, AlertTriangle } from 'lucide-react'
+import { Shield, ShieldCheck, ShieldOff, UserPlus, Trash2, User } from 'lucide-react'
 
 // Force dynamic rendering to prevent static generation errors
 export const dynamic = 'force-dynamic'
@@ -26,17 +26,6 @@ export default async function AdminManageAdminsPage() {
         <div>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Manage Admins</h1>
           <p className="text-muted-foreground text-sm mt-1">Add, remove, and manage admin user roles.</p>
-        </div>
-      </div>
-
-      {/* Security Warning */}
-      <div className="border border-amber-900/40 bg-amber-950/20 rounded-xl px-5 py-4 flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
-        <div>
-          <p className="text-sm font-semibold text-amber-300">High Security Area</p>
-          <p className="text-xs text-amber-500/80 mt-0.5">
-            Only <strong>High role</strong> admins can access this section. Actions taken here affect user authentication.
-          </p>
         </div>
       </div>
 
@@ -81,14 +70,6 @@ export default async function AdminManageAdminsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                    admin.role === 'high'
-                      ? 'bg-red-500/10 text-destructive border border-red-500/20'
-                      : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                  }`}>
-                    {admin.role === 'high' ? <ShieldCheck className="w-3.5 h-3.5 inline mr-1" /> : <Shield className="w-3.5 h-3.5 inline mr-1" />}
-                    {admin.role} role
-                  </span>
                   {admin.id !== currentUserId && (
                     <div className="flex items-center gap-2">
                       <Link

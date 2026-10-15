@@ -1,0 +1,31 @@
+{
+  "project_type": "Next.js 14 App Router + Supabase (PostgreSQL + Auth + Storage)",
+  "language": "TypeScript",
+  "build_system": "pnpm + Next.js 14 (next build). Package manager: pnpm@9.0.0. No Prisma — uses @supabase/supabase-js directly. Tailwind CSS v4 with tw-animate-css.",
+  "test_framework": "No dedicated test framework configured. Verification is via pnpm run build (next build) and pnpm run type-check (tsc --noEmit).",
+  "build_command": "pnpm run build",
+  "test_command": "pnpm run type-check",
+  "verification_instructions": "1. Run `pnpm run type-check` — must pass with zero errors. 2. Run `pnpm run build` — must complete without errors. 3. Run `pnpm run lint` to check for lint issues.",
+  "snapshot_or_generated_files": null,
+  "environment_constraints": "Windows (PowerShell). Only 3 env vars set: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY. Email env vars (GMAIL_USER, GMAIL_APP_PASSWORD, ADMIN_EMAIL) are missing — email features will fail at runtime but this is out of scope for these fixes. SQL migrations must be applied manually in Supabase SQL Editor — no supabase CLI migration runner is in use.",
+  "contribution_requirements": "No AGENTS.md or CONTRIBUTING.md found. Follow existing code style. All new pages must export `dynamic = 'force-dynamic'` and `revalidate = 0`. Admin pages must call `requireAdmin()` or `getCurrentAdmin()` for auth guard. Client components need `'use client'` directive at top.",
+  "key_patterns": "1. Server components fetch via `createClient()` from `@/lib/supabase/server`. Client components use `createClient()` from `@/lib/supabase/client`. 2. Server actions live in `lib/supabase/` (e.g., settings-actions.ts, content-actions.ts) with `'use server'` directive. 3. Client form components extracted as separate files (e.g., site-settings-form.tsx) and imported into server-component page.tsx — this is the required pattern for forms. 4. Toast notifications via `sonner` (`toast.success`, `toast.error`). 5. UI components from `@/components/ui/*` (shadcn). 6. Lucide icons throughout. 7. All admin pages use tailwind classes like `rounded-xl border border-border bg-card p-6`. 8. Public pages use slate/blue color palette matching about/services pages.",
+  "relevant_files": [
+    "app/api/service-inquiry/route.ts",
+    "app/api/admin/notifications/route.ts",
+    "app/admin/(dashboard)/notifications/page.tsx",
+    "app/admin/(dashboard)/settings/homepage/page.tsx",
+    "app/admin/(dashboard)/settings/site/page.tsx",
+    "app/admin/(dashboard)/settings/site/site-settings-form.tsx",
+    "app/admin/(dashboard)/subscribers/page.tsx",
+    "lib/supabase/settings-actions.ts",
+    "supabase/schema/CLIENT_INQUIRIES_SCHEMA.sql",
+    "supabase/schema/SITE_SETTINGS_SCHEMA.sql",
+    "supabase/schema/CONSULTATION_REQUESTS_SCHEMA.sql",
+    "supabase/schema/DATABASE_SCHEMA.sql",
+    "components/header.tsx",
+    "app/about/page.tsx",
+    "app/services/page.tsx"
+  ],
+  "directory_structure": "app/ — Next.js App Router pages. app/api/ — API routes. app/admin/(dashboard)/ — all admin pages behind route group. app/admin/(dashboard)/settings/ — settings sub-pages (site/, homepage/ exist; 6 others missing). lib/supabase/ — server actions and Supabase client helpers. components/ — shared React components including header.tsx (public nav). supabase/schema/ — SQL schema files (applied manually in Supabase SQL Editor). supabase/migrations/ — SQL migration files (also applied manually). .agents/tasks/ — workflow artifacts directory."
+}

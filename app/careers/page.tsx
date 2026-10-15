@@ -1,0 +1,238 @@
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+import { MapPin, Clock, DollarSign, Briefcase, ArrowRight, Users, Sparkles } from 'lucide-react'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export const metadata = {
+  title: 'Careers - Asrivo Tech',
+  description:
+    'Join the Asrivo Tech team. Explore open positions in software development, design, and technology consulting.',
+  openGraph: {
+    title: 'Careers at Asrivo Tech',
+    description: 'Build the future with us. See all open positions.',
+  },
+}
+
+interface JobPosting {
+  id: string
+  title: string
+  slug: string | null
+  description: string | null
+  requirements: string[] | null
+  salary_range: string | null
+  location: string | null
+  employment_type: string | null
+  experience_level: string | null
+  active: boolean
+  created_at: string
+}
+
+const employmentTypeColors: Record<string, string> = {
+  'full-time': 'bg-green-500/10 text-green-700 dark:text-green-400',
+  'part-time': 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  contract: 'bg-purple-500/10 text-purple-700 dark:text-purple-400',
+  freelance: 'bg-orange-500/10 text-orange-700 dark:text-orange-400',
+  internship: 'bg-pink-500/10 text-pink-700 dark:text-pink-400',
+}
+
+export default async function CareersPage() {
+  const supabase = await createClient()
+
+  const { data: jobs } = await supabase
+    .from('job_postings')
+    .select(
+      'id, title, slug, description, requirements, salary_range, location, employment_type, experience_level, active, created_at'
+    )
+    .eq('active', true)
+    .order('created_at', { ascending: false })
+
+  const activeJobs: JobPosting[] = jobs ?? []
+
+  return (
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        {/* Hero */}
+        <section className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,#1a56db22,transparent_60%)]" />
+          <div className="relative max-w-5xl mx-auto px-4 py-24 lg:py-32 text-center">
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 text-sm font-medium text-blue-300 mb-6">
+              <Sparkles className="w-4 h-4" />
+              We&apos;re Hiring
+            </div>
+            <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">
+              Join Our Team at{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                Asrivo Tech
+              </span>
+            </h1>
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+              We&apos;re a team of passionate builders crafting digital solutions that make a
+              real difference. Come build the future with us.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-slate-400 text-sm">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-blue-400" />
+                Collaborative culture
+              </div>
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-blue-400" />
+                Remote-friendly
+              </div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-400" />
+                Cutting-edge tech stack
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Jobs */}
+        <section className="max-w-5xl mx-auto px-4 py-16">
+          {activeJobs.length === 0 ? (
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg p-12 text-center">
+              <Briefcase className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                No Open Positions Right Now
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
+                We don&apos;t have any active openings at the moment, but we&apos;re always interested in
+                talented people. Send us your CV!
+              </p>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              >
+                Get in Touch
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  Open Positions
+                  <span className="ml-2 text-base font-semibold text-blue-600 dark:text-blue-400">
+                    ({activeJobs.length})
+                  </span>
+                </h2>
+              </div>
+
+              <div className="space-y-4">
+                {activeJobs.map((job) => {
+                  const typeColor =
+                    employmentTypeColors[job.employment_type?.toLowerCase() ?? ''] ??
+                    'bg-slate-500/10 text-slate-700 dark:text-slate-400'
+
+                  const applyUrl = `/contact?subject=${encodeURIComponent(`Job Application: ${job.title}`)}`
+
+                  return (
+                    <article
+                      key={job.id}
+                      className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-lg transition-shadow p-6"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                              {job.title}
+                            </h3>
+                            {job.employment_type && (
+                              <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${typeColor}`}>
+                                {job.employment_type}
+                              </span>
+                            )}
+                            {job.experience_level && (
+                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                {job.experience_level}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400 mb-3">
+                            {job.location && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" />
+                                {job.location}
+                              </span>
+                            )}
+                            {job.salary_range && (
+                              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 font-medium">
+                                <DollarSign className="w-3.5 h-3.5" />
+                                {job.salary_range}
+                              </span>
+                            )}
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" />
+                              {new Date(job.created_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          </div>
+
+                          {job.description && (
+                            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-3">
+                              {job.description}
+                            </p>
+                          )}
+
+                          {job.requirements && job.requirements.length > 0 && (
+                            <ul className="space-y-1">
+                              {job.requirements.slice(0, 4).map((req, i) => (
+                                <li
+                                  key={i}
+                                  className="text-sm text-slate-600 dark:text-slate-400 flex items-start gap-2"
+                                >
+                                  <span className="text-blue-500 mt-1.5 shrink-0">•</span>
+                                  {req}
+                                </li>
+                              ))}
+                              {job.requirements.length > 4 && (
+                                <li className="text-xs text-slate-400">
+                                  +{job.requirements.length - 4} more requirements
+                                </li>
+                              )}
+                            </ul>
+                          )}
+                        </div>
+
+                        <div className="shrink-0">
+                          <Link
+                            href={applyUrl}
+                            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap"
+                          >
+                            Apply Now
+                            <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+
+              {/* CTA Footer */}
+              <div className="mt-12 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-8 text-center">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                  Don&apos;t see a perfect fit?
+                </h3>
+                <p className="text-slate-500 dark:text-slate-400 mb-4">
+                  We&apos;re always looking for exceptional talent. Send us your CV and we&apos;ll keep you in mind.
+                </p>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+                >
+                  Contact Us
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </>
+          )}
+        </section>
+      </main>
+  )
+}

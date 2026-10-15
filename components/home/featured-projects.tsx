@@ -101,7 +101,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   )
 }
 
-export async function FeaturedProjects() {
+export async function FeaturedProjects({ settings }: { settings?: Record<string, string> }) {
   let displayProjects: Project[] = []
 
   try {
@@ -130,6 +130,10 @@ export async function FeaturedProjects() {
     console.warn('Unable to load featured projects from Supabase:', err)
   }
 
+  // Extract settings with fallbacks
+  const title = settings?.featured_projects_title || 'Featured Projects'
+  const description = settings?.featured_projects_description || 'Explore some of our recent projects that showcase our expertise and innovation.'
+
   return (
     <section className="py-24 lg:py-32 relative overflow-hidden">
       {/* Background decoration */}
@@ -146,10 +150,10 @@ export async function FeaturedProjects() {
               Our Work
             </span>
             <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              Featured <span className="gradient-text">Projects</span>
+              {title}
             </h2>
             <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-              Explore some of our recent projects that showcase our expertise and innovation.
+              {description}
             </p>
           </div>
           <Button variant="outline" className="bg-transparent group h-12 px-6" asChild>

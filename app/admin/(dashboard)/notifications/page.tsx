@@ -25,7 +25,7 @@ export default async function NotificationsPage() {
     supabase.from('client_inquiries').select('*').eq('status', 'new').order('created_at', { ascending: false }),
     supabase.from('consultation_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false }),
     supabase.from('job_applications').select('*').eq('status', 'new').order('created_at', { ascending: false }),
-    supabase.from('partnership_requests').select('*').eq('status', 'new').order('created_at', { ascending: false }),
+    supabase.from('partnerships').select('*').eq('status', 'new').order('created_at', { ascending: false }),
     supabase.from('complaints').select('*').eq('status', 'new').order('created_at', { ascending: false }),
   ])
 
