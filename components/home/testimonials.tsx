@@ -104,7 +104,7 @@ function TestimonialCardItem({
     .toUpperCase()
 
   return (
-    <div className={fullWidth ? "w-full" : "flex-shrink-0 w-[400px]"}>
+    <div className={fullWidth ? "w-full" : "flex-shrink-0 w-[320px] sm:w-[400px] flex flex-col"}>
       <div className="group relative rounded-2xl border border-border bg-card p-8 transition-all duration-700 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2 overflow-hidden h-full flex flex-col justify-between">
         {/* Animated background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -197,12 +197,23 @@ export function Testimonials({
   }))
 
   const hasDbTestimonials = normalizedDbTestimonials.length > 0
-  const isFewTestimonials = hasDbTestimonials && normalizedDbTestimonials.length < 4
 
-  // For marquee: if 4+ DB items, use them; if 0 DB items, use default fallback items
-  const marqueeItems: TestimonialItem[] = hasDbTestimonials
-    ? normalizedDbTestimonials
+  // Combine DB testimonials with defaults so approved DB reviews appear first,
+  // while ensuring a rich, full showcase.
+  const combinedTestimonials: TestimonialItem[] = hasDbTestimonials
+    ? [
+        ...normalizedDbTestimonials,
+        ...DEFAULT_TESTIMONIALS.filter(
+          (d) => !normalizedDbTestimonials.some((db) => db.author.toLowerCase() === d.author.toLowerCase())
+        ),
+      ]
     : DEFAULT_TESTIMONIALS
+
+  // Ensure there are at least 8 items in the sequence so the marquee smoothly spans any screen size
+  let marqueeItems = combinedTestimonials
+  while (marqueeItems.length < 8) {
+    marqueeItems = [...marqueeItems, ...combinedTestimonials]
+  }
 
   return (
     <section className="py-24 lg:py-32 relative overflow-hidden">
@@ -227,51 +238,38 @@ export function Testimonials({
           <p className="mt-6 text-lg text-muted-foreground">{subtitle}</p>
         </div>
 
-        {/* If 1 to 3 testimonials, render them centered cleanly without duplicate marquee */}
-        {isFewTestimonials ? (
-          <div
-            className={`mt-16 grid gap-8 ${
-              normalizedDbTestimonials.length === 1
-                ? 'max-w-2xl mx-auto'
-                : normalizedDbTestimonials.length === 2
-                ? 'max-w-4xl mx-auto md:grid-cols-2'
-                : 'max-w-6xl mx-auto md:grid-cols-3'
-            }`}
-          >
-            {normalizedDbTestimonials.map((testimonial, index) => (
-              <TestimonialCardItem
-                key={`db-${testimonial.id ?? index}`}
-                testimonial={testimonial}
-                fullWidth
-              />
-            ))}
-          </div>
-        ) : (
-          /* Infinite Auto-Scrolling Carousel for 4+ items */
-          <div className="mt-16 relative">
-            {/* Gradient overlays for fade effect */}
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+        {/* Infinite Auto-Scrolling Carousel with zero seam gap */}
+        <div className="mt-16 relative">
+          {/* Gradient overlays for fade effect */}
+          <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
-            <div className="overflow-hidden">
-              <div className="flex gap-8 animate-scroll-testimonials hover:[animation-play-state:paused]">
-                {/* First set of testimonials */}
+          <div className="overflow-hidden w-full">
+            <div
+              className="flex w-max animate-scroll-testimonials hover:[animation-play-state:paused]"
+              style={{ animationDuration: `${Math.max(45, marqueeItems.length * 5)}s` }}
+            >
+              {/* First set of testimonials */}
+              <div className="flex shrink-0 items-stretch gap-8 pr-8">
                 {marqueeItems.map((testimonial, index) => (
                   <TestimonialCardItem
-                    key={`first-${index}-${testimonial.id ?? 'item'}`}
+                    key={`set1-${index}-${testimonial.id ?? index}`}
                     testimonial={testimonial}
                   />
                 ))}
-                {/* Duplicate set for seamless loop - hidden from screen readers */}
+              </div>
+              {/* Duplicate identical set for seamless 50% loop */}
+              <div className="flex shrink-0 items-stretch gap-8 pr-8" aria-hidden="true">
                 {marqueeItems.map((testimonial, index) => (
-                  <div key={`second-${index}-${testimonial.id ?? 'item'}`} aria-hidden="true">
-                    <TestimonialCardItem testimonial={testimonial} />
-                  </div>
+                  <TestimonialCardItem
+                    key={`set2-${index}-${testimonial.id ?? index}`}
+                    testimonial={testimonial}
+                  />
                 ))}
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </section>
   )
