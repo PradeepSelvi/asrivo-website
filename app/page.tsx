@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/home/testimonials"
 import { CTASection } from "@/components/home/cta-section"
 import { getHomeContent } from "@/lib/supabase/content-helpers"
 import { getTeamMembers } from "@/lib/supabase/actions"
+import { getApprovedTestimonials } from "@/lib/supabase/content-actions"
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getHomeContent()
@@ -25,15 +26,14 @@ export const revalidate = 0
 
 export default async function HomePage() {
   try {
-    const homeContent = await getHomeContent()
-    console.log('Homepage stats from DB:', {
-      projects: homeContent.stats_projects,
-      clients: homeContent.stats_clients,
-      team: homeContent.stats_team,
-      experience: homeContent.stats_experience
-    })
-    const teamResult = await getTeamMembers()
+    const [homeContent, teamResult, testimonialsResult] = await Promise.all([
+      getHomeContent(),
+      getTeamMembers(),
+      getApprovedTestimonials(),
+    ])
+
     const teamMembers = teamResult.success ? teamResult.data || [] : []
+    const testimonials = testimonialsResult.success ? testimonialsResult.data || [] : []
 
     return (
       <div className="flex flex-col">
@@ -43,7 +43,7 @@ export default async function HomePage() {
         <WhyChooseUs content={homeContent} />
         <FeaturedProjects content={homeContent} />
         <TeamPreview members={teamMembers} content={homeContent} />
-        <Testimonials content={homeContent} />
+        <Testimonials content={homeContent} testimonials={testimonials} />
         <CTASection content={homeContent} />
       </div>
     )
@@ -60,7 +60,7 @@ export default async function HomePage() {
         <WhyChooseUs content={homeContent} />
         <FeaturedProjects content={homeContent} />
         <TeamPreview members={[]} content={homeContent} />
-        <Testimonials content={homeContent} />
+        <Testimonials content={homeContent} testimonials={[]} />
         <CTASection content={homeContent} />
       </div>
     )

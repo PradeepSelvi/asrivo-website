@@ -525,6 +525,35 @@ export async function getTestimonials() {
   }
 }
 
+export async function getApprovedTestimonials() {
+  try {
+    const supabase = await createClient()
+    // First retrieve verified testimonials
+    const { data: verifiedData, error: verifiedError } = await supabase
+      .from('testimonials')
+      .select('*')
+      .eq('verified', true)
+      .order('display_order', { ascending: true })
+
+    if (verifiedError) throw new Error(verifiedError.message)
+
+    if (verifiedData && verifiedData.length > 0) {
+      return { success: true, data: verifiedData }
+    }
+
+    // Fallback: If no testimonials are marked verified, return all testimonials from DB
+    const { data: allData, error: allError } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('display_order', { ascending: true })
+
+    if (allError) throw new Error(allError.message)
+    return { success: true, data: allData || [] }
+  } catch (error: any) {
+    return { success: false, data: [], error: error.message }
+  }
+}
+
 export async function createTestimonial(data: {
   client_name: string
   client_title?: string
@@ -563,6 +592,7 @@ export async function createTestimonial(data: {
 
     if (error) throw new Error(error.message)
 
+    revalidatePath('/')
     revalidatePath('/admin/testimonials')
     return { success: true, data: newTestimonial }
   } catch (error: any) {
@@ -602,6 +632,7 @@ export async function updateTestimonial(id: string | number, data: {
 
     if (error) throw new Error(error.message)
 
+    revalidatePath('/')
     revalidatePath('/admin/testimonials')
     return { success: true, data: updatedTestimonial }
   } catch (error: any) {
@@ -630,6 +661,7 @@ export async function deleteTestimonial(id: string | number) {
 
     if (error) throw new Error(error.message)
 
+    revalidatePath('/')
     revalidatePath('/admin/testimonials')
     return { success: true }
   } catch (error: any) {
@@ -657,6 +689,7 @@ export async function toggleTestimonialVerified(id: string | number, currentStat
 
     if (error) throw new Error(error.message)
 
+    revalidatePath('/')
     revalidatePath('/admin/testimonials')
     return { success: true, data: updated }
   } catch (error: any) {
@@ -902,6 +935,7 @@ export async function reorderTestimonials(idOrderList: { id: string | number; di
       if (error) throw new Error(error.message)
     }
 
+    revalidatePath('/')
     revalidatePath('/admin/testimonials')
     return { success: true }
   } catch (error: any) {

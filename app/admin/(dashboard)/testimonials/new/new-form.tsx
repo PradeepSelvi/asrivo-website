@@ -25,6 +25,7 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
   const [projectId, setProjectId] = useState('')
   const [displayOrder, setDisplayOrder] = useState('1')
   const [featured, setFeatured] = useState(false)
+  const [verified, setVerified] = useState(true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,7 +42,7 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
       project_id: projectId ? parseInt(projectId) : null,
       display_order: parseInt(displayOrder) || 1,
       featured,
-      verified: false // default verified to false until admin reviews/approves
+      verified
     })
 
     if (!result.success) {
@@ -176,17 +177,32 @@ export default function NewTestimonialForm({ projects }: NewTestimonialFormProps
           />
         </div>
 
-        <div className="flex items-center gap-3 bg-background/40 p-4 border border-slate-850 rounded-xl">
-          <input
-            id="featured"
-            type="checkbox"
-            checked={featured}
-            onChange={(e) => setFeatured(e.target.checked)}
-            className="w-4 h-4 rounded text-indigo-600 focus:ring-primary"
-          />
-          <label htmlFor="featured" className="text-sm font-medium text-foreground cursor-pointer select-none">
-            Featured (highlights testimonial on key pages)
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center gap-3 bg-background/40 p-4 border border-border rounded-xl">
+            <input
+              id="verified"
+              type="checkbox"
+              checked={verified}
+              onChange={(e) => setVerified(e.target.checked)}
+              className="w-4 h-4 rounded text-indigo-600 focus:ring-primary"
+            />
+            <label htmlFor="verified" className="text-sm font-medium text-foreground cursor-pointer select-none">
+              Approved / Verified (displays on public website)
+            </label>
+          </div>
+
+          <div className="flex items-center gap-3 bg-background/40 p-4 border border-border rounded-xl">
+            <input
+              id="featured"
+              type="checkbox"
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+              className="w-4 h-4 rounded text-indigo-600 focus:ring-primary"
+            />
+            <label htmlFor="featured" className="text-sm font-medium text-foreground cursor-pointer select-none">
+              Featured (highlights testimonial on key pages)
+            </label>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 pt-6 border-t border-border justify-end">
