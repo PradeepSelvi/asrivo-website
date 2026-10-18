@@ -949,6 +949,11 @@ function ServicesFields({ register }: { register: any }) {
         <h3 className="text-lg font-semibold text-foreground">Hero Section</h3>
         
         <div className="space-y-2">
+          <Label htmlFor="services_page_badge">Page Badge</Label>
+          <Input id="services_page_badge" {...register('services_page_badge')} placeholder="Services" />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="hero_title">Hero Title</Label>
           <Input id="hero_title" {...register('hero_title')} placeholder="Our Services" />
         </div>
@@ -958,8 +963,122 @@ function ServicesFields({ register }: { register: any }) {
           <Textarea
             id="hero_subtitle"
             {...register('hero_subtitle')}
-            placeholder="What we offer"
+            placeholder="Comprehensive technology solutions tailored to your business needs"
             rows={3}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Process Section</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="process_badge">Process Badge</Label>
+            <Input id="process_badge" {...register('process_badge')} placeholder="Our Process" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="process_title">Process Title</Label>
+            <Input id="process_title" {...register('process_title')} placeholder="How We Work" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="process_subtitle">Process Subtitle</Label>
+          <Textarea
+            id="process_subtitle"
+            {...register('process_subtitle')}
+            placeholder="Our proven methodology ensures successful project delivery..."
+            rows={2}
+          />
+        </div>
+
+        <div className="space-y-4 pt-4">
+          <h4 className="text-sm font-medium text-muted-foreground">Process Steps (1 - 6)</h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="process_step_1_title">Step 1 Title</Label>
+              <Input id="process_step_1_title" {...register('process_step_1_title')} placeholder="Discovery & Planning" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="process_step_1_desc">Step 1 Description</Label>
+              <Input id="process_step_1_desc" {...register('process_step_1_desc')} placeholder="We analyze your requirements..." />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="process_step_2_title">Step 2 Title</Label>
+              <Input id="process_step_2_title" {...register('process_step_2_title')} placeholder="Design & Prototyping" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="process_step_2_desc">Step 2 Description</Label>
+              <Input id="process_step_2_desc" {...register('process_step_2_desc')} placeholder="Creating user-centric designs..." />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="process_step_3_title">Step 3 Title</Label>
+              <Input id="process_step_3_title" {...register('process_step_3_title')} placeholder="Development" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="process_step_3_desc">Step 3 Description</Label>
+              <Input id="process_step_3_desc" {...register('process_step_3_desc')} placeholder="Building robust solutions..." />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="process_step_4_title">Step 4 Title</Label>
+              <Input id="process_step_4_title" {...register('process_step_4_title')} placeholder="Testing & QA" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="process_step_4_desc">Step 4 Description</Label>
+              <Input id="process_step_4_desc" {...register('process_step_4_desc')} placeholder="Comprehensive testing..." />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="process_step_5_title">Step 5 Title</Label>
+              <Input id="process_step_5_title" {...register('process_step_5_title')} placeholder="Deployment" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="process_step_5_desc">Step 5 Description</Label>
+              <Input id="process_step_5_desc" {...register('process_step_5_desc')} placeholder="Smooth deployment and launch..." />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="process_step_6_title">Step 6 Title</Label>
+              <Input id="process_step_6_title" {...register('process_step_6_title')} placeholder="Support & Maintenance" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="process_step_6_desc">Step 6 Description</Label>
+              <Input id="process_step_6_desc" {...register('process_step_6_desc')} placeholder="Ongoing support..." />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Project Status & Availability Section</h3>
+        
+        <div className="space-y-2">
+          <Label htmlFor="status_title">Status Title</Label>
+          <Input id="status_title" {...register('status_title')} placeholder="Currently Accepting Projects" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status_description">Status Description</Label>
+          <Textarea
+            id="status_description"
+            {...register('status_description')}
+            placeholder="We have availability for new projects starting Q2 2025."
+            rows={2}
           />
         </div>
       </div>
@@ -977,14 +1096,14 @@ function ServicesFields({ register }: { register: any }) {
           <Textarea
             id="cta_description"
             {...register('cta_description')}
-            placeholder="Encouraging message"
+            placeholder="Let's discuss how we can help you achieve your goals..."
             rows={3}
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="cta_button">Button Text</Label>
-          <Input id="cta_button" {...register('cta_button')} placeholder="Contact Us" />
+          <Input id="cta_button" {...register('cta_button')} placeholder="Contact Us Today" />
         </div>
       </div>
     </>
@@ -998,6 +1117,11 @@ function ContactFields({ register }: { register: any }) {
         <h3 className="text-lg font-semibold text-foreground">Hero Section</h3>
         
         <div className="space-y-2">
+          <Label htmlFor="contact_badge">Page Badge</Label>
+          <Input id="contact_badge" {...register('contact_badge')} placeholder="Contact Us" />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="hero_title">Hero Title</Label>
           <Input id="hero_title" {...register('hero_title')} placeholder="Get in Touch" />
         </div>
@@ -1007,7 +1131,7 @@ function ContactFields({ register }: { register: any }) {
           <Textarea
             id="hero_subtitle"
             {...register('hero_subtitle')}
-            placeholder="Contact introduction"
+            placeholder="Have a project in mind or want to learn more about our services? We'd love to hear from you."
             rows={3}
           />
         </div>
@@ -1016,38 +1140,227 @@ function ContactFields({ register }: { register: any }) {
       <div className="space-y-6 border-t border-border pt-8">
         <h3 className="text-lg font-semibold text-foreground">Contact Form Section</h3>
         
-        <div className="space-y-2">
-          <Label htmlFor="form_title">Form Title</Label>
-          <Input id="form_title" {...register('form_title')} placeholder="Send Us a Message" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="form_title">Form Title</Label>
+            <Input id="form_title" {...register('form_title')} placeholder="Send Us a Message" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="form_description">Form Description</Label>
+            <Input
+              id="form_description"
+              {...register('form_description')}
+              placeholder="Fill out the form below and we'll get back to you within 24 hours."
+            />
+          </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="form_description">Form Description</Label>
-          <Textarea
-            id="form_description"
-            {...register('form_description')}
-            placeholder="Form instructions"
-            rows={3}
-          />
+        <div className="space-y-4 pt-2">
+          <h4 className="text-sm font-medium text-muted-foreground">Form Field Labels & Placeholders</h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="form_label_name">Name Label</Label>
+              <Input id="form_label_name" {...register('form_label_name')} placeholder="Full Name" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="form_placeholder_name">Name Placeholder</Label>
+              <Input id="form_placeholder_name" {...register('form_placeholder_name')} placeholder="John Doe" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="form_label_email">Email Label</Label>
+              <Input id="form_label_email" {...register('form_label_email')} placeholder="Email Address" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="form_placeholder_email">Email Placeholder</Label>
+              <Input id="form_placeholder_email" {...register('form_placeholder_email')} placeholder="john@example.com" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="form_label_phone">Phone Label</Label>
+              <Input id="form_label_phone" {...register('form_label_phone')} placeholder="Phone Number" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="form_placeholder_phone">Phone Placeholder</Label>
+              <Input id="form_placeholder_phone" {...register('form_placeholder_phone')} placeholder="+91 XXXXX XXXXX" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="form_label_company">Company Label</Label>
+              <Input id="form_label_company" {...register('form_label_company')} placeholder="Company Name" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="form_placeholder_company">Company Placeholder</Label>
+              <Input id="form_placeholder_company" {...register('form_placeholder_company')} placeholder="Your Company" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="form_label_subject">Subject Label</Label>
+              <Input id="form_label_subject" {...register('form_label_subject')} placeholder="Subject" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="form_placeholder_subject">Subject Placeholder</Label>
+              <Input id="form_placeholder_subject" {...register('form_placeholder_subject')} placeholder="Project Inquiry" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="form_label_message">Message Label</Label>
+              <Input id="form_label_message" {...register('form_label_message')} placeholder="Your Message" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="form_placeholder_message">Message Placeholder</Label>
+              <Input id="form_placeholder_message" {...register('form_placeholder_message')} placeholder="Tell us about your project..." />
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
-        <h3 className="text-lg font-semibold text-foreground">Contact Information Section</h3>
+        <h3 className="text-lg font-semibold text-foreground">Direct Contact Channels</h3>
         
-        <div className="space-y-2">
-          <Label htmlFor="info_title">Info Title</Label>
-          <Input id="info_title" {...register('info_title')} placeholder="Contact Information" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="info_title">Information Title</Label>
+            <Input id="info_title" {...register('info_title')} placeholder="Contact Information" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="info_description">Information Description</Label>
+            <Input
+              id="info_description"
+              {...register('info_description')}
+              placeholder="You can also reach us through any of the following channels."
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="contact_email">Email Address</Label>
+            <Input id="contact_email" {...register('contact_email')} placeholder="hello@asrivotech.com" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact_phone">Phone Number</Label>
+            <Input id="contact_phone" {...register('contact_phone')} placeholder="+91 99764 22558" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact_address">Office Address / Location</Label>
+            <Input id="contact_address" {...register('contact_address')} placeholder="India" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact_hours">Business Hours</Label>
+            <Input id="contact_hours" {...register('contact_hours')} placeholder="Mon-Fri: 9AM-6PM IST" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <div className="space-y-2">
+            <Label htmlFor="contact_linkedin">LinkedIn URL</Label>
+            <Input id="contact_linkedin" {...register('contact_linkedin')} placeholder="https://linkedin.com/company/asrivotech" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact_github">GitHub URL</Label>
+            <Input id="contact_github" {...register('contact_github')} placeholder="https://github.com/asrivotech" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact_twitter">Twitter / X URL</Label>
+            <Input id="contact_twitter" {...register('contact_twitter')} placeholder="https://twitter.com/asrivotech" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact_instagram">Instagram URL</Label>
+            <Input id="contact_instagram" {...register('contact_instagram')} placeholder="https://instagram.com/asrivotech" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Complaint / Grievance Redressal Section</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="complaint_title">Complaint Section Title</Label>
+            <Input id="complaint_title" {...register('complaint_title')} placeholder="File a Complaint" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="complaint_submit_button">Submit Button Text</Label>
+            <Input id="complaint_submit_button" {...register('complaint_submit_button')} placeholder="Submit Complaint" />
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="info_description">Info Description</Label>
+          <Label htmlFor="complaint_description">Complaint Description</Label>
           <Textarea
-            id="info_description"
-            {...register('info_description')}
-            placeholder="Additional contact details"
-            rows={3}
+            id="complaint_description"
+            {...register('complaint_description')}
+            placeholder="If you have concerns about our services, please let us know."
+            rows={2}
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="complaint_email">Complaint Email</Label>
+            <Input id="complaint_email" {...register('complaint_email')} placeholder="complaints@asrivotech.com" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="complaint_phone">Complaint Phone</Label>
+            <Input id="complaint_phone" {...register('complaint_phone')} placeholder="+91 99764 22558" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="complaint_form_title">Form Title</Label>
+            <Input id="complaint_form_title" {...register('complaint_form_title')} placeholder="Submit a Complaint" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="complaint_form_description">Form Description</Label>
+            <Input
+              id="complaint_form_description"
+              {...register('complaint_form_description')}
+              placeholder="We take all complaints seriously and will respond within 48 hours."
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Inquiry Status Tracker Section</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="status_check_title">Status Check Title</Label>
+            <Input id="status_check_title" {...register('status_check_title')} placeholder="Check Inquiry Status" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="status_check_button">Status Check Button</Label>
+            <Input id="status_check_button" {...register('status_check_button')} placeholder="Check Status" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="status_check_description">Status Check Description</Label>
+            <Input
+              id="status_check_description"
+              {...register('status_check_description')}
+              placeholder="Enter your inquiry ID to check the status of your submission."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="status_check_placeholder">Input Placeholder</Label>
+            <Input id="status_check_placeholder" {...register('status_check_placeholder')} placeholder="Enter Inquiry ID" />
+          </div>
         </div>
       </div>
     </>
@@ -1061,6 +1374,11 @@ function ProjectsFields({ register }: { register: any }) {
         <h3 className="text-lg font-semibold text-foreground">Hero Section</h3>
         
         <div className="space-y-2">
+          <Label htmlFor="projects_badge">Page Badge</Label>
+          <Input id="projects_badge" {...register('projects_badge')} placeholder="Portfolio" />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="hero_title">Hero Title</Label>
           <Input id="hero_title" {...register('hero_title')} placeholder="Our Projects" />
         </div>
@@ -1070,14 +1388,14 @@ function ProjectsFields({ register }: { register: any }) {
           <Textarea
             id="hero_subtitle"
             {...register('hero_subtitle')}
-            placeholder="Portfolio introduction"
+            placeholder="Explore our portfolio of completed projects and see how we've helped businesses transform digitally."
             rows={3}
           />
         </div>
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
-        <h3 className="text-lg font-semibold text-foreground">Filter Labels</h3>
+        <h3 className="text-lg font-semibold text-foreground">Filter Categories</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -1085,9 +1403,86 @@ function ProjectsFields({ register }: { register: any }) {
             <Input id="filter_all" {...register('filter_all')} placeholder="All Projects" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="filter_featured">Featured Label</Label>
+            <Label htmlFor="filter_featured">Featured Projects Label</Label>
             <Input id="filter_featured" {...register('filter_featured')} placeholder="Featured" />
           </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Projects Statistics</h3>
+        
+        <div className="space-y-2">
+          <Label htmlFor="stats_title">Stats Section Title</Label>
+          <Input id="stats_title" {...register('stats_title')} placeholder="Project Statistics" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="stats_total_label">Total Projects Label</Label>
+            <Input id="stats_total_label" {...register('stats_total_label')} placeholder="Completed Projects" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats_total_value">Total Projects Value</Label>
+            <Input id="stats_total_value" {...register('stats_total_value')} placeholder="2" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats_active_label">Happy Clients Label</Label>
+            <Input id="stats_active_label" {...register('stats_active_label')} placeholder="Happy Clients" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats_active_value">Happy Clients Value</Label>
+            <Input id="stats_active_value" {...register('stats_active_value')} placeholder="2" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">UI Labels & Empty State</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="button_view_all">View All Button</Label>
+            <Input id="button_view_all" {...register('button_view_all')} placeholder="View All Projects" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="button_load_more">Load More Button</Label>
+            <Input id="button_load_more" {...register('button_load_more')} placeholder="Load More" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="empty_state_message">Empty State Message</Label>
+          <Textarea
+            id="empty_state_message"
+            {...register('empty_state_message')}
+            placeholder="No projects found matching your criteria."
+            rows={2}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">CTA Section</h3>
+        
+        <div className="space-y-2">
+          <Label htmlFor="cta_title">CTA Title</Label>
+          <Input id="cta_title" {...register('cta_title')} placeholder="Have a Project in Mind?" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="cta_description">CTA Description</Label>
+          <Textarea
+            id="cta_description"
+            {...register('cta_description')}
+            placeholder="Let's discuss how we can bring your vision to life."
+            rows={3}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="cta_button">CTA Button Text</Label>
+          <Input id="cta_button" {...register('cta_button')} placeholder="Start Your Project" />
         </div>
       </div>
     </>
@@ -1101,8 +1496,13 @@ function TeamFields({ register }: { register: any }) {
         <h3 className="text-lg font-semibold text-foreground">Hero Section</h3>
         
         <div className="space-y-2">
+          <Label htmlFor="team_badge">Page Badge</Label>
+          <Input id="team_badge" {...register('team_badge')} placeholder="Our Team" />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="hero_title">Hero Title</Label>
-          <Input id="hero_title" {...register('hero_title')} placeholder="Meet Our Team" />
+          <Input id="hero_title" {...register('hero_title')} placeholder="Meet the Team Behind Asrivo Tech" />
         </div>
 
         <div className="space-y-2">
@@ -1110,18 +1510,24 @@ function TeamFields({ register }: { register: any }) {
           <Textarea
             id="hero_subtitle"
             {...register('hero_subtitle')}
-            placeholder="Team introduction"
+            placeholder="Our 9-member team of professionals combines deep technical expertise with a passion for innovation."
             rows={3}
           />
         </div>
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
-        <h3 className="text-lg font-semibold text-foreground">Management Section</h3>
+        <h3 className="text-lg font-semibold text-foreground">Management Team Section</h3>
         
-        <div className="space-y-2">
-          <Label htmlFor="management_title">Section Title</Label>
-          <Input id="management_title" {...register('management_title')} placeholder="Management Team" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="management_badge">Management Badge</Label>
+            <Input id="management_badge" {...register('management_badge')} placeholder="Leadership" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="management_title">Section Title</Label>
+            <Input id="management_title" {...register('management_title')} placeholder="Management Team" />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -1129,18 +1535,24 @@ function TeamFields({ register }: { register: any }) {
           <Textarea
             id="management_description"
             {...register('management_description')}
-            placeholder="About the management team"
+            placeholder="Experienced leaders guiding our vision and strategy for success."
             rows={3}
           />
         </div>
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
-        <h3 className="text-lg font-semibold text-foreground">Development Team Section</h3>
+        <h3 className="text-lg font-semibold text-foreground">Development / Technical Team Section</h3>
         
-        <div className="space-y-2">
-          <Label htmlFor="development_title">Section Title</Label>
-          <Input id="development_title" {...register('development_title')} placeholder="Our Developers" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="development_badge">Technical Team Badge</Label>
+            <Input id="development_badge" {...register('development_badge')} placeholder="Engineers" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="development_title">Section Title</Label>
+            <Input id="development_title" {...register('development_title')} placeholder="Our Technical Team" />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -1148,9 +1560,116 @@ function TeamFields({ register }: { register: any }) {
           <Textarea
             id="development_description"
             {...register('development_description')}
-            placeholder="About the development team"
+            placeholder="Meet the skilled developers building the next generation of digital solutions."
             rows={3}
           />
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Empty State</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="empty_state_title">Empty State Title</Label>
+            <Input id="empty_state_title" {...register('empty_state_title')} placeholder="No Team Members Yet" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="empty_state_description">Empty State Description</Label>
+            <Input
+              id="empty_state_description"
+              {...register('empty_state_description')}
+              placeholder="We're building our team. Check back soon!"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Direct Team Communication Channels</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_title">Section Title</Label>
+            <Input id="company_contact_title" {...register('company_contact_title')} placeholder="Connect With Us" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_button">Action Button</Label>
+            <Input id="company_contact_button" {...register('company_contact_button')} placeholder="Get in Touch" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="company_contact_description">Section Description</Label>
+          <Textarea
+            id="company_contact_description"
+            {...register('company_contact_description')}
+            placeholder="Reach out to our team through any of these channels."
+            rows={2}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_email_label">Email Label</Label>
+            <Input id="company_contact_email_label" {...register('company_contact_email_label')} placeholder="Email Us" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_email">Email Address</Label>
+            <Input id="company_contact_email" {...register('company_contact_email')} placeholder="hello@asrivotech.com" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_phone">Phone Number</Label>
+            <Input id="company_contact_phone" {...register('company_contact_phone')} placeholder="+91 99764 22558" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_whatsapp_label">WhatsApp Label</Label>
+            <Input id="company_contact_whatsapp_label" {...register('company_contact_whatsapp_label')} placeholder="WhatsApp" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_whatsapp">WhatsApp Link</Label>
+            <Input id="company_contact_whatsapp" {...register('company_contact_whatsapp')} placeholder="https://wa.me/919976422558" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_linkedin_label">LinkedIn Label</Label>
+            <Input id="company_contact_linkedin_label" {...register('company_contact_linkedin_label')} placeholder="LinkedIn" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_linkedin">LinkedIn URL</Label>
+            <Input id="company_contact_linkedin" {...register('company_contact_linkedin')} placeholder="https://linkedin.com/company/asrivotech" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_github_label">GitHub Label</Label>
+            <Input id="company_contact_github_label" {...register('company_contact_github_label')} placeholder="GitHub" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="company_contact_github">GitHub URL</Label>
+            <Input id="company_contact_github" {...register('company_contact_github')} placeholder="https://github.com/asrivotech" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Join Our Team CTA</h3>
+        
+        <div className="space-y-2">
+          <Label htmlFor="join_cta_title">Join CTA Title</Label>
+          <Input id="join_cta_title" {...register('join_cta_title')} placeholder="Want to Join Our Team?" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="join_cta_description">Join CTA Description</Label>
+          <Textarea
+            id="join_cta_description"
+            {...register('join_cta_description')}
+            placeholder="We're always looking for talented people to join our growing team."
+            rows={3}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="join_cta_button">Join CTA Button</Label>
+          <Input id="join_cta_button" {...register('join_cta_button')} placeholder="View Open Positions" />
         </div>
       </div>
     </>
@@ -1164,8 +1683,13 @@ function CareersFields({ register }: { register: any }) {
         <h3 className="text-lg font-semibold text-foreground">Hero Section</h3>
         
         <div className="space-y-2">
+          <Label htmlFor="careers_badge">Page Badge</Label>
+          <Input id="careers_badge" {...register('careers_badge')} placeholder="Careers" />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="hero_title">Hero Title</Label>
-          <Input id="hero_title" {...register('hero_title')} placeholder="Join Our Team" />
+          <Input id="hero_title" {...register('hero_title')} placeholder="Join Our Team at Asrivo Tech" />
         </div>
 
         <div className="space-y-2">
@@ -1173,14 +1697,33 @@ function CareersFields({ register }: { register: any }) {
           <Textarea
             id="hero_subtitle"
             {...register('hero_subtitle')}
-            placeholder="Career opportunities introduction"
+            placeholder="We're a team of passionate builders crafting digital solutions that make a real difference."
             rows={3}
           />
         </div>
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
-        <h3 className="text-lg font-semibold text-foreground">Positions Section</h3>
+        <h3 className="text-lg font-semibold text-foreground">Benefits & Culture Features</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="feature_1">Feature 1</Label>
+            <Input id="feature_1" {...register('feature_1')} placeholder="Competitive Salary & Benefits" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="feature_2">Feature 2</Label>
+            <Input id="feature_2" {...register('feature_2')} placeholder="Remote & Flexible Work" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="feature_3">Feature 3</Label>
+            <Input id="feature_3" {...register('feature_3')} placeholder="Growth & Learning Opportunities" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Open Positions Section</h3>
         
         <div className="space-y-2">
           <Label htmlFor="positions_title">Section Title</Label>
@@ -1189,7 +1732,34 @@ function CareersFields({ register }: { register: any }) {
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
-        <h3 className="text-lg font-semibold text-foreground">No Positions Message</h3>
+        <h3 className="text-lg font-semibold text-foreground">Job Listing Card Labels</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="job_label_location">Location Label</Label>
+            <Input id="job_label_location" {...register('job_label_location')} placeholder="Location" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="job_label_salary">Salary Label</Label>
+            <Input id="job_label_salary" {...register('job_label_salary')} placeholder="Salary" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="job_label_posted">Posted Date Label</Label>
+            <Input id="job_label_posted" {...register('job_label_posted')} placeholder="Posted" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="job_button_apply">Apply Button Text</Label>
+            <Input id="job_button_apply" {...register('job_button_apply')} placeholder="Apply Now" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="job_button_closed">Position Closed Button Text</Label>
+            <Input id="job_button_closed" {...register('job_button_closed')} placeholder="Position Closed" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">No Open Positions Message</h3>
         
         <div className="space-y-2">
           <Label htmlFor="no_positions_title">No Positions Title</Label>
@@ -1205,9 +1775,57 @@ function CareersFields({ register }: { register: any }) {
           <Textarea
             id="no_positions_description"
             {...register('no_positions_description')}
-            placeholder="Message when no jobs are available"
+            placeholder="We don't have any active openings at the moment, but we're always interested in talented people."
             rows={3}
           />
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Send Resume CTA Footer</h3>
+        
+        <div className="space-y-2">
+          <Label htmlFor="cta_footer_title">CTA Footer Title</Label>
+          <Input id="cta_footer_title" {...register('cta_footer_title')} placeholder="Don't See a Perfect Fit?" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="cta_footer_description">CTA Footer Description</Label>
+          <Textarea
+            id="cta_footer_description"
+            {...register('cta_footer_description')}
+            placeholder="We're always looking for talented people. Send us your resume..."
+            rows={3}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="cta_footer_button">CTA Footer Button</Label>
+          <Input id="cta_footer_button" {...register('cta_footer_button')} placeholder="Send Resume" />
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Applications Paused / Disabled State</h3>
+        
+        <div className="space-y-2">
+          <Label htmlFor="disabled_title">Disabled State Title</Label>
+          <Input id="disabled_title" {...register('disabled_title')} placeholder="Applications Paused" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="disabled_description">Disabled State Description</Label>
+          <Textarea
+            id="disabled_description"
+            {...register('disabled_description')}
+            placeholder="We are not currently accepting new applications. Please check back later."
+            rows={3}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="disabled_button">Disabled State Button</Label>
+          <Input id="disabled_button" {...register('disabled_button')} placeholder="Notify Me" />
         </div>
       </div>
     </>
