@@ -211,13 +211,15 @@ export default function EditProjectForm({ project }: EditProjectFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Live Project URL</label>
+            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Live/Deployed Project URL</label>
             <input
               type="url"
               value={liveUrl}
               onChange={(e) => setLiveUrl(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              placeholder="https://example.com"
             />
+            <p className="text-xs text-slate-500">Where users can visit the live project</p>
           </div>
 
           <div className="space-y-2">

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Lock, Mail, Eye, EyeOff, ArrowLeft, Home, Loader2, User, Shield, AlertTriangle, CheckCircle2 } from 'lucide-react'
-import { validateEmail, checkPasswordBreach, getPasswordStrength } from '@/lib/utils/security-validation'
+import { checkPasswordBreach, getPasswordStrength } from '@/lib/utils/security-validation'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -34,8 +34,18 @@ export default function RegisterPage() {
 
     const timer = setTimeout(async () => {
       setEmailValidating(true)
-      const result = await validateEmail(email)
-      setEmailValidation(result)
+      try {
+        const response = await fetch('/api/validate-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        })
+        const result = await response.json()
+        setEmailValidation(result)
+      } catch (error) {
+        console.error('Email validation error:', error)
+        setEmailValidation({ isValid: true }) // Fail open
+      }
       setEmailValidating(false)
     }, 800) // Wait 800ms after user stops typing
 

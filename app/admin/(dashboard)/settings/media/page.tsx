@@ -1,7 +1,7 @@
 import { requireAdmin } from '@/lib/auth/admin-guard'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Image, FolderOpen, ExternalLink, Info } from 'lucide-react'
+import { ArrowLeft, Image, FolderOpen, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
@@ -66,19 +66,6 @@ export default async function MediaSettingsPage() {
 
       <div className="flex-1 p-4 lg:p-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Info Banner */}
-          <div className="flex gap-3 p-4 rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400 text-sm">
-            <Info className="w-5 h-5 shrink-0 mt-0.5" />
-            <div>
-              <strong>About Media Storage</strong>
-              <p className="mt-1 text-blue-600 dark:text-blue-400/80">
-                All media files are stored in Supabase Storage. Images are uploaded contextually — 
-                directly from project, team, or service edit forms. Use the Supabase dashboard for 
-                bulk file management.
-              </p>
-            </div>
-          </div>
-
           {/* Media Sections */}
           <div className="grid gap-4 md:grid-cols-3">
             {mediaSections.map((section) => (
@@ -100,10 +87,6 @@ export default async function MediaSettingsPage() {
           {/* Supabase Storage Link */}
           <div className="rounded-xl border border-border bg-card p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Supabase Storage</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              For advanced media management — browsing all uploaded files, deleting unused assets, 
-              or configuring storage buckets — use the Supabase dashboard directly.
-            </p>
             <div className="flex flex-wrap gap-3">
               <Button variant="outline" size="sm" asChild>
                 <a

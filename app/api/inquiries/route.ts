@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
 
 export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, formSubmitRateLimit)
+  if (limited) return limited
+
   try {
     const body = await request.json()
     

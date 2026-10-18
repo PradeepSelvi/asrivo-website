@@ -17,7 +17,8 @@ export async function validateEmail(email: string): Promise<{
   }
 }> {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_ABSTRACT_API_KEY
+    // Use server-only API key (no NEXT_PUBLIC_ prefix)
+    const apiKey = process.env.ABSTRACT_API_KEY
     
     if (!apiKey) {
       console.warn('AbstractAPI key not configured')

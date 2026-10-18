@@ -4,14 +4,19 @@ import React, { useState } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { GripVertical, Loader2 } from 'lucide-react'
 
-interface ReorderableListProps {
-  items: any[]
+interface ReorderableListProps<T extends { id: string | number; display_order: number }> {
+  items: T[]
   onReorder: (idOrderList: { id: string | number; display_order: number }[]) => Promise<{ success: boolean; error?: string }>
-  renderItem: (item: any, index: number) => React.ReactNode
+  renderItem: (item: T, index: number) => React.ReactNode
   droppableId: string
 }
 
-export default function ReorderableList({ items, onReorder, renderItem, droppableId }: ReorderableListProps) {
+export default function ReorderableList<T extends { id: string | number; display_order: number }>({ 
+  items, 
+  onReorder, 
+  renderItem, 
+  droppableId 
+}: ReorderableListProps<T>): React.JSX.Element {
   const [orderedItems, setOrderedItems] = useState(items)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)

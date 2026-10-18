@@ -1,5 +1,7 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
 
 // GET - Fetch all complaints (for admin)
 export async function GET(request: NextRequest) {
@@ -33,6 +35,9 @@ export async function GET(request: NextRequest) {
 
 // POST - Create a new complaint (NO AUTHENTICATION REQUIRED)
 export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, formSubmitRateLimit)
+  if (limited) return limited
+
   try {
     const body = await request.json()
     const { name, email, phone, subject, description, category, priority, proofDocumentUrl } = body

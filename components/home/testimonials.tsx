@@ -2,6 +2,7 @@
 
 import { Quote, Star } from "lucide-react"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
+import type { HomeContent } from "@/lib/supabase/content-helpers"
 
 const testimonials = [
   {
@@ -135,8 +136,12 @@ function TestimonialCard({ testimonial, index }: { testimonial: typeof testimoni
   )
 }
 
-export function Testimonials() {
+export function Testimonials({ content }: { content?: HomeContent }) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
+
+  const badge = content?.testimonials_badge ?? 'Testimonials'
+  const title = content?.testimonials_title ?? 'What Our Clients Say'
+  const subtitle = content?.testimonials_subtitle ?? "Hear from the businesses we have helped transform through technology."
 
   return (
     <section className="py-24 lg:py-32 relative overflow-hidden">
@@ -153,13 +158,13 @@ export function Testimonials() {
         >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary uppercase tracking-wider px-4 py-1.5 bg-primary/5 rounded-full">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Testimonials
+            {badge}
           </span>
           <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
             What Our <span className="gradient-text">Clients</span> Say
           </h2>
           <p className="mt-6 text-lg text-muted-foreground">
-            Hear from the businesses we have helped transform through technology.
+            {subtitle}
           </p>
         </div>
 
@@ -227,11 +232,12 @@ export function Testimonials() {
                   </div>
                 </div>
               ))}
-              {/* Duplicate set for seamless loop */}
+              {/* Duplicate set for seamless loop - hidden from screen readers */}
               {testimonials.map((testimonial, index) => (
                 <div
                   key={`second-${index}`}
                   className="flex-shrink-0 w-[400px]"
+                  aria-hidden="true"
                 >
                   <div className="group relative rounded-2xl border border-border bg-card p-8 transition-all duration-700 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2 overflow-hidden h-full">
                     {/* Animated background gradient */}

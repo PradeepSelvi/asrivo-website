@@ -28,7 +28,7 @@ const timeSlots = [
 ]
 
 export default function SchedulePage() {
-  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date, setDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
@@ -178,9 +178,9 @@ export default function SchedulePage() {
                 Call us directly or send an email for urgent inquiries.
               </p>
               <div className="space-y-3">
-                <a href="tel:+918122575337" className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors">
+                <a href="tel:+919976422558" className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors">
                   <Phone className="h-4 w-4" />
-                  +91 8122575337
+                  +91 99764 22558
                 </a>
                 <a href="mailto:info@asrivotech.com" className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors">
                   <Mail className="h-4 w-4" />
@@ -215,7 +215,11 @@ export default function SchedulePage() {
                           selected={date}
                           onSelect={setDate}
                           className="rounded-xl border border-border shadow-sm p-4"
-                          disabled={(date) => date < new Date() || date.getDay() === 0}
+                          disabled={(date) => {
+                            const today = new Date()
+                            today.setHours(0, 0, 0, 0)
+                            return date < today || date.getDay() === 0
+                          }}
                         />
                       </div>
                       <div className="space-y-4">

@@ -74,17 +74,35 @@ export class RateLimiter {
 // Pre-configured rate limiters
 export const loginRateLimit = new RateLimiter({
   interval: 15 * 60 * 1000, // 15 minutes
-  uniqueTokenPerInterval: 5, // 5 attempts per 15 minutes
+  uniqueTokenPerInterval: 5,  // 5 attempts per 15 min
 })
 
 export const apiRateLimit = new RateLimiter({
-  interval: 60 * 1000, // 1 minute
+  interval: 60 * 1000,        // 1 minute
   uniqueTokenPerInterval: 30, // 30 requests per minute
 })
 
 export const contactFormRateLimit = new RateLimiter({
-  interval: 60 * 60 * 1000, // 1 hour
-  uniqueTokenPerInterval: 3, // 3 submissions per hour
+  interval: 60 * 60 * 1000,  // 1 hour
+  uniqueTokenPerInterval: 3,  // 3 submissions per hour
+})
+
+// Upload routes — tighter to prevent storage abuse
+export const uploadRateLimit = new RateLimiter({
+  interval: 60 * 60 * 1000,  // 1 hour
+  uniqueTokenPerInterval: 10, // 10 uploads per hour per IP
+})
+
+// Inquiry / consultation / schedule forms
+export const formSubmitRateLimit = new RateLimiter({
+  interval: 60 * 60 * 1000,  // 1 hour
+  uniqueTokenPerInterval: 5,  // 5 submissions per hour per IP
+})
+
+// Newsletter / validate-email — lighter limit
+export const lightRateLimit = new RateLimiter({
+  interval: 60 * 1000,        // 1 minute
+  uniqueTokenPerInterval: 10, // 10 per minute
 })
 
 /**

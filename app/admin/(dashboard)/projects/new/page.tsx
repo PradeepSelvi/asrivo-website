@@ -24,7 +24,6 @@ export default function NewProjectPage() {
   const [githubUrl, setGithubUrl] = useState('')
   const [status, setStatus] = useState('completed')
   const [featured, setFeatured] = useState(false)
-  const [displayOrder, setDisplayOrder] = useState('1')
   
   // Technologies array tags
   const [techInput, setTechInput] = useState('')
@@ -82,10 +81,6 @@ export default function NewProjectPage() {
       case 'githubUrl':
         if (value && !isValidUrl(value)) return 'Please enter a valid URL (e.g., https://example.com)'
         return null
-      case 'displayOrder':
-        const num = parseInt(value)
-        if (isNaN(num) || num < 1) return 'Display order must be a positive number'
-        return null
       default:
         return null
     }
@@ -117,9 +112,6 @@ export default function NewProjectPage() {
     
     const githubUrlError = validateField('githubUrl', githubUrl)
     if (githubUrlError) newErrors.githubUrl = githubUrlError
-    
-    const displayOrderError = validateField('displayOrder', displayOrder)
-    if (displayOrderError) newErrors.displayOrder = displayOrderError
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -169,8 +161,7 @@ export default function NewProjectPage() {
       live_url: liveUrl || undefined,
       github_url: githubUrl || undefined,
       status,
-      featured,
-      display_order: parseInt(displayOrder) || 1
+      featured
     })
 
     if (!result.success) {
@@ -304,7 +295,7 @@ export default function NewProjectPage() {
         </div>
 
         {/* Meta Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Category</label>
             <select
@@ -330,28 +321,6 @@ export default function NewProjectPage() {
               className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder="e.g. Acme Corp"
             />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Display Order</label>
-            <input
-              type="number"
-              value={displayOrder}
-              onChange={(e) => {
-                setDisplayOrder(e.target.value)
-                clearError('displayOrder')
-              }}
-              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
-                errors.displayOrder ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
-              }`}
-              min="1"
-            />
-            {errors.displayOrder && (
-              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="w-3 h-3" />
-                {errors.displayOrder}
-              </p>
-            )}
           </div>
         </div>
 
@@ -405,7 +374,7 @@ export default function NewProjectPage() {
         {/* Links Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Live Project URL</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Live/Deployed Project URL</label>
             <input
               type="url"
               value={liveUrl}
@@ -416,7 +385,7 @@ export default function NewProjectPage() {
               className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
                 errors.liveUrl ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
               }`}
-              placeholder="https://..."
+              placeholder="https://example.com"
             />
             {errors.liveUrl && (
               <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
@@ -424,6 +393,7 @@ export default function NewProjectPage() {
                 {errors.liveUrl}
               </p>
             )}
+            <p className="text-xs text-muted-foreground">Where users can visit the live project</p>
           </div>
 
           <div className="space-y-2">

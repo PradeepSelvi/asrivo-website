@@ -158,7 +158,7 @@ export default function BookConsultPage() {
 
               <div className="space-y-4">
                 <Button size="lg" className="w-full" asChild>
-                  <Link href="/book-consult/schedule">
+                  <Link href="/schedule">
                     <Calendar className="mr-2 h-5 w-5" />
                     Schedule Consultation Now
                   </Link>

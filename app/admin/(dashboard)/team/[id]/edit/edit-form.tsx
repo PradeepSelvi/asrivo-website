@@ -23,6 +23,7 @@ export default function EditTeamForm({ member }: EditTeamFormProps) {
   const [imageUrl, setImageUrl] = useState(member.image_url || '')
   const [displayOrder, setDisplayOrder] = useState(String(member.display_order || '1'))
   const [active, setActive] = useState(member.active ?? true)
+  const [teamType, setTeamType] = useState<'management' | 'developer'>(member.team_type || 'developer')
   
   // Social links
   const [linkedin, setLinkedin] = useState(member.social_links?.linkedin || '')
@@ -58,7 +59,8 @@ export default function EditTeamForm({ member }: EditTeamFormProps) {
       expertise,
       social_links: { linkedin, github, twitter },
       display_order: parseInt(displayOrder) || 1,
-      active
+      active,
+      team_type: teamType
     })
 
     if (!result.success) {
@@ -113,7 +115,7 @@ export default function EditTeamForm({ member }: EditTeamFormProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Work Email</label>
             <input
@@ -122,6 +124,19 @@ export default function EditTeamForm({ member }: EditTeamFormProps) {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Team Category</label>
+            <select
+              value={teamType}
+              onChange={(e) => setTeamType(e.target.value as 'management' | 'developer')}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              required
+            >
+              <option value="developer">Development Team</option>
+              <option value="management">Management Team</option>
+            </select>
           </div>
 
           <div className="space-y-2">
@@ -178,7 +193,7 @@ export default function EditTeamForm({ member }: EditTeamFormProps) {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] text-slate-500 uppercase">Twitter URL</label>
+              <label className="text-[10px] text-slate-500 uppercase">X (Twitter) URL</label>
               <input
                 type="url"
                 value={twitter}

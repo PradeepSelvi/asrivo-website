@@ -1,8 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyCaptcha } from '@/lib/utils/captcha'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { lightRateLimit } from '@/lib/utils/rate-limit'
 
 export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, lightRateLimit)
+  if (limited) return limited
+
   try {
     const body = await request.json()
     const { email, name, captchaToken } = body

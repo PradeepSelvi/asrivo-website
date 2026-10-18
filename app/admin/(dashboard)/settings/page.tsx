@@ -12,7 +12,8 @@ import {
   Database,
   FileCode,
   ArrowRight,
-  Lock
+  Lock,
+  Briefcase
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -41,6 +42,13 @@ export default async function SettingsPage() {
       icon: Globe,
       href: '/admin/settings/site',
       items: ['Site title', 'Meta description', 'Contact info', 'Social links']
+    },
+    {
+      title: 'Careers Page',
+      description: 'Control careers page visibility and job application settings',
+      icon: Briefcase,
+      href: '/admin/settings/careers',
+      items: ['Page visibility', 'Application method', 'Accept applications', 'Form settings']
     },
     {
       title: 'Homepage Content',

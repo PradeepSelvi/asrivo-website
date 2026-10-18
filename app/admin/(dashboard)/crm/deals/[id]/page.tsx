@@ -156,7 +156,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
               {deal.currency && (
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold mb-1">Currency</p>
-                  <p className="text-sm text-foreground uppercase">{deal.currency}</p>
+                  <p className="text-sm text-foreground">₹ INR (Indian Rupee)</p>
                 </div>
               )}
             </div>

@@ -280,6 +280,7 @@ export async function createTeamMember(data: {
   social_links?: { linkedin?: string; github?: string; twitter?: string }
   display_order?: number
   active?: boolean
+  team_type?: 'management' | 'developer'
 }) {
   try {
     const user = await checkAuthAndPermission('high')
@@ -328,6 +329,7 @@ export async function updateTeamMember(id: string | number, data: {
   social_links?: { linkedin?: string; github?: string; twitter?: string }
   display_order?: number
   active?: boolean
+  team_type?: 'management' | 'developer'
 }) {
   try {
     await checkAuthAndPermission()

@@ -1,18 +1,43 @@
-import { createClient } from '@/lib/supabase/server'
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { MapPin, Clock, DollarSign, Briefcase, ArrowRight, Users, Sparkles } from 'lucide-react'
+import {
+  ArrowRight,
+  Briefcase,
+  Calendar,
+  Clock,
+  Code,
+  DollarSign,
+  MapPin,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Users,
+} from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { createClient } from '@/lib/supabase/server'
+import { getCareersContent } from '@/lib/supabase/content-helpers'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export const metadata = {
-  title: 'Careers - Asrivo Tech',
-  description:
-    'Join the Asrivo Tech team. Explore open positions in software development, design, and technology consulting.',
-  openGraph: {
-    title: 'Careers at Asrivo Tech',
-    description: 'Build the future with us. See all open positions.',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getCareersContent()
+
+  return {
+    title: content.meta_title || 'Careers - Asrivo Tech',
+    description:
+      content.meta_description ||
+      content.hero_subtitle ||
+      "We're a team of passionate builders crafting digital solutions that make a real difference.",
+    keywords: content.meta_keywords,
+    openGraph: {
+      title: content.meta_title || 'Careers at Asrivo Tech',
+      description:
+        content.meta_description || 'Build the future with us. See all open positions.',
+    },
+  }
 }
 
 interface JobPosting {
@@ -39,6 +64,65 @@ const employmentTypeColors: Record<string, string> = {
 
 export default async function CareersPage() {
   const supabase = await createClient()
+  let content
+  try {
+    content = await getCareersContent()
+  } catch (error) {
+    console.error('Error loading careers page content:', error)
+    content = await getCareersContent() // Helper returns defaults on error
+  }
+
+  // Check if careers page is enabled
+  const { data: pageEnabledSetting } = await supabase
+    .from('site_settings')
+    .select('setting_value')
+    .eq('setting_key', 'careers_page_enabled')
+    .single()
+
+  const careersPageEnabled = pageEnabledSetting?.setting_value === 'true'
+
+  // Check if job applications are enabled (dedicated form vs contact form)
+  const { data: applicationsEnabledSetting } = await supabase
+    .from('site_settings')
+    .select('setting_value')
+    .eq('setting_key', 'job_applications_enabled')
+    .single()
+
+  const jobApplicationsEnabled = applicationsEnabledSetting?.setting_value !== 'false'
+
+  // Check if accepting new applications
+  const { data: acceptApplicationsSetting } = await supabase
+    .from('site_settings')
+    .select('setting_value')
+    .eq('setting_key', 'accept_applications')
+    .single()
+
+  const acceptApplications = acceptApplicationsSetting?.setting_value !== 'false'
+
+  // If careers page is disabled, show message
+  if (!careersPageEnabled) {
+    return (
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+          <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-6" />
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+            Careers Page Temporarily Unavailable
+          </h1>
+          <p className="text-lg text-slate-500 dark:text-slate-400 mb-8">
+            We're currently updating our careers section. Please check back soon or contact us
+            directly for any inquiries.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+          >
+            Contact Us
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </main>
+    )
+  }
 
   const { data: jobs } = await supabase
     .from('job_postings')
@@ -61,14 +145,13 @@ export default async function CareersPage() {
               We&apos;re Hiring
             </div>
             <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">
-              Join Our Team at{' '}
+              {content.hero_title.split(' at')[0]} at{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
                 Asrivo Tech
               </span>
             </h1>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-              We&apos;re a team of passionate builders crafting digital solutions that make a
-              real difference. Come build the future with us.
+              {content.hero_subtitle}
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-slate-400 text-sm">
@@ -94,11 +177,10 @@ export default async function CareersPage() {
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg p-12 text-center">
               <Briefcase className="w-12 h-12 text-slate-300 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                No Open Positions Right Now
+                {content.no_positions_title}
               </h2>
               <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
-                We don&apos;t have any active openings at the moment, but we&apos;re always interested in
-                talented people. Send us your CV!
+                {content.no_positions_description}
               </p>
               <Link
                 href="/contact"
@@ -112,7 +194,7 @@ export default async function CareersPage() {
             <>
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                  Open Positions
+                  {content.positions_title}
                   <span className="ml-2 text-base font-semibold text-blue-600 dark:text-blue-400">
                     ({activeJobs.length})
                   </span>
@@ -125,7 +207,10 @@ export default async function CareersPage() {
                     employmentTypeColors[job.employment_type?.toLowerCase() ?? ''] ??
                     'bg-slate-500/10 text-slate-700 dark:text-slate-400'
 
-                  const applyUrl = `/contact?subject=${encodeURIComponent(`Job Application: ${job.title}`)}`
+                  // Use dedicated application form or contact form based on settings
+                  const applyUrl = jobApplicationsEnabled
+                    ? `/apply?job=${encodeURIComponent(job.title)}&position=${job.id}`
+                    : `/contact?subject=${encodeURIComponent(`Job Application: ${job.title}`)}`
 
                   return (
                     <article
@@ -200,13 +285,21 @@ export default async function CareersPage() {
                         </div>
 
                         <div className="shrink-0">
-                          <Link
-                            href={applyUrl}
-                            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap"
-                          >
-                            Apply Now
-                            <ArrowRight className="w-4 h-4" />
-                          </Link>
+                          {acceptApplications ? (
+                            <Link
+                              href={applyUrl}
+                              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap"
+                            >
+                              Apply Now
+                              <ArrowRight className="w-4 h-4" />
+                            </Link>
+                          ) : (
+                            <div className="text-center">
+                              <span className="inline-block text-xs font-semibold px-4 py-2 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20">
+                                Applications Closed
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </article>

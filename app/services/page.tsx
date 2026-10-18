@@ -1,20 +1,11 @@
 import { Metadata } from "next"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { InquiryStatusChecker } from "@/components/inquiry-status-checker"
 import { MobileBackButton } from "@/components/mobile-back-button"
+import { ServicesDisplay } from "@/components/services/services-content"
+import { getServicesContent } from "@/lib/supabase/content-helpers"
 import { 
-  FileCode2, 
-  Globe, 
-  Smartphone, 
-  Cloud, 
-  Bot, 
-  Users,
-  Database,
-  Shield,
-  Cpu,
-  LayoutGrid,
   ArrowRight,
   Search,
   Paintbrush,
@@ -22,148 +13,17 @@ import {
   TestTube,
   Rocket,
   HeartHandshake,
-  CheckCircle
 } from "lucide-react"
 
-export const metadata: Metadata = {
-  title: "Services - Asrivo Tech",
-  description: "Explore our comprehensive technology services including software development, web & mobile apps, cloud solutions, AI & automation, and IT consulting.",
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getServicesContent()
+  
+  return {
+    title: content.meta_title || "Services - Asrivo Tech",
+    description: content.meta_description || content.hero_subtitle || "Explore our comprehensive technology services including software development, web & mobile apps, cloud solutions, AI & automation, and IT consulting.",
+    keywords: content.meta_keywords,
+  }
 }
-
-const services = [
-  {
-    id: "software",
-    icon: FileCode2,
-    title: "Custom Software Development",
-    image: "/services/software-development.webp",
-    description: "We build tailored software solutions that address your unique business challenges. Our team delivers robust, scalable applications designed to streamline operations and drive growth with your specific needs in mind.",
-    features: [
-      "Enterprise Application development",
-      "Modern System architecture design",
-      "API development and integration",
-      "Database design and optimization",
-    ],
-  },
-  {
-    id: "web",
-    icon: Globe,
-    title: "Web Application Development",
-    image: "/services/web-development.webp",
-    description: "Modern, responsive web applications that deliver exceptional user experiences across all devices. We use the latest technologies to build fast, secure, and scalable web solutions.",
-    features: [
-      "Progressive Web Apps (PWA)",
-      "Single Page Applications (SPA)",
-      "E-commerce platforms",
-      "Content Management Systems",
-    ],
-  },
-  {
-    id: "mobile",
-    icon: Smartphone,
-    title: "Mobile Application Development",
-    image: "/services/mobile-development.webp",
-    description: "Native and cross-platform mobile applications for iOS and Android. We create intuitive, high-performance apps that engage users and drive business results.",
-    features: [
-      "iOS and Android native apps",
-      "Cross-platform development (React Native, Flutter)",
-      "Mobile UI/UX design",
-      "App store optimization",
-    ],
-  },
-  {
-    id: "cloud",
-    icon: Cloud,
-    title: "Cloud & DevOps Solutions",
-    image: "/services/cloud-devops.webp",
-    description: "Scalable cloud infrastructure and automated deployment pipelines. We help you leverage the full potential of cloud computing for efficiency and cost savings.",
-    features: [
-      "Cloud migration and strategy",
-      "Infrastructure as Code (IaC)",
-      "CI/CD pipeline implementation",
-      "Kubernetes and container orchestration",
-    ],
-  },
-  {
-    id: "ai",
-    icon: Bot,
-    title: "Web -Hosting",
-    image: "/services/web-hosting.webp",
-    description: "Intelligent automation solutions powered by machine learning and artificial intelligence. Transform your business processes with smart, data-driven systems.",
-    features: [
-      "Machine learning model development",
-      "Natural language processing",
-      "Process automation (RPA)",
-      "Predictive analytics",
-    ],
-  },
-  {
-    id: "consulting",
-    icon: Users,
-    title: "Enterprise IT Consulting",
-    image: "/services/enterprise-consulting.webp",
-    description: "Strategic technology consulting to guide your digital transformation journey. Our experts help you make informed decisions and optimize your IT investments.",
-    features: [
-      "Digital transformation strategy",
-      "Technology roadmap planning",
-      "IT architecture assessment",
-      "Vendor selection and management",
-    ],
-  },
-  {
-    id: "digital-marketing",
-    icon: Database,
-    title: "Digital Marketing",
-    image: "/services/digital-marketing.webp",
-    description: "Delivering result-driven digital marketing solutions to enhance brand visibility, generate quality leads, and accelerate business growth.",
-    features: [
-      "Search Engine Optimization (SEO) & Search Engine Marketing (SEM)",
-      "Social Media Marketing & Paid Advertising (Meta, Instagram, LinkedIn, Google Ads)",
-      "Branding & Content Marketing",
-      "Lead Generation & Performance Marketing",
-    ],
-  },
-  /*
-  {
-    id: "security",
-    icon: Shield,
-    title: "Cybersecurity Services",
-    description: "Protect your business with our comprehensive cybersecurity solutions. We implement robust security measures to safeguard your digital assets and data.",
-    features: [
-      "Security audits and assessments",
-      "Penetration testing",
-      "Security architecture design",
-      "Compliance management",
-    ],
-  },
-  */
-  {
-    id: "product",
-    icon: Cpu,
-    title: "Product Engineering",
-    image: "/services/product-engineering.webp",
-    description: "End-to-end product development from concept to launch. We help startups and enterprises build innovative digital products that succeed in the market.",
-    features: [
-      "Product strategy and roadmapping",
-      "MVP development",
-      "Product scaling and optimization",
-      "Technical due diligence",
-    ],
-  },
-  /*
-  {
-    id: "ux",
-    icon: LayoutGrid,
-    title: "UI/UX Design Services",
-    description: "Create exceptional user experiences with our design services. We combine aesthetics with usability to build interfaces that users love.",
-    features: [
-      "User research and testing",
-      "Wireframing and prototyping",
-      "Visual design and branding",
-      "Design system development",
-    ],
-  },
-  */
-]
 
 const process = [
   {
@@ -198,10 +58,19 @@ const process = [
   },
 ]
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  let content
+  try {
+    content = await getServicesContent()
+  } catch (error) {
+    console.error('Error loading services page content:', error)
+    content = await getServicesContent() // Helper returns defaults on error
+  }
+
   return (
     <div className="flex flex-col">
       <MobileBackButton />
+      
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
         <div className="absolute inset-0 -z-10">
@@ -210,91 +79,33 @@ export default function ServicesPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Our Services
+              {content.services_page_badge}
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              Comprehensive Technology Solutions
+              {content.hero_title}
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              From concept to deployment and beyond, we offer end-to-end services to transform 
-              your ideas into powerful digital solutions that drive business success.
+              {content.hero_subtitle}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Services Grid */}
-      <section className="py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="space-y-16">
-            {services.map((service, index) => (
-              <div
-                key={service.id}
-                id={service.id}
-                className={`scroll-mt-24 grid gap-8 lg:grid-cols-2 lg:gap-16 items-center ${
-                  index % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""
-                }`}
-              >
-                <div>
-                  <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10">
-                    <service.icon className="h-7 w-7 text-primary" />
-                  </div>
-                  <h2 className="mt-6 text-2xl font-bold text-foreground sm:text-3xl">
-                    {service.title}
-                  </h2>
-                  <p className="mt-4 text-muted-foreground leading-relaxed">
-                    {service.description}
-                  </p>
-                  <ul className="mt-6 space-y-3">
-                    {service.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-primary shrink-0" />
-                        <span className="text-muted-foreground">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="mt-8" asChild>
-                    <Link href="/services/inquiry">
-                      Get Started
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-                <div className="relative">
-                  {service.image ? (
-                    <div className="aspect-video rounded-xl overflow-hidden border border-border relative">
-                      <Image
-                        src={service.image}
-                        alt={`${service.title} Services at AsrivoTech`}
-                        fill
-                        loading="lazy"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="aspect-video rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-border">
-                      <service.icon className="h-24 w-24 text-primary/20" />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Services Grid - Now using CMS content */}
+      <ServicesDisplay content={content} />
 
       {/* Process Section */}
       <section className="bg-muted/30 py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Our Process
+              {content.process_badge}
             </span>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              How We Work
+              {content.process_title}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Our proven methodology ensures successful delivery of each and every project.
+              {content.process_subtitle}
             </p>
           </div>
 
@@ -328,10 +139,10 @@ export default function ServicesPage() {
               Track Your Request
             </span>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Check Inquiry Status
+              {content.status_title}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Enter your email to track the status of your service inquiry
+              {content.status_description}
             </p>
           </div>
 
@@ -344,10 +155,10 @@ export default function ServicesPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="rounded-2xl bg-primary px-8 py-16 text-center sm:px-16">
             <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl text-balance">
-              Ready to Start Your Project?
+              {content.cta_title}
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-primary-foreground/80">
-              Let&apos;s discuss how we can help you achieve your Product goals.
+              {content.cta_description}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button 
@@ -356,7 +167,7 @@ export default function ServicesPage() {
                 asChild
               >
                 <Link href="/contact">
-                  Contact Us
+                  {content.cta_button}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

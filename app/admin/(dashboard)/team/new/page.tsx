@@ -20,6 +20,7 @@ export default function NewTeamMemberPage() {
   const [imageUrl, setImageUrl] = useState('')
   const [displayOrder, setDisplayOrder] = useState('1')
   const [active, setActive] = useState(true)
+  const [teamType, setTeamType] = useState<'management' | 'developer'>('developer')
   
   // Social links
   const [linkedin, setLinkedin] = useState('')
@@ -55,7 +56,8 @@ export default function NewTeamMemberPage() {
       expertise,
       social_links: { linkedin, github, twitter },
       display_order: parseInt(displayOrder) || 1,
-      active
+      active,
+      team_type: teamType
     })
 
     if (!result.success) {
@@ -124,7 +126,21 @@ export default function NewTeamMemberPage() {
             />
           </div>
 
-          
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Team Category</label>
+            <select
+              value={teamType}
+              onChange={(e) => setTeamType(e.target.value as 'management' | 'developer')}
+              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              required
+            >
+              <option value="developer">Development Team</option>
+              <option value="management">Management Team</option>
+            </select>
+            <p className="text-xs text-muted-foreground mt-1">
+              Select where this member appears on the team page
+            </p>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -173,13 +189,13 @@ export default function NewTeamMemberPage() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] text-muted-foreground uppercase">Twitter URL</label>
+              <label className="text-[10px] text-muted-foreground uppercase">X (Twitter) URL</label>
               <input
                 type="url"
                 value={twitter}
                 onChange={(e) => setTwitter(e.target.value)}
                 className="w-full bg-background border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none"
-                placeholder="https://twitter.com/..."
+                placeholder="https://x.com/..."
               />
             </div>
           </div>

@@ -389,29 +389,31 @@ export default function ServiceInquiryPage() {
 
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center mb-4">
             {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex items-center flex-1">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                  step < currentStep ? 'bg-green-500 text-white' :
-                  step === currentStep ? 'bg-primary text-white' :
-                  'bg-muted text-muted-foreground'
-                }`}>
-                  {step < currentStep ? <Check className="w-5 h-5" /> : step}
+                <div className="flex flex-col items-center w-full">
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full shrink-0 ${
+                    step < currentStep ? 'bg-green-500 text-white' :
+                    step === currentStep ? 'bg-primary text-white' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {step < currentStep ? <Check className="w-5 h-5" /> : step}
+                  </div>
+                  <span className="text-xs text-muted-foreground mt-2 text-center px-1">
+                    {step === 1 && 'Contact Info'}
+                    {step === 2 && 'Project Details'}
+                    {step === 3 && 'Business Metrics'}
+                    {step === 4 && 'Additional Info'}
+                  </span>
                 </div>
                 {step < 4 && (
                   <div className={`flex-1 h-1 mx-2 ${
                     step < currentStep ? 'bg-green-500' : 'bg-muted'
-                  }`} />
+                  }`} style={{ marginTop: '-24px' }} />
                 )}
               </div>
             ))}
-          </div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Contact Info</span>
-            <span>Project Details</span>
-            <span>Business Metrics</span>
-            <span>Additional Info</span>
           </div>
         </div>
 

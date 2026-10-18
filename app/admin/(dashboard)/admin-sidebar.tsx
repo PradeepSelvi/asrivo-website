@@ -105,16 +105,12 @@ export default function AdminSidebar({ user, isMobileMenuOpen, setIsMobileMenuOp
 
       {/* Sidebar */}
       <aside 
-        className={`w-72 bg-card border-l border-border flex flex-col shrink-0 h-screen transition-transform duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
-        } fixed lg:sticky top-0 z-50 lg:z-auto shadow-2xl lg:shadow-none overflow-hidden right-0 lg:left-0`}
-        style={{
-          paddingTop: 'env(safe-area-inset-top)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
+        className={`w-72 bg-card border-r border-border flex flex-col shrink-0 transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        } fixed lg:relative top-0 bottom-0 z-50 lg:z-auto shadow-2xl lg:shadow-none left-0 h-full`}
       >
-        {/* Header/Logo - Fixed at top */}
-        <div className="p-5 border-b border-border flex items-center justify-between shrink-0">
+        {/* Mobile Header - only visible on mobile */}
+        <div className="lg:hidden p-5 border-b border-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <img
               src="/asrivo.png"
@@ -132,14 +128,14 @@ export default function AdminSidebar({ user, isMobileMenuOpen, setIsMobileMenuOp
           {/* Close button for mobile */}
           <button
             onClick={closeMobileMenu}
-            className="lg:hidden p-1.5 hover:bg-muted rounded-md transition-colors"
+            className="p-1.5 hover:bg-muted rounded-md transition-colors"
             aria-label="Close menu"
           >
             <X className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
 
-        {/* Navigation Links - Scrollable with momentum scrolling for iOS */}
+        {/* Navigation Links - Scrollable */}
         <nav className="flex-1 p-4 space-y-5 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="space-y-1">
             <p className="px-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">

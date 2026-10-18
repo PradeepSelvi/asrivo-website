@@ -3,7 +3,18 @@
  * whenever a new client request is received
  */
 
-export async function sendAdminNotification(type: string, data: any) {
+interface NotificationData {
+  title?: string
+  message?: string
+  type?: string
+  link?: string
+  [key: string]: unknown // Allow additional flexible fields
+}
+
+export async function sendAdminNotification(
+  type: string, 
+  data: NotificationData
+): Promise<{ success: boolean; error?: unknown; recipients?: number }> {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/admin/send-notification-email`,

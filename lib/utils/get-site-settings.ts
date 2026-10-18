@@ -8,33 +8,28 @@ export async function getSiteSettingsMap() {
   try {
     const supabase = await createClient()
     
+    // Table uses setting_key / setting_value — no category column
     const { data: settings, error } = await supabase
       .from('site_settings')
-      .select('*')
-      .eq('category', 'site')
-    
+      .select('setting_key, setting_value')
+
     if (error) {
       console.error('Error fetching site settings:', error)
       return getDefaultSettings()
     }
-    
+
     if (!settings || settings.length === 0) {
       return getDefaultSettings()
     }
-    
+
     // Convert array to object
     const settingsMap: Record<string, string> = {}
     settings.forEach(setting => {
-      try {
-        // Parse JSON value
-        settingsMap[setting.key] = typeof setting.value === 'string' 
-          ? JSON.parse(setting.value) 
-          : setting.value
-      } catch {
-        settingsMap[setting.key] = setting.value
+      if (setting.setting_key) {
+        settingsMap[setting.setting_key] = setting.setting_value
       }
     })
-    
+
     return { ...getDefaultSettings(), ...settingsMap }
   } catch (error) {
     console.error('Error in getSiteSettingsMap:', error)
@@ -50,13 +45,23 @@ export async function getHomepageSettings() {
   try {
     const supabase = await createClient()
     
+    // For now, just return defaults since we're using the careers-focused site_settings table
+    // The homepage settings should eventually be in a proper CMS or settings table
+    return getDefaultHomepageSettings()
+    
+    /* Disabled until we have a proper homepage settings table
     const { data: settings, error } = await supabase
       .from('site_settings')
       .select('*')
       .eq('category', 'homepage')
     
     if (error) {
-      console.error('Error fetching homepage settings:', error)
+      // Table doesn't exist yet or other error - using defaults
+      if (error.code === '42P01') {
+        console.warn('⚠️  site_settings table not found. Run the migration: supabase/migrations/create_site_settings_table.sql')
+      } else {
+        console.error('Error fetching homepage settings:', error)
+      }
       return getDefaultHomepageSettings()
     }
     
@@ -78,6 +83,7 @@ export async function getHomepageSettings() {
     })
     
     return { ...getDefaultHomepageSettings(), ...settingsMap }
+    */
   } catch (error) {
     console.error('Error in getHomepageSettings:', error)
     return getDefaultHomepageSettings()
@@ -123,7 +129,7 @@ function getDefaultSettings() {
     
     // Contact Information
     contact_email: 'info@asrivotech.com',
-    contact_phone: '+91 8122575337',
+    contact_phone: '+91 99764 22558',
     contact_address: 'Madurai, Tamil Nadu, India',
     business_hours: 'Mon-Sat: 9AM-6PM',
     support_email: 'support@asrivotech.com',
@@ -131,7 +137,7 @@ function getDefaultSettings() {
     // Social Media
     social_linkedin: 'https://linkedin.com/company/asrivotech',
     social_instagram: 'https://instagram.com/asrivotech',
-    social_twitter: 'https://twitter.com/asrivotech',
+    social_twitter: 'https://x.com/asrivotech',
     social_github: 'https://github.com/asrivotech',
     
     // SEO

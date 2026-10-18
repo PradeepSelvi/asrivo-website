@@ -41,25 +41,56 @@ export async function savePageContent(
 
     // Upsert each content field as a separate row
     for (const [sectionKey, contentValue] of Object.entries(updates)) {
-      const { error } = await supabase
+      // Try UPDATE first — only touch content_value and updated_at
+      const { data: existing, error: selectError } = await supabase
         .from('page_content')
-        .upsert(
-          {
+        .select('id')
+        .eq('page_slug', pageSlug)
+        .eq('section_key', sectionKey)
+        .maybeSingle()
+
+      if (selectError) throw new Error(selectError.message)
+
+      if (existing) {
+        // Row exists — only update the value, leave display_label untouched
+        const { error } = await supabase
+          .from('page_content')
+          .update({
+            content_value: contentValue,
+            updated_at: new Date().toISOString()
+          })
+          .eq('page_slug', pageSlug)
+          .eq('section_key', sectionKey)
+
+        if (error) throw new Error(error.message)
+      } else {
+        // New row — generate a readable label from the key
+        // e.g. "hero_title" → "Hero Title"
+        const displayLabel = sectionKey
+          .split('_')
+          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ')
+
+        const { error } = await supabase
+          .from('page_content')
+          .insert({
             page_slug: pageSlug,
             section_key: sectionKey,
             content_value: contentValue,
+            display_label: displayLabel,
+            content_type: 'text',
             is_active: true,
-            updated_at: new Date().toISOString()
-          },
-          {
-            onConflict: 'page_slug,section_key'
-          }
-        )
+          })
 
-      if (error) throw new Error(error.message)
+        if (error) throw new Error(error.message)
+      }
     }
 
     // Invalidate cache for both public page and admin content page
+    // NOTE: revalidatePath() triggers Next.js to regenerate the page on next request.
+    // In production, changes should be visible immediately after save. In development,
+    // cache behavior may vary. For dynamic pages with `force-dynamic`, revalidation
+    // ensures even static content gets refreshed.
     const pageRoutes: Record<string, string> = {
       home: '/',
       about: '/about',

@@ -53,8 +53,8 @@ const envVars = [
     required: false,
   },
   {
-    key: 'NEXT_PUBLIC_ABSTRACT_API_KEY',
-    description: 'AbstractAPI key for email validation on registration',
+    key: 'ABSTRACT_API_KEY',
+    description: 'AbstractAPI key for email validation on registration (server-side only)',
     required: false,
   },
 ]
@@ -117,10 +117,6 @@ export default async function AdvancedSettingsPage() {
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="px-6 py-4 border-b border-border bg-muted/50">
               <h2 className="font-semibold text-foreground">Environment Variables</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Values are never displayed here — only whether each variable is set.
-                Edit your <code className="font-mono bg-muted px-1 rounded">.env</code> file to add missing variables.
-              </p>
             </div>
             <div className="divide-y divide-border">
               {envStatus.map((v) => (
@@ -155,20 +151,6 @@ export default async function AdvancedSettingsPage() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* How to set env vars */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-3">How to Set Environment Variables</h2>
-            <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-              <li>Open the <code className="font-mono bg-muted px-1 rounded">.env</code> file in the project root</li>
-              <li>Add the missing variable: <code className="font-mono bg-muted px-1 rounded">KEY=value</code></li>
-              <li>Restart the dev server for changes to take effect</li>
-              <li>For production, set variables in your hosting provider (Vercel, Netlify, etc.)</li>
-            </ol>
-            <p className="text-xs text-muted-foreground mt-3">
-              See <code className="font-mono bg-muted px-1 rounded">.env.example</code> for a full list of supported variables.
-            </p>
           </div>
         </div>
       </div>

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Linkedin, Github, Mail, ArrowRight } from "lucide-react"
 import { useScrollAnimation, useTilt } from "@/hooks/use-scroll-animation"
 
+import type { HomeContent } from "@/lib/supabase/content-helpers"
+
 interface TeamMember {
   id: number
   name: string
@@ -118,7 +120,7 @@ function TeamMemberCard({ member, index }: { member: TeamMember; index: number }
   )
 }
 
-export function TeamPreview({ members }: { members?: TeamMember[] }) {
+export function TeamPreview({ members, content }: { members?: TeamMember[]; content?: HomeContent }) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
 
   // Show only featured or first 6 active members
@@ -129,6 +131,10 @@ export function TeamPreview({ members }: { members?: TeamMember[] }) {
   if (displayMembers.length === 0) {
     return null
   }
+
+  const badge = content?.team_badge ?? 'Our Team'
+  const title = content?.team_title ?? 'Meet the Experts'
+  const subtitle = content?.team_subtitle ?? 'Our talented team of professionals is dedicated to delivering exceptional results.'
 
   return (
     <section className="bg-muted/30 py-24 lg:py-32 relative overflow-hidden">
@@ -145,13 +151,13 @@ export function TeamPreview({ members }: { members?: TeamMember[] }) {
         >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary uppercase tracking-wider px-4 py-1.5 bg-primary/5 rounded-full">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Our Team
+            {badge}
           </span>
           <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
             Meet the <span className="gradient-text">Experts</span>
           </h2>
           <p className="mt-6 text-lg text-muted-foreground">
-            Our talented team of professionals is dedicated to delivering exceptional results.
+            {subtitle}
           </p>
         </div>
 

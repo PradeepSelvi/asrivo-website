@@ -1,16 +1,29 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ExternalLink, Eye } from "lucide-react"
+import { ArrowRight, Eye } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getProjectsContent } from "@/lib/supabase/content-helpers"
 
-export const metadata: Metadata = {
-  title: "Projects - Asrivo Tech",
-  description: "Explore our portfolio of successful projects across various industries. See how we've helped businesses transform through technology.",
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getProjectsContent()
+  
+  return {
+    title: content.meta_title || "Projects - Asrivo Tech",
+    description: content.meta_description || content.hero_subtitle || "Explore our portfolio of successful projects across various industries. See how we've helped businesses transform through technology.",
+    keywords: content.meta_keywords,
+  }
 }
 
 export default async function ProjectsPage() {
   const supabase = await createClient()
+  let content
+  try {
+    content = await getProjectsContent()
+  } catch (error) {
+    console.error('Error loading projects page content:', error)
+    content = await getProjectsContent() // Helper returns defaults on error
+  }
   
   const { data: projects, error } = await supabase
     .from('projects')
@@ -34,11 +47,10 @@ export default async function ProjectsPage() {
               Our Work
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              Projects & Case Studies
+              {content.hero_title}
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Explore our portfolio of successful projects across various industries. 
-              See how we&apos;ve helped businesses transform through innovative technology solutions.
+              {content.hero_subtitle}
             </p>
           </div>
         </div>
@@ -48,17 +60,22 @@ export default async function ProjectsPage() {
       <section className="border-b border-border py-12">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-            {[
-              { value: "10+", label: "Projects Bulit" },
-              { value: "2+", label: "Start Up Partners" },
-              { value: "10+", label: "Developer Community" },
-              { value: "100%", label: "Commitment to Quality" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-3xl font-bold text-primary sm:text-4xl">{stat.value}</div>
-                <div className="mt-1 text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_total_value}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_total_label}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_active_value}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_active_label}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">10+</div>
+              <div className="mt-1 text-sm text-muted-foreground">Developer Community</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">100%</div>
+              <div className="mt-1 text-sm text-muted-foreground">Commitment to Quality</div>
+            </div>
           </div>
         </div>
       </section>
@@ -184,7 +201,7 @@ export default async function ProjectsPage() {
                 asChild
               >
                 <Link href="/contact">
-                  Start a Product Innovation
+                  Contact Us
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

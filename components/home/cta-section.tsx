@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, Rocket } from "lucide-react"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 
-export function CTASection({ settings }: { settings?: Record<string, string> }) {
+import type { HomeContent } from "@/lib/supabase/content-helpers"
+
+export function CTASection({ content }: { content: HomeContent }) {
   const { ref, isVisible } = useScrollAnimation()
   
-  const title = settings?.cta_title || "Let's Build Your Next Product Together"
-  const description = settings?.cta_description || 
-    'Ready to transform your ideas into reality? Our team is here to help you build innovative solutions that drive your business forward.'
-  const buttonText = settings?.cta_button || 'Start a Project'
+  // Use HomeContent directly
+  const title = content.cta_title
+  const description = content.cta_description
+  const buttonText = content.cta_button
 
   return (
     <section className="bg-muted/30 py-24 lg:py-32">

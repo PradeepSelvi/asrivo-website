@@ -99,21 +99,44 @@ function AnimatedStat({ icon: Icon, value, label, description, delay }: {
   )
 }
 
+import type { HomeContent } from "@/lib/supabase/content-helpers"
+
 /** * MAIN COMPONENT: AboutPreview
  * A full-screen width section with floating background orbs and glass panels.
  */
-export function AboutPreview({ settings }: { settings?: Record<string, string> }) {
+export function AboutPreview({ content }: { content: HomeContent }) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
 
-  // Extract settings with fallbacks
-  const title = settings?.about_title || 'Why Choose Asrivo Tech'
-  const description = settings?.about_description || "Asrivo Tech isn't just a dev shop. We are a Digital Product Studio where performance meets aesthetics. We take the \"impossible\" ideas and build them into lightning-fast, secure, and beautiful realities."
+  // Use HomeContent directly
+  const title = content.about_title
+  const description = content.about_description
 
+  // Wire CMS stats fields to the highlights
   const highlights = [
-  { icon: Briefcase, value: "6+", label: "Core Services", description: "Comprehensive technology solutions for modern businesses." },
-  { icon: Users, value: "24/7", label: "Support Availability", description: "Continuous assistance for seamless operations." },
-  { icon: Globe, value: "10+", label: "Technology Stack", description: "Modern tools and frameworks powering solutions." }, 
-  { icon: ShieldCheckIcon, value: "99%", label: "System Reliability", description: "Stable infrastructure powering every service." }
+    { 
+      icon: Briefcase, 
+      value: content.stats_services, 
+      label: "Core Services", 
+      description: "Comprehensive technology solutions for modern businesses." 
+    },
+    { 
+      icon: Users, 
+      value: content.stats_support, 
+      label: "Support Availability", 
+      description: "Continuous assistance for seamless operations." 
+    },
+    { 
+      icon: Globe, 
+      value: content.stats_projects, 
+      label: "Technology Stack", 
+      description: "Modern tools and frameworks powering solutions." 
+    }, 
+    { 
+      icon: ShieldCheckIcon, 
+      value: content.stats_reliability, 
+      label: "System Reliability", 
+      description: "Stable infrastructure powering every service." 
+    }
   ]
 
   const features = [

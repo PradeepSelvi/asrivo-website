@@ -2,6 +2,11 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/mail'
 import { verifyCaptcha } from '@/lib/utils/captcha'
+import { handleApiError, logError } from '@/lib/utils/error-handler'
+import { apiSuccess, apiError } from '@/lib/types/api'
+import { HTTP_STATUS } from '@/lib/constants'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { contactFormRateLimit } from '@/lib/utils/rate-limit'
 
 // 👉 GET (optional - to fetch contacts)
 export async function GET(request: NextRequest) {
@@ -14,22 +19,21 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error("GET ERROR:", error)
-
+      logError('GET /api/contacts - Supabase error', error)
       return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
+        apiError(error.message, 'DATABASE_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
-    return NextResponse.json({ success: true, data })
+    return NextResponse.json(apiSuccess(data))
 
-  } catch (error: any) {
-    console.error("SERVER ERROR:", error)
-
+  } catch (error) {
+    logError('GET /api/contacts', error)
+    const errorDetail = handleApiError(error)
     return NextResponse.json(
-      { error: error.message || 'Unknown error' },
-      { status: 500 }
+      apiError(errorDetail.message, errorDetail.code),
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 }
@@ -37,16 +41,24 @@ export async function GET(request: NextRequest) {
 
 // 👉 POST (MAIN FIXED CODE)
 export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, contactFormRateLimit)
+  if (limited) return limited
+
+  let email: string | undefined
+  let name: string | undefined
+
   try {
     const body = await request.json()
 
-    const { email, name, message, company, subject, type, captchaToken } = body
+    email = body?.email
+    name = body?.name
+    const { message, company, subject, type, captchaToken } = body || {}
 
     // ✅ Validation
     if (!email || !name || !message) {
       return NextResponse.json(
-        { error: 'Missing required fields: email, name, message' },
-        { status: 400 }
+        apiError('Missing required fields: email, name, message', 'VALIDATION_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -54,8 +66,8 @@ export async function POST(request: NextRequest) {
     const captchaResult = await verifyCaptcha(captchaToken, 'contact_form')
     if (!captchaResult.success) {
       return NextResponse.json(
-        { error: 'Security verification failed. Please try again.' },
-        { status: 403 }
+        apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
+        { status: HTTP_STATUS.FORBIDDEN }
       )
     }
 
@@ -76,15 +88,11 @@ export async function POST(request: NextRequest) {
       ])
       .select()
 
-    // 🔥 DEBUG
-    console.log("Supabase Insert Result:", { data, error })
-
     if (error) {
-      console.error("Supabase ERROR:", error)
-
+      logError('POST /api/contacts - Supabase insert error', error, { email, name })
       return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
+        apiError(error.message, 'DATABASE_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
@@ -99,7 +107,7 @@ export async function POST(request: NextRequest) {
         })
       })
     } catch (notifError) {
-      console.error('Failed to send admin notification:', notifError)
+      logError('POST /api/contacts - Failed to send admin notification', notifError)
       // Don't fail the whole operation if notification fails
     }
 
@@ -128,18 +136,16 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: true, data },
-      { status: 201 }
+      apiSuccess(data),
+      { status: HTTP_STATUS.CREATED }
     )
 
-  } catch (error: any) {
-    console.error("SERVER ERROR:", error)
-
+  } catch (error) {
+    logError('POST /api/contacts', error, { email, name })
+    const errorDetail = handleApiError(error)
     return NextResponse.json(
-      {
-        error: error.message || 'Internal Server Error',
-      },
-      { status: 500 }
+      apiError(errorDetail.message, errorDetail.code),
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 }

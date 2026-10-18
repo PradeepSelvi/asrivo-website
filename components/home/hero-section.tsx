@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ShieldCheck, Globe, Zap, Users, Building2,Folder,CheckCircle  } from "lucide-react"
+import { ArrowRight, ShieldCheck, Globe, Users, Building2, Folder, CheckCircle } from "lucide-react"
 import { useScrollAnimation, useCountUp } from "@/hooks/use-scroll-animation"
 
 /**
@@ -99,7 +99,9 @@ function CompanyMetric({ value, suffix, label, icon: Icon }: { value: number; su
   )
 }
 
-export function HeroSection({ settings }: { settings?: Record<string, string> }) {
+import type { HomeContent } from "@/lib/supabase/content-helpers"
+
+export function HeroSection({ content }: { content: HomeContent }) {
   const [mounted, setMounted] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
@@ -115,11 +117,11 @@ export function HeroSection({ settings }: { settings?: Record<string, string> })
     return () => window.removeEventListener("mousemove", handleMove)
   }, [])
 
-  // Extract settings with fallbacks
-  const heroTitle = settings?.hero_title || "Building Tomorrow's Digital Solutions"
-  const heroSubtitle = settings?.hero_subtitle || 'Asrivo Tech develops resilient digital ecosystems for modern enterprises. We transform structural complexity into high-performance infrastructure components.'
-  const heroCTAPrimary = settings?.hero_cta_primary || 'Start Your Project'
-  const heroCTASecondary = settings?.hero_cta_secondary || 'View Our Work'
+  // Use HomeContent directly
+  const heroTitle = content.hero_title
+  const heroSubtitle = content.hero_subtitle
+  const heroCTAPrimary = content.hero_cta_primary
+  const heroCTASecondary = content.hero_cta_secondary
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -179,17 +181,17 @@ export function HeroSection({ settings }: { settings?: Record<string, string> })
             </div>
 
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-1000 delay-800 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-              <CompanyMetric value={7} suffix="" label="Our Core Service" icon={Building2} />
-              <CompanyMetric value={99.9} suffix=".9%" label="System Reliability" icon={Users} />
-              <CompanyMetric value={7} suffix="+" label="Technology Expertise" icon={CheckCircle} />
-              <CompanyMetric value={25} suffix="/7" label="Live Support" icon={Zap} />
+              <CompanyMetric value={parseInt(content.stats_projects) || 2} suffix="+" label="Completed Projects" icon={Folder} />
+              <CompanyMetric value={parseInt(content.stats_clients) || 2} suffix="+" label="Happy Clients" icon={Users} />
+              <CompanyMetric value={parseInt(content.stats_team) || 9} suffix="" label="Team Members" icon={Building2} />
+              <CompanyMetric value={parseInt(content.stats_experience) || 1} suffix="yr" label="Years of Experience" icon={CheckCircle} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 opacity-30">
-        <span className="text-[10px] font-black tracking-[0.5em] uppercase text-slate-400">Scroll Analytics</span>
+        <span className="text-[10px] font-black tracking-[0.5em] uppercase text-slate-400">Explore</span>
         <div className="w-[2px] h-16 rounded-full bg-gradient-to-b from-primary to-transparent animate-bounce-slow" />
       </div>
 

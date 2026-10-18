@@ -1,47 +1,47 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { TeamCard } from "@/components/team-card"
 import { ArrowRight, Linkedin, Github, Mail, MessageCircle } from "lucide-react"
 import { getTeamMembers } from "@/lib/supabase/actions"
+import { getTeamContent } from "@/lib/supabase/content-helpers"
 import { MobileBackButton } from "@/components/mobile-back-button"
+import { TeamCard } from "@/components/team-card"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
-export const metadata: Metadata = {
-  title: "Our Team - Asrivo Tech",
-  description: "Meet the talented professionals behind Asrivo Tech. Our leadership and engineering team is dedicated to delivering exceptional technology solutions.",
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getTeamContent()
+  return {
+    title: content.meta_title || "Our Team - Asrivo Tech",
+    description:
+      content.meta_description ||
+      content.hero_subtitle ||
+      "Meet the talented professionals behind Asrivo Tech.",
+    keywords: content.meta_keywords,
+  }
 }
 
 export default async function TeamPage() {
   const teamResult = await getTeamMembers()
+  let content
+  try {
+    content = await getTeamContent()
+  } catch (error) {
+    console.error("Error loading team page content:", error)
+    content = await getTeamContent()
+  }
   const teamMembers = teamResult.success ? teamResult.data || [] : []
 
-  // Filter active members only
-  const activeMembers = teamMembers.filter(member => member.active)
-
-  // Separate management and engineering/development team members
-  const managementKeywords = [
-    'management', 'manager', 'head', 'officer', 'ceo', 'cto', 'coo', 
-    'cfo', 'hr', 'founder', 'director', 'president', 'vp', 'chief',
-    'legal', 'marketing', 'operations', 'project manager'
-  ]
-
-  const managementTeam = activeMembers.filter(member =>
-    managementKeywords.some(keyword => 
-      member.position?.toLowerCase().includes(keyword)
-    )
-  )
-
-  const developmentTeam = activeMembers.filter(member =>
-    !managementTeam.includes(member)
-  )
+  const activeMembers = teamMembers.filter((member) => member.active)
+  const managementTeam = activeMembers.filter((member) => member.team_type === "management")
+  const developmentTeam = activeMembers.filter((member) => member.team_type !== "management")
 
   return (
     <div className="flex flex-col">
       <MobileBackButton />
-      
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
         <div className="absolute inset-0 -z-10">
@@ -50,14 +50,13 @@ export default async function TeamPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Our Team
+              {content.team_badge || "Our Team"}
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              Meet the Experts Behind Asrivo Tech
+              {content.hero_title}
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Our talented team of professionals combines deep technical expertise with a passion
-              for innovation to deliver exceptional solutions for our clients.
+              {content.hero_subtitle}
             </p>
           </div>
         </div>
@@ -69,16 +68,15 @@ export default async function TeamPage() {
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Leadership
+                {content.management_badge || "Leadership"}
               </span>
               <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                Management Team
+                {content.management_title}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Experienced leaders guiding our vision and strategy for success.
+                {content.management_description}
               </p>
             </div>
-
             <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {managementTeam.map((member) => (
                 <TeamCard
@@ -101,20 +99,19 @@ export default async function TeamPage() {
 
       {/* Development Team Section */}
       {developmentTeam.length > 0 && (
-        <section className={`py-20 lg:py-28 ${managementTeam.length > 0 ? 'bg-muted/30' : ''}`}>
+        <section className={`py-20 lg:py-28 ${managementTeam.length > 0 ? "bg-muted/30" : ""}`}>
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Development
+                {content.development_badge || "Engineers"}
               </span>
               <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                Our Technical Team
+                {content.development_title}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Meet the skilled developers building the next generation of digital solutions.
+                {content.development_description}
               </p>
             </div>
-
             <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {developmentTeam.map((member) => (
                 <TeamCard
@@ -141,10 +138,11 @@ export default async function TeamPage() {
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                Team Coming Soon
+                {content.empty_state_title || "Team Coming Soon"}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                We're building our team. Check back soon to meet our talented professionals!
+                {content.empty_state_description ||
+                  "We're building our team. Check back soon to meet our talented professionals!"}
               </p>
             </div>
           </div>
@@ -158,22 +156,21 @@ export default async function TeamPage() {
             <div className="rounded-2xl border border-border bg-background p-8 lg:p-12">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-                  Get in Touch with Asrivo Tech
+                  {content.company_contact_title || "Connect With Us"}
                 </h2>
                 <p className="mt-4 text-muted-foreground">
-                  Have a project in mind? We&apos;d love to hear from you.
+                  {content.company_contact_description || "Have a project in mind? We'd love to hear from you."}
                 </p>
               </div>
-
               <div className="mt-10 grid gap-6 sm:grid-cols-2">
                 <div className="flex items-center gap-4 rounded-lg border border-border bg-muted/30 p-4">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
                     <Mail className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <a href="mailto:info@asrivotech.com" className="font-medium text-foreground hover:text-primary">
-                      info@asrivotech.com
+                    <p className="text-sm text-muted-foreground">{content.company_contact_email_label || "Email"}</p>
+                    <a href={`mailto:${content.company_contact_email || "info@asrivotech.com"}`} className="font-medium text-foreground hover:text-primary">
+                      {content.company_contact_email || "info@asrivotech.com"}
                     </a>
                   </div>
                 </div>
@@ -182,13 +179,8 @@ export default async function TeamPage() {
                     <Linkedin className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">LinkedIn</p>
-                    <a
-                      href="https://linkedin.com/company/asrivotech"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-foreground hover:text-primary"
-                    >
+                    <p className="text-sm text-muted-foreground">{content.company_contact_linkedin_label || "LinkedIn"}</p>
+                    <a href={content.company_contact_linkedin || "https://linkedin.com/company/asrivotech"} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground hover:text-primary">
                       Asrivo Tech
                     </a>
                   </div>
@@ -198,13 +190,8 @@ export default async function TeamPage() {
                     <Github className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">GitHub</p>
-                    <a
-                      href="https://github.com/asrivotech"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-foreground hover:text-primary"
-                    >
+                    <p className="text-sm text-muted-foreground">{content.company_contact_github_label || "GitHub"}</p>
+                    <a href={content.company_contact_github || "https://github.com/asrivotech"} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground hover:text-primary">
                       @asrivotech
                     </a>
                   </div>
@@ -214,23 +201,17 @@ export default async function TeamPage() {
                     <MessageCircle className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">WhatsApp</p>
-                    <a
-                      href="https://wa.me/918125257537"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-foreground hover:text-primary"
-                    >
-                      +91 81252 57537
+                    <p className="text-sm text-muted-foreground">{content.company_contact_whatsapp_label || "WhatsApp"}</p>
+                    <a href={content.company_contact_whatsapp || "https://wa.me/919976422558"} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground hover:text-primary">
+                      +91 99764 22558
                     </a>
                   </div>
                 </div>
               </div>
-
               <div className="mt-8 text-center">
                 <Button size="lg" asChild>
                   <Link href="/contact">
-                    Contact Us
+                    {content.company_contact_button || "Get in Touch"}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -245,16 +226,16 @@ export default async function TeamPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl text-balance">
-              Want to Join Our Team?
+              {content.join_cta_title || "Want to Join Our Team?"}
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
-              We&apos;re always looking for talented individuals who are passionate about technology
-              and innovation. Check out our open positions.
+              {content.join_cta_description ||
+                "We're always looking for talented individuals who are passionate about technology and innovation."}
             </p>
             <div className="mt-8">
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/careers">
-                  View Open Positions
+                  {content.join_cta_button || "View Open Positions"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

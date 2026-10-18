@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { LogOut, User, Settings } from "lucide-react"
+import { LogOut, User, Settings, AlertCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
@@ -77,6 +77,14 @@ export function MobileAuthButtons({ onNavigate }: MobileAuthButtonsProps) {
         >
           <Settings className="h-5 w-5" />
           Settings
+        </Link>
+        <Link 
+          href="/complaints/new"
+          className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-semibold text-foreground bg-muted hover:bg-muted/80 rounded-xl transition-colors active:scale-98 touch-manipulation"
+          onClick={onNavigate}
+        >
+          <AlertCircle className="h-5 w-5" />
+          Raise a Complaint
         </Link>
         <button
           onClick={handleLogout}

@@ -111,10 +111,7 @@ export default async function DatabaseSettingsPage() {
 
           {/* Actions */}
           <div className="rounded-xl border border-border bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Backup & Export</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Use the Supabase dashboard to create database backups, export data, and run SQL queries.
-            </p>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Database Management</h2>
             <div className="flex flex-wrap gap-3">
               <Button variant="outline" size="sm" asChild>
                 <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">

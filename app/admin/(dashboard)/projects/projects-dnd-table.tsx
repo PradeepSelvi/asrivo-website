@@ -10,7 +10,7 @@ export default function ProjectsDndTable({ projects, isHigh }: { projects: any[]
   return (
     <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl">
       {/* Table Header - Hidden on mobile */}
-      <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[1fr_120px_90px_60px_100px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+      <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[1fr_130px_100px_80px_120px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
         <span>Project</span>
         <span>Category</span>
         <span>Status</span>
@@ -25,10 +25,10 @@ export default function ProjectsDndTable({ projects, isHigh }: { projects: any[]
         renderItem={(project) => (
           <>
             {/* Desktop View */}
-            <div className="hidden lg:grid grid-cols-[1fr_120px_90px_60px_100px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
-              <div>
+            <div className="hidden lg:grid grid-cols-[1fr_130px_100px_80px_120px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+              <div className="min-w-0 pr-4">
                 <p className="font-semibold text-foreground text-sm">{project.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{project.description}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">{project.description}</p>
               </div>
               <span className="text-xs font-medium bg-muted text-foreground px-2.5 py-1 rounded-full capitalize w-fit">
                 {project.category}

@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
     // Fetch new complaints
     const { data: complaints } = await supabase
       .from('complaints')
-      .select('id, name, email, complaint_type, created_at, status')
+      .select('id, name, email, category, created_at, status')
       .eq('status', 'new')
       .order('created_at', { ascending: false })
       .limit(20)
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
           id: `complaint-${complaint.id}`,
           type: 'complaint',
           title: `New Complaint: ${complaint.name}`,
-          message: `${complaint.complaint_type || 'General complaint'}`,
+          message: `${complaint.category || 'General complaint'}`,
           link: `/admin/complaints/${complaint.id}`,
           created_at: complaint.created_at,
           read: false

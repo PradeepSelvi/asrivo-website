@@ -1,32 +1,20 @@
 "use client"
 
+import React from "react"
 import { Users, Shield, Zap, HeartHandshake } from "lucide-react"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
+import type { HomeContent } from "@/lib/supabase/content-helpers"
 
-const reasons = [
-  {
-    icon: Users,
-    title: "Expert Team",
-    description: "Our team consists of highly skilled developers, designers, and strategists with proven track records in delivering complex projects.",
-  },
-  {
-    icon: Shield,
-    title: "Secure & Scalable",
-    description: "We build solutions with enterprise-grade security and architecture that scales with your business growth.",
-  },
-  {
-    icon: Zap,
-    title: "Agile Development",
-    description: "Our agile methodology ensures faster delivery, continuous feedback, and flexibility to adapt to changing requirements.",
-  },
-  {
-    icon: HeartHandshake,
-    title: "Long-Term Support",
-    description: "We provide ongoing maintenance and support to ensure your solutions continue to perform optimally.",
-  },
-]
+const reasonIcons = [Users, Shield, Zap, HeartHandshake]
 
-function ReasonCard({ reason, index }: { reason: typeof reasons[0]; index: number }) {
+interface ReasonCardProps {
+  icon: React.ElementType
+  title: string
+  description: string
+  index: number
+}
+
+function ReasonCard({ icon: Icon, title, description, index }: ReasonCardProps) {
   const { ref, isVisible } = useScrollAnimation(0.2)
 
   return (
@@ -44,21 +32,36 @@ function ReasonCard({ reason, index }: { reason: typeof reasons[0]; index: numbe
 
       <div className="relative z-10">
         <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary-foreground/20 transition-all duration-500 group-hover:bg-primary-foreground/30 group-hover:scale-110 group-hover:rotate-3">
-          <reason.icon className="h-8 w-8 text-primary-foreground transition-transform duration-500 group-hover:scale-110" />
+          <Icon className="h-8 w-8 text-primary-foreground transition-transform duration-500 group-hover:scale-110" />
         </div>
         <h3 className="mt-6 text-xl font-semibold text-primary-foreground">
-          {reason.title}
+          {title}
         </h3>
         <p className="mt-3 text-primary-foreground/80 leading-relaxed">
-          {reason.description}
+          {description}
         </p>
       </div>
     </div>
   )
 }
 
-export function WhyChooseUs() {
+interface WhyChooseUsProps {
+  content?: HomeContent
+}
+
+export function WhyChooseUs({ content }: WhyChooseUsProps) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
+
+  const badge = content?.why_choose_badge ?? 'Why Choose Us'
+  const title = content?.why_choose_title ?? 'What Sets Us Apart'
+  const subtitle = content?.why_choose_subtitle ?? 'We combine technical excellence with a client-first approach to deliver exceptional results.'
+
+  const reasons = [
+    { title: content?.why_choose_reason_1_title ?? 'Expert Team', description: content?.why_choose_reason_1_desc ?? 'Our team consists of highly skilled developers, designers, and strategists with proven track records in delivering complex projects.' },
+    { title: content?.why_choose_reason_2_title ?? 'Secure & Scalable', description: content?.why_choose_reason_2_desc ?? 'We build solutions with enterprise-grade security and architecture that scales with your business growth.' },
+    { title: content?.why_choose_reason_3_title ?? 'Agile Development', description: content?.why_choose_reason_3_desc ?? 'Our agile methodology ensures faster delivery, continuous feedback, and flexibility to adapt to changing requirements.' },
+    { title: content?.why_choose_reason_4_title ?? 'Long-Term Support', description: content?.why_choose_reason_4_desc ?? 'We provide ongoing maintenance and support to ensure your solutions continue to perform optimally.' },
+  ]
 
   return (
     <section className="bg-primary py-24 lg:py-32 relative overflow-hidden">
@@ -78,25 +81,25 @@ export function WhyChooseUs() {
         >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary-foreground/80 uppercase tracking-wider px-4 py-1.5 bg-primary-foreground/10 rounded-full">
             <div className="w-2 h-2 rounded-full bg-primary-foreground/60 animate-pulse" />
-            Why Choose Us
+            {badge}
           </span>
           <h2 className="mt-6 text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl text-balance">
-            What Sets Us{" "}
-            <span className="relative">
-              Apart
-              <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0,5 Q25,0 50,5 T100,5" stroke="currentColor" strokeWidth="2" fill="none" className="text-primary-foreground/40" />
-              </svg>
-            </span>
+            {title}
           </h2>
           <p className="mt-6 text-lg text-primary-foreground/80 leading-relaxed">
-            We combine technical excellence with a client-first approach to deliver exceptional results.
+            {subtitle}
           </p>
         </div>
 
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {reasons.map((reason, index) => (
-            <ReasonCard key={reason.title} reason={reason} index={index} />
+            <ReasonCard
+              key={reason.title}
+              icon={reasonIcons[index]}
+              title={reason.title}
+              description={reason.description}
+              index={index}
+            />
           ))}
         </div>
       </div>
