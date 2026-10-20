@@ -180,8 +180,8 @@ export default function BookConsultPage() {
                   </p>
                   <p className="text-sm text-muted-foreground text-center">
                     Prefer email? Reach us at{" "}
-                    <a href="mailto:info@asrivotech.com" className="text-primary hover:underline">
-                      info@asrivotech.com
+                    <a href="mailto:info@asrivotech.in" className="text-primary hover:underline">
+                      info@asrivotech.in
                     </a>
                   </p>
                 </div>

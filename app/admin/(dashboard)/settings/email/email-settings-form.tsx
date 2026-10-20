@@ -79,9 +79,9 @@ export function EmailSettingsForm({ initialSettings }: EmailSettingsFormProps) {
               <input
                 type="email"
                 name="smtp_from_email"
-                defaultValue={initialSettings.smtp_from_email || 'noreply@asrivotech.com'}
+                defaultValue={initialSettings.smtp_from_email || 'noreply@asrivotech.in'}
                 className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="noreply@asrivotech.com"
+                placeholder="noreply@asrivotech.in"
               />
             </div>
           </div>

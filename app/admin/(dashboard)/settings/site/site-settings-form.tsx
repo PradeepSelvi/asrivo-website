@@ -120,7 +120,7 @@ export function SiteSettingsForm({ initialSettings }: SiteSettingsFormProps) {
             <input
               type="email"
               name="contact_email"
-              defaultValue={initialSettings.contact_email || "contact@asrivotech.com"}
+              defaultValue={initialSettings.contact_email || "contact@asrivotech.in"}
               className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               placeholder="your@email.com"
             />
@@ -173,7 +173,7 @@ export function SiteSettingsForm({ initialSettings }: SiteSettingsFormProps) {
               <input
                 type="email"
                 name="support_email"
-                defaultValue={initialSettings.support_email || "support@asrivotech.com"}
+                defaultValue={initialSettings.support_email || "support@asrivotech.in"}
                 className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>

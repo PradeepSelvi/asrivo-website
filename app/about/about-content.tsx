@@ -124,10 +124,21 @@ export function AboutContent({ content }: AboutContentProps) {
               About
             </div>
             <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 leading-[0.9]">
-              Engineering <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400 animate-text-gradient">
-                Digital Innovation
-              </span>
+              {content.hero_title ? (
+                <>
+                  {content.hero_title.split(' ').slice(0, -2).join(' ')} <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400 animate-text-gradient">
+                    {content.hero_title.split(' ').slice(-2).join(' ')}
+                  </span>
+                </>
+              ) : (
+                <>
+                  Engineering <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400 animate-text-gradient">
+                    Digital Innovation
+                  </span>
+                </>
+              )}
             </h1>
             <p className="mt-8 text-xl text-slate-600 leading-relaxed font-medium">
               {content.hero_subtitle}
@@ -187,32 +198,32 @@ export function AboutContent({ content }: AboutContentProps) {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-blue-600 font-bold uppercase tracking-widest text-xs">Our Journey</span>
-            <h2 className="mt-4 text-4xl font-bold text-slate-900">From Vision to Reality</h2>
+            <h2 className="mt-4 text-4xl font-bold text-slate-900">{content.journey_title || "From Vision to Reality"}</h2>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                year: "2024",
-                title: "The Beginning",
-                desc: "Started as a freelance technology initiative, collaborating with students on real-world technology projects and helping them gain practical industry experience."
+                year: content.journey_milestone_1_year || "2024",
+                title: content.journey_milestone_1_title || "The Beginning",
+                desc: content.journey_milestone_1_desc || "Started as a freelance technology initiative, collaborating with students on real-world technology projects and helping them gain practical industry experience."
               },
               {
-                year: "2025",
-                title: "Team Growth",
-                desc: "Expanded our vision by building a structured team, launching training programs, and strengthening expertise across multiple technology domains."
+                year: content.journey_milestone_2_year || "2025",
+                title: content.journey_milestone_2_title || "Team Growth",
+                desc: content.journey_milestone_2_desc || "Expanded our vision by building a structured team, launching training programs, and strengthening expertise across multiple technology domains."
               },
               {
-                year: "2026",
-                title: "Official Launch",
-                desc: "Officially established as both a Product-Based and Service-Based company, delivering innovative technology solutions and Digital Marketing services worldwide."
+                year: content.journey_milestone_3_year || "2026",
+                title: content.journey_milestone_3_title || "Official Launch",
+                desc: content.journey_milestone_3_desc || "Officially established as both a Product-Based and Service-Based company, delivering innovative technology solutions and Digital Marketing services worldwide."
               },
               {
-                year: "Future",
-                title: "Global Expansion",
-                desc: "Building AI-powered products, expanding globally, and creating opportunities for the next generation of technology professionals."
+                year: content.journey_milestone_4_year || "Future",
+                title: content.journey_milestone_4_title || "Global Expansion",
+                desc: content.journey_milestone_4_desc || "Building AI-powered products, expanding globally, and creating opportunities for the next generation of technology professionals."
               }
-            ].map((milestone, idx) => (
+            ].map((milestone) => (
               <div key={milestone.year} className="relative p-8 rounded-2xl bg-white border border-slate-100 shadow-lg hover:-translate-y-2 transition-transform duration-500">
                 <div className="absolute -top-4 left-8 px-4 py-1 rounded-full bg-blue-600 text-white font-bold text-sm">
                   {milestone.year}
@@ -229,7 +240,7 @@ export function AboutContent({ content }: AboutContentProps) {
       <section className="py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900">Our Foundation</h2>
+            <h2 className="text-4xl font-bold text-slate-900">{content.foundation_title || "Our Foundation"}</h2>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-3">
@@ -247,7 +258,7 @@ export function AboutContent({ content }: AboutContentProps) {
               { 
                 icon: Heart, 
                 title: content.values_title, 
-                desc: "Innovation • Integrity • Quality • Customer Success • Collaboration • Continuous Learning" 
+                desc: content.values_description || "Innovation • Integrity • Quality • Customer Success • Collaboration • Continuous Learning" 
               }
             ].map((pillar) => (
               <div key={pillar.title} className="p-10 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-blue-900/5 hover:-translate-y-2 transition-transform duration-500">
@@ -295,18 +306,18 @@ export function AboutContent({ content }: AboutContentProps) {
           <div className="relative text-center p-12 lg:p-24 rounded-[3rem] bg-blue-600 text-white overflow-hidden shadow-2xl">
             <Quote className="absolute top-10 left-10 w-20 h-20 text-white/10 rotate-12" />
             <div className="relative z-10">
-              <span className="text-blue-200 font-bold uppercase tracking-widest text-xs">Founder's Message</span>
+              <span className="text-blue-200 font-bold uppercase tracking-widest text-xs">{content.leadership_quote_badge || "Founder's Message"}</span>
               <p className="mt-6 text-2xl lg:text-3xl font-medium leading-relaxed mb-10">
-                &ldquo;We believe technology should solve real business challenges while creating opportunities for future talent. Our mission is to build innovative products, deliver exceptional services, and empower businesses to grow in the digital era.&rdquo;
+                &ldquo;{content.leadership_quote_text || "We believe technology should solve real business challenges while creating opportunities for future talent. Our mission is to build innovative products, deliver exceptional services, and empower businesses to grow in the digital era."}&rdquo;
               </p>
-              <div className="flex items-center justify-center gap-4">
-               {/* <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold">PK</div>*/}
-                <div className="text-left">
-                 {/*founder name
-                  <div className="font-bold">Pradeep Kumar</div>
-                  <div className="text-xs text-blue-200">Founder, Asrivo Tech</div>*/}
+              {(content.leadership_quote_author_name || content.leadership_quote_author_title) && (
+                <div className="flex items-center justify-center gap-4">
+                  <div className="text-center">
+                    {content.leadership_quote_author_name && <div className="font-bold text-lg">{content.leadership_quote_author_name}</div>}
+                    {content.leadership_quote_author_title && <div className="text-xs text-blue-200">{content.leadership_quote_author_title}</div>}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -317,12 +328,12 @@ export function AboutContent({ content }: AboutContentProps) {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-20">
             <div className="space-y-8">
-              <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Enterprise Overview</h2>
+              <h2 className="text-4xl font-bold text-slate-900 tracking-tight">{content.profile_title || "Enterprise Overview"}</h2>
               <div className="grid gap-4">
                 {[
-                   { i: Building2, l: "Entity", v: "Asrivo Tech Solutions Inc." },
-                   { i: Award, l: "Sector", v: "Enterprise Software & Cloud Services" },
-                   { i: ShieldCheck, l: "Compliance", v: "Secure Software Development Practices" }
+                   { i: Building2, l: content.profile_entity_label || "Entity", v: content.profile_entity_value || "Asrivo Tech Solutions Inc." },
+                   { i: Award, l: content.profile_sector_label || "Sector", v: content.profile_sector_value || "Enterprise Software & Cloud Services" },
+                   { i: ShieldCheck, l: content.profile_compliance_label || "Compliance", v: content.profile_compliance_value || "Secure Software Development Practices" }
                 ].map((item) => (
                   <div key={item.l} className="flex items-center gap-6 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm">
                     <item.i className="w-6 h-6 text-blue-600" />
@@ -347,17 +358,15 @@ export function AboutContent({ content }: AboutContentProps) {
          
          <div>
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-400 mb-3">
-               Strategic Collaboration
+               {content.partnership_badge || "Strategic Collaboration"}
             </p>
 
             <h3 className="text-3xl font-bold leading-tight">
-               Digital Marketing Partnership
+               {content.partnership_title || "Digital Marketing Partnership"}
             </h3>
 
             <p className="mt-4 text-slate-400 max-w-xl leading-relaxed">
-               Asrivo Tech collaborates with leading digital marketing agencies
-               to deliver complete business growth solutions including branding,
-               advertising, SEO, social media management, and performance marketing.
+               {content.partnership_description || "Asrivo Tech collaborates with leading digital marketing agencies to deliver complete business growth solutions including branding, advertising, SEO, social media management, and performance marketing."}
             </p>
          </div>
 
@@ -372,37 +381,37 @@ export function AboutContent({ content }: AboutContentProps) {
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
             <h4 className="font-semibold text-lg">
-               Performance Marketing
+               {content.partnership_service_1_title || "Performance Marketing"}
             </h4>
             <p className="text-sm text-slate-400 mt-1">
-               Paid campaigns & lead generation
+               {content.partnership_service_1_desc || "Paid campaigns & lead generation"}
             </p>
          </div>
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
             <h4 className="font-semibold text-lg">
-               SEO Optimization
+               {content.partnership_service_2_title || "SEO Optimization"}
             </h4>
             <p className="text-sm text-slate-400 mt-1">
-               Improve search visibility & ranking
+               {content.partnership_service_2_desc || "Improve search visibility & ranking"}
             </p>
          </div>
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
             <h4 className="font-semibold text-lg">
-               Social Media Branding
+               {content.partnership_service_3_title || "Social Media Branding"}
             </h4>
             <p className="text-sm text-slate-400 mt-1">
-               Build audience engagement & reach
+               {content.partnership_service_3_desc || "Build audience engagement & reach"}
             </p>
          </div>
 
          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
             <h4 className="font-semibold text-lg">
-               Growth Strategy
+               {content.partnership_service_4_title || "Growth Strategy"}
             </h4>
             <p className="text-sm text-slate-400 mt-1">
-               Scalable digital business solutions
+               {content.partnership_service_4_desc || "Scalable digital business solutions"}
             </p>
          </div>
 
@@ -413,7 +422,7 @@ export function AboutContent({ content }: AboutContentProps) {
 
          <div>
             <p className="text-slate-400 text-sm">
-               Combining software innovation with digital marketing excellence.
+               {content.partnership_footer_text || "Combining software innovation with digital marketing excellence."}
             </p>
          </div>
 
@@ -424,7 +433,7 @@ export function AboutContent({ content }: AboutContentProps) {
                asChild
             >
                <Link href="/partnership/status">
-                  Check Status
+                  {content.partnership_cta_status || "Check Status"}
                   <Eye className="ml-2 w-4 h-4" />
                </Link>
             </Button>
@@ -434,7 +443,7 @@ export function AboutContent({ content }: AboutContentProps) {
                asChild
             >
                <Link href="/partnership">
-                  Start Partnership
+                  {content.partnership_cta_start || "Start Partnership"}
                   <ArrowRight className="ml-2 w-4 h-4" />
                </Link>
             </Button>

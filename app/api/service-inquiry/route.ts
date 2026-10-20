@@ -3,16 +3,28 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyCaptcha } from '@/lib/utils/captcha'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
+import { serviceInquirySchema } from '@/lib/utils/validation'
+import { ZodError } from 'zod'
+import { apiSuccess, apiError } from '@/lib/types/api'
+import { HTTP_STATUS } from '@/lib/constants'
+import { logError } from '@/lib/utils/error-handler'
 
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, formSubmitRateLimit)
   if (limited) return limited
 
+  let email: string | undefined
+  let name: string | undefined
+
   try {
     const body = await request.json()
+
+    // ✅ Zod Validation
+    const validatedData = serviceInquirySchema.parse(body)
+    
+    email = validatedData.email
+    name = validatedData.name
     const {
-      email,
-      name,
       company,
       phone,
       service_type,
@@ -20,39 +32,14 @@ export async function POST(request: NextRequest) {
       timeline,
       budget,
       captchaToken,
-    } = body
-
-    // Validate required fields
-    if (!email || !name || !company || !service_type) {
-      return NextResponse.json(
-        { error: 'Missing required fields: email, name, company, service_type' },
-        { status: 400 }
-      )
-    }
+    } = validatedData
 
     // 🤖 CAPTCHA Verification
     const captchaResult = await verifyCaptcha(captchaToken, 'service_inquiry')
     if (!captchaResult.success) {
       return NextResponse.json(
-        { error: 'Security verification failed. Please try again.' },
-        { status: 403 }
-      )
-    }
-
-    // Validate service type
-    const validServiceTypes = [
-      'software-dev',
-      'web-app',
-      'mobile-app',
-      'cloud-devops',
-      'ai-automation',
-      'it-consulting',
-    ]
-
-    if (!validServiceTypes.includes(service_type)) {
-      return NextResponse.json(
-        { error: `Invalid service type. Must be one of: ${validServiceTypes.join(', ')}` },
-        { status: 400 }
+        apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
+        { status: HTTP_STATUS.FORBIDDEN }
       )
     }
 
@@ -84,26 +71,31 @@ export async function POST(request: NextRequest) {
       .select()
 
     if (error) {
+      logError('POST /api/service-inquiry - Supabase error', error, { email, name })
       return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
+        apiError('Failed to submit inquiry', 'DATABASE_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
     return NextResponse.json(
-      { 
-        success: true, 
-        message: 'Service inquiry submitted successfully',
-        data 
-      },
-      { status: 201 }
+      apiSuccess(data, 'Service inquiry submitted successfully'),
+      { status: HTTP_STATUS.CREATED }
     )
   } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof ZodError) {
+      const firstError = error.errors[0]
+      return NextResponse.json(
+        apiError(`Validation failed: ${firstError.path.join('.')}: ${firstError.message}`, 'VALIDATION_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
+      )
+    }
+
+    logError('POST /api/service-inquiry', error, { email, name })
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
+      apiError('An error occurred processing your request', 'INTERNAL_SERVER_ERROR'),
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 }

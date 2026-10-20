@@ -20,9 +20,13 @@ export const COMPANY = {
       href: 'tel:+919976422558',
     },
     email: {
-      primary: 'info@asrivotech.com',
-      support: 'support@asrivotech.com',
-      careers: 'careers@asrivotech.com',
+      primary: 'info@asrivotech.in',
+      support: 'support@asrivotech.in',
+      careers: 'careers@asrivotech.in',
+      media: 'media@asrivotech.in',
+      cto: 'cto@asrivotech.in',
+      hr_team: 'hr_team@asrivotech.in',
+      noreplay: 'noreplay@asrivotech.in',
     },
     address: {
       street: '', // TODO: Add full street address
@@ -45,7 +49,7 @@ export const COMPANY = {
     github: 'https://github.com/asrivotech',
     twitter: 'https://x.com/asrivotech', // Updated to x.com
     instagram: 'https://instagram.com/asrivotech',
-    email: 'mailto:info@asrivotech.com',
+    email: 'mailto:info@asrivotech.in',
   },
 
   // Business information

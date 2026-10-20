@@ -227,7 +227,7 @@ export function ConsultationStatusChecker() {
             <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
               <p className="text-sm text-blue-600">
                 💡 Check your email regularly for updates about your consultation. If you have any questions, 
-                contact us at <a href="mailto:info@asrivotech.com" className="underline">info@asrivotech.com</a>
+                contact us at <a href="mailto:info@asrivotech.in" className="underline">info@asrivotech.in</a>
               </p>
             </div>
           </div>

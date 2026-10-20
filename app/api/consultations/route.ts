@@ -3,22 +3,28 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createClient } from '@supabase/supabase-js'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
+import { consultationSchema } from '@/lib/utils/validation'
+import { ZodError } from 'zod'
+import { apiSuccess, apiError } from '@/lib/types/api'
+import { HTTP_STATUS } from '@/lib/constants'
+import { logError } from '@/lib/utils/error-handler'
 
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, formSubmitRateLimit)
   if (limited) return limited
 
+  let email: string | undefined
+  let name: string | undefined
+
   try {
     const body = await request.json()
-    const { name, email, phone, whatsapp, availability, preferredMode, message } = body
-
-    // Validate required fields
-    if (!name || !email || !phone || !availability || !preferredMode || preferredMode.length === 0) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
+    
+    // ✅ Zod Validation
+    const validatedData = consultationSchema.parse(body)
+    
+    name = validatedData.name
+    email = validatedData.email
+    const { phone, whatsapp, availability, preferredMode, message } = validatedData
 
     // Use anon client for public submissions
     const supabase = createClient(
@@ -45,15 +51,10 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Database error details:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      })
+      logError('POST /api/consultations - Database error', error, { email, name })
       return NextResponse.json(
-        { error: 'Failed to save consultation request', details: error.message },
-        { status: 500 }
+        apiError('Failed to save consultation request', 'DATABASE_ERROR'),
+        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
       )
     }
 
@@ -61,14 +62,23 @@ export async function POST(request: NextRequest) {
     // TODO: Send notification email to admin
 
     return NextResponse.json(
-      { success: true, data },
-      { status: 201 }
+      apiSuccess(data, 'Consultation request submitted successfully'),
+      { status: HTTP_STATUS.CREATED }
     )
   } catch (error) {
-    console.error('Error processing consultation request:', error)
+    // Handle Zod validation errors
+    if (error instanceof ZodError) {
+      const firstError = error.errors[0]
+      return NextResponse.json(
+        apiError(`Validation failed: ${firstError.path.join('.')}: ${firstError.message}`, 'VALIDATION_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
+      )
+    }
+
+    logError('POST /api/consultations', error, { email, name })
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      apiError('An error occurred processing your request', 'INTERNAL_SERVER_ERROR'),
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 }

@@ -49,32 +49,42 @@ export function useParallax(speed = 0.5) {
 
 export function useCountUp(end: number, duration = 2000, start = 0) {
   const [count, setCount] = useState(start)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const isAnimatingRef = useRef(false)
+  const hasAnimatedRef = useRef(false)
+
+  // Keep count updated if end prop changes after animation completed
+  useEffect(() => {
+    if (hasAnimatedRef.current && !isAnimatingRef.current) {
+      setCount(end)
+    }
+  }, [end])
 
   const startAnimation = useCallback(() => {
-    if (isAnimating) return
-    setIsAnimating(true)
+    if (isAnimatingRef.current || hasAnimatedRef.current) return
+    isAnimatingRef.current = true
+    hasAnimatedRef.current = true
 
-    const startTime = Date.now()
-    const animate = () => {
-      const elapsed = Date.now() - startTime
+    const startTime = performance.now()
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
-      
-      // Easing function (ease-out-expo)
-      const easeOutExpo = 1 - Math.pow(2, -10 * progress)
-      const currentCount = Math.floor(start + (end - start) * easeOutExpo)
+
+      if (progress >= 1) {
+        setCount(end)
+        isAnimatingRef.current = false
+        return
+      }
+
+      // Smooth cubic ease-out curve
+      const easeOut = 1 - Math.pow(1 - progress, 3)
+      const currentCount = Math.min(end, Math.max(start, Math.round(start + (end - start) * easeOut)))
       
       setCount(currentCount)
-
-      if (progress < 1) {
-        requestAnimationFrame(animate)
-      } else {
-        setIsAnimating(false)
-      }
+      requestAnimationFrame(animate)
     }
 
     requestAnimationFrame(animate)
-  }, [end, duration, start, isAnimating])
+  }, [end, duration, start])
 
   return { count, startAnimation }
 }

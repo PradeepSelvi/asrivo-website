@@ -5,7 +5,7 @@
  * INSTRUCTIONS:
  * - Use Title Case for names (e.g., "Sivaganesh J")
  * - Qualifications go after a comma (e.g., "Pradeep Kumar M, DCSE")
- * - Use company email addresses (@asrivotech.com)
+ * - Use company email addresses (@asrivotech.in)
  * - Match photo filenames to name (lowercase-with-hyphens.jpeg)
  * - Role title should match description content
  */
@@ -29,7 +29,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Sargunan leads Asrivo Tech with a strategic vision for innovation and growth. With extensive experience in technology leadership, he drives the company\'s mission to deliver cutting-edge digital solutions.',
     image: '/team/sargunan.jpeg',
-    email: 'sargunan@asrivotech.com', // Replace with company email
+    email: 'sargunan@asrivotech.in', // Company email
     linkedin: '',
     order: 1,
   },
@@ -40,7 +40,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Aswin oversees HR, administration, and finance operations. He ensures organizational excellence in talent management, employee development, and operational efficiency.',
     image: '/team/aswin.jpeg',
-    email: 'aswin@asrivotech.com',
+    email: 'aswin@asrivotech.in',
     linkedin: '',
     order: 2,
   },
@@ -51,7 +51,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Pradeep manages legal affairs, regulatory compliance, and risk management. He ensures the company operates within legal frameworks and maintains strong governance standards.',
     image: '/team/pradeep.jpeg',
-    email: 'pradeep@asrivotech.com',
+    email: 'pradeep@asrivotech.in',
     linkedin: '',
     order: 3,
   },
@@ -62,7 +62,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Sivaganesh drives our digital marketing initiatives, specializing in SEO and SMO strategies. He helps clients achieve online visibility and measurable growth through data-driven campaigns.',
     image: '/team/sivaganesh-j.jpeg', // Rename file to match
-    email: 'sivaganesh@asrivotech.com',
+    email: 'sivaganesh@asrivotech.in',
     linkedin: '',
     order: 4,
   },
@@ -73,7 +73,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Krishna manages client projects and leads frontend development efforts. He ensures timely delivery and high-quality code while coordinating between design, development, and client teams.',
     image: '/team/krishnakumar.jpeg', // Filename uses "krishna"
-    email: 'krishna@asrivotech.com', // Email uses "krishna"
+    email: 'krishna@asrivotech.in', // Email uses "krishna"
     linkedin: '',
     order: 5,
   },
@@ -84,7 +84,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Dhanushraj specializes in server-side development, database architecture, and API design. He builds robust backend systems that power our client applications.',
     image: '/team/dhanushraj.jpeg',
-    email: 'dhanushraj@asrivotech.com',
+    email: 'dhanushraj@asrivotech.in',
     linkedin: '',
     order: 6,
   },
@@ -95,7 +95,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Karthik works across the entire technology stack, building end-to-end solutions. His versatility enables him to contribute to both frontend and backend development.',
     image: '/team/karthik-rajalee.jpeg', // Rename file to match
-    email: 'karthik@asrivotech.com',
+    email: 'karthik@asrivotech.in',
     linkedin: '',
     order: 7,
   },
@@ -106,7 +106,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Siranjeevi develops comprehensive web applications using modern frameworks. He delivers complete solutions from database to user interface.',
     image: '/team/siranjeevi.jpeg',
-    email: 'siranjeevi@asrivotech.com',
+    email: 'siranjeevi@asrivotech.in',
     linkedin: '',
     order: 8,
   },
@@ -117,7 +117,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Krishnamoorthi builds scalable web applications with expertise in both frontend and backend technologies. He delivers efficient, maintainable code for complex projects.',
     image: '/team/krishnamoorthi.jpeg',
-    email: 'krishnamoorthi@asrivotech.com',
+    email: 'krishnamoorthi@asrivotech.in',
     linkedin: '',
     order: 9,
   },
@@ -128,7 +128,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     description:
       'Dhanuvel contributes to full-stack development projects, working with modern web technologies to create seamless user experiences backed by solid server architecture.',
     image: '/team/dhanuvel.jpeg',
-    email: 'dhanuvel@asrivotech.com',
+    email: 'dhanuvel@asrivotech.in',
     linkedin: '',
     order: 10,
   },

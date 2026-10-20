@@ -33,7 +33,7 @@ const navigation = {
 const defaultSettings = {
   site_name: 'Asrivo Tech',
   site_tagline: "TURNING IDEAS INTO INTELLIGENT SOLUTIONS",
-  contact_email: 'info@asrivotech.com',
+  contact_email: 'info@asrivotech.in',
   contact_phone: '+91 99764 22558',
   contact_address: 'Madurai, Tamil Nadu, India',
   social_linkedin: 'https://linkedin.com/company/asrivotech',

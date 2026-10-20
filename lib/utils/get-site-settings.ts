@@ -128,11 +128,11 @@ function getDefaultSettings() {
     site_keywords: 'software development, web design, mobile apps',
     
     // Contact Information
-    contact_email: 'info@asrivotech.com',
+    contact_email: 'info@asrivotech.in',
     contact_phone: '+91 99764 22558',
     contact_address: 'Madurai, Tamil Nadu, India',
     business_hours: 'Mon-Sat: 9AM-6PM',
-    support_email: 'support@asrivotech.com',
+    support_email: 'support@asrivotech.in',
     
     // Social Media
     social_linkedin: 'https://linkedin.com/company/asrivotech',

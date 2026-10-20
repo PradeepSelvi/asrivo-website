@@ -172,7 +172,7 @@ INSERT INTO public.team_members (
 ) VALUES
   -- Sivaganesh.J
   (
-    'sivaganesh.J',
+    'SIVAGANESH.J',
     'Team Lead, Database, Backend',
     'Leading the team, backend and database optimization initiatives for robust, scalable application infrastructure.',
     '/team/sivaganesh j.jpeg',

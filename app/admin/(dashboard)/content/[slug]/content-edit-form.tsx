@@ -626,6 +626,16 @@ function AboutFields({ register }: { register: any}) {
           <Input id="values_title" {...register('values_title')} placeholder="Our Values" />
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="values_description">Values Description</Label>
+          <Textarea
+            id="values_description"
+            {...register('values_description')}
+            placeholder="Innovation • Integrity • Quality • Customer Success • Collaboration • Continuous Learning"
+            rows={2}
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="founded_year">Founded Year</Label>
@@ -967,6 +977,55 @@ function ServicesFields({ register }: { register: any }) {
             rows={3}
           />
         </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Services (1 - 8)</h3>
+        <p className="text-sm text-muted-foreground">Manage the 8 core service offerings displayed on the Services page.</p>
+
+        {[
+          { num: 1, defaultTitle: 'Custom Software Development' },
+          { num: 2, defaultTitle: 'Web Application Development' },
+          { num: 3, defaultTitle: 'Mobile Application Development' },
+          { num: 4, defaultTitle: 'Cloud & DevOps Solutions' },
+          { num: 5, defaultTitle: 'Web Hosting' },
+          { num: 6, defaultTitle: 'Enterprise IT Consulting' },
+          { num: 7, defaultTitle: 'Digital Marketing' },
+          { num: 8, defaultTitle: 'Product Engineering' },
+        ].map((svc) => (
+          <div key={svc.num} className="p-4 rounded-xl border border-border bg-card space-y-4">
+            <h4 className="text-md font-semibold text-foreground">Service {svc.num}: {svc.defaultTitle}</h4>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`service_${svc.num}_title`}>Title</Label>
+              <Input id={`service_${svc.num}_title`} {...register(`service_${svc.num}_title`)} placeholder={svc.defaultTitle} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={`service_${svc.num}_description`}>Description</Label>
+              <Textarea id={`service_${svc.num}_description`} {...register(`service_${svc.num}_description`)} rows={2} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor={`service_${svc.num}_feature_1`}>Feature 1</Label>
+                <Input id={`service_${svc.num}_feature_1`} {...register(`service_${svc.num}_feature_1`)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`service_${svc.num}_feature_2`}>Feature 2</Label>
+                <Input id={`service_${svc.num}_feature_2`} {...register(`service_${svc.num}_feature_2`)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`service_${svc.num}_feature_3`}>Feature 3</Label>
+                <Input id={`service_${svc.num}_feature_3`} {...register(`service_${svc.num}_feature_3`)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`service_${svc.num}_feature_4`}>Feature 4</Label>
+                <Input id={`service_${svc.num}_feature_4`} {...register(`service_${svc.num}_feature_4`)} />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
@@ -1433,6 +1492,22 @@ function ProjectsFields({ register }: { register: any }) {
           <div className="space-y-2">
             <Label htmlFor="stats_active_value">Happy Clients Value</Label>
             <Input id="stats_active_value" {...register('stats_active_value')} placeholder="2" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats_community_label">Community Label</Label>
+            <Input id="stats_community_label" {...register('stats_community_label')} placeholder="Developer Community" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats_community_value">Community Value</Label>
+            <Input id="stats_community_value" {...register('stats_community_value')} placeholder="10+" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats_quality_label">Quality Commitment Label</Label>
+            <Input id="stats_quality_label" {...register('stats_quality_label')} placeholder="Commitment to Quality" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats_quality_value">Quality Commitment Value</Label>
+            <Input id="stats_quality_value" {...register('stats_quality_value')} placeholder="100%" />
           </div>
         </div>
       </div>

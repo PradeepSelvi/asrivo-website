@@ -110,6 +110,7 @@ export interface AboutContent {
   vision_title: string
   vision_description: string
   values_title: string
+  values_description: string
   founded_year: string
   team_size: string
   projects_completed: string
@@ -322,6 +323,12 @@ export interface ContactContent {
   contact_twitter: string
   contact_instagram: string
   
+  // Additional Company Email Addresses
+  media_email: string
+  cto_email: string
+  hr_team_email: string
+  noreplay_email: string
+  
   // Complaint Section
   complaint_title: string
   complaint_description: string
@@ -356,6 +363,10 @@ export interface ProjectsContent {
   stats_total_value: string
   stats_active_label: string
   stats_active_value: string
+  stats_community_label: string
+  stats_community_value: string
+  stats_quality_label: string
+  stats_quality_value: string
   
   // Buttons and Labels
   button_view_all: string
@@ -559,6 +570,7 @@ const DEFAULT_ABOUT_CONTENT: AboutContent = {
   vision_title: 'Our Vision',
   vision_description: 'To be the most trusted technology partner for businesses worldwide, known for exceptional quality and innovation.',
   values_title: 'Our Values',
+  values_description: 'Innovation • Integrity • Quality • Customer Success • Collaboration • Continuous Learning',
   founded_year: '2024',
   team_size: '10+',
   projects_completed: '50+',
@@ -752,7 +764,7 @@ const DEFAULT_CONTACT_CONTENT: ContactContent = {
   form_placeholder_message: 'Tell us about your project...',
   
   // Contact Info
-  contact_email: 'hello@asrivotech.com',
+  contact_email: 'hello@asrivotech.in',
   contact_phone: '+91 (555) 123-4567',
   contact_address: 'Bangalore, Karnataka, India',
   contact_hours: 'Mon-Fri: 9AM-6PM IST',
@@ -761,10 +773,16 @@ const DEFAULT_CONTACT_CONTENT: ContactContent = {
   contact_twitter: 'https://twitter.com/asrivotech',
   contact_instagram: 'https://instagram.com/asrivotech',
   
+  // Additional Company Email Addresses
+  media_email: 'media@asrivotech.in',
+  cto_email: 'cto@asrivotech.in',
+  hr_team_email: 'hr_team@asrivotech.in',
+  noreplay_email: 'noreplay@asrivotech.in',
+  
   // Complaint Section
   complaint_title: 'File a Complaint',
   complaint_description: 'If you have concerns about our services, please let us know.',
-  complaint_email: 'complaints@asrivotech.com',
+  complaint_email: 'complaints@asrivotech.in',
   complaint_phone: '+91 (555) 123-4568',
   complaint_form_title: 'Submit a Complaint',
   complaint_form_description: 'We take all complaints seriously and will respond within 48 hours.',
@@ -790,6 +808,10 @@ const DEFAULT_PROJECTS_CONTENT: ProjectsContent = {
   stats_total_value: '50+',
   stats_active_label: 'Active Projects',
   stats_active_value: '12',
+  stats_community_label: 'Developer Community',
+  stats_community_value: '10+',
+  stats_quality_label: 'Commitment to Quality',
+  stats_quality_value: '100%',
   
   // Buttons and Labels
   button_view_all: 'View All Projects',
@@ -820,7 +842,7 @@ const DEFAULT_TEAM_CONTENT: TeamContent = {
   // Company Contact
   company_contact_title: 'Connect With Us',
   company_contact_description: 'Reach out to our team through any of these channels.',
-  company_contact_email: 'hello@asrivotech.com',
+  company_contact_email: 'hello@asrivotech.in',
   company_contact_email_label: 'Email Us',
   company_contact_linkedin: 'https://linkedin.com/company/asrivotech',
   company_contact_linkedin_label: 'LinkedIn',
@@ -1028,6 +1050,7 @@ export async function getAboutContent(): Promise<AboutContent> {
     vision_title: content.vision_title || DEFAULT_ABOUT_CONTENT.vision_title,
     vision_description: content.vision_description || DEFAULT_ABOUT_CONTENT.vision_description,
     values_title: content.values_title || DEFAULT_ABOUT_CONTENT.values_title,
+    values_description: content.values_description || DEFAULT_ABOUT_CONTENT.values_description,
     founded_year: content.founded_year || DEFAULT_ABOUT_CONTENT.founded_year,
     team_size: content.team_size || DEFAULT_ABOUT_CONTENT.team_size,
     projects_completed: content.projects_completed || DEFAULT_ABOUT_CONTENT.projects_completed,
@@ -1262,6 +1285,10 @@ export async function getProjectsContent(): Promise<ProjectsContent> {
     stats_total_value: content.stats_total_value || DEFAULT_PROJECTS_CONTENT.stats_total_value,
     stats_active_label: content.stats_active_label || DEFAULT_PROJECTS_CONTENT.stats_active_label,
     stats_active_value: content.stats_active_value || DEFAULT_PROJECTS_CONTENT.stats_active_value,
+    stats_community_label: content.stats_community_label || DEFAULT_PROJECTS_CONTENT.stats_community_label,
+    stats_community_value: content.stats_community_value || DEFAULT_PROJECTS_CONTENT.stats_community_value,
+    stats_quality_label: content.stats_quality_label || DEFAULT_PROJECTS_CONTENT.stats_quality_label,
+    stats_quality_value: content.stats_quality_value || DEFAULT_PROJECTS_CONTENT.stats_quality_value,
     button_view_all: content.button_view_all || DEFAULT_PROJECTS_CONTENT.button_view_all,
     button_load_more: content.button_load_more || DEFAULT_PROJECTS_CONTENT.button_load_more,
     empty_state_message: content.empty_state_message || DEFAULT_PROJECTS_CONTENT.empty_state_message,

@@ -182,9 +182,9 @@ export default function SchedulePage() {
                   <Phone className="h-4 w-4" />
                   +91 99764 22558
                 </a>
-                <a href="mailto:info@asrivotech.com" className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors">
+                <a href="mailto:info@asrivotech.in" className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors">
                   <Mail className="h-4 w-4" />
-                  info@asrivotech.com
+                  info@asrivotech.in
                 </a>
               </div>
             </div>

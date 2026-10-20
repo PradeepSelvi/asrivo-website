@@ -5,6 +5,9 @@ import { ArrowRight, Eye } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getProjectsContent } from "@/lib/supabase/content-helpers"
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getProjectsContent()
   
@@ -44,7 +47,7 @@ export default async function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Our Work
+              {content.projects_badge || "Our Work"}
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
               {content.hero_title}
@@ -69,12 +72,12 @@ export default async function ProjectsPage() {
               <div className="mt-1 text-sm text-muted-foreground">{content.stats_active_label}</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary sm:text-4xl">10+</div>
-              <div className="mt-1 text-sm text-muted-foreground">Developer Community</div>
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_community_value || "10+"}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_community_label || "Developer Community"}</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary sm:text-4xl">100%</div>
-              <div className="mt-1 text-sm text-muted-foreground">Commitment to Quality</div>
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_quality_value || "100%"}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_quality_label || "Commitment to Quality"}</div>
             </div>
           </div>
         </div>
@@ -85,7 +88,7 @@ export default async function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           {!projects || projects.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No projects found. Run the database migration to add sample projects.</p>
+              <p className="text-muted-foreground">{content.empty_state_message || "No projects found matching your criteria."}</p>
             </div>
           ) : (
             <div className="space-y-12">
@@ -189,10 +192,10 @@ export default async function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl text-balance">
-              Ready to Build Something Great?
+              {content.cta_title || "Ready to Build Something Great?"}
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
-              Let&apos;s discuss your project and see how we can help you achieve your goals.
+              {content.cta_description || "Let's discuss your project and see how we can help you achieve your goals."}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button 
@@ -201,7 +204,7 @@ export default async function ProjectsPage() {
                 asChild
               >
                 <Link href="/contact">
-                  Contact Us
+                  {content.cta_button || "Contact Us"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

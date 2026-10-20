@@ -15,6 +15,9 @@ import {
   HeartHandshake,
 } from "lucide-react"
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getServicesContent()
   
@@ -109,25 +112,61 @@ export default async function ServicesPage() {
             </p>
           </div>
 
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {process.map((step, index) => (
-              <div
-                key={step.title}
-                className="relative rounded-xl border border-border bg-background p-8 transition-all hover:shadow-md hover:border-primary/30"
-              >
-                <div className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                  {index + 1}
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mt-2">
-                  <step.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
+          {(() => {
+            const steps = [
+              {
+                icon: Search,
+                title: content.process_step_1_title || "Requirement Analysis",
+                description: content.process_step_1_desc || "We begin by understanding your business goals, challenges, and requirements through detailed discovery sessions.",
+              },
+              {
+                icon: Paintbrush,
+                title: content.process_step_2_title || "Design",
+                description: content.process_step_2_desc || "Our designers create intuitive interfaces and user experiences that align with your brand and user needs.",
+              },
+              {
+                icon: Cog,
+                title: content.process_step_3_title || "Development",
+                description: content.process_step_3_desc || "Our engineers build your solution using modern technologies and best practices for quality and scalability.",
+              },
+              {
+                icon: TestTube,
+                title: content.process_step_4_title || "Testing",
+                description: content.process_step_4_desc || "Rigorous testing ensures your product is bug-free, secure, and performs optimally under all conditions.",
+              },
+              {
+                icon: Rocket,
+                title: content.process_step_5_title || "Deployment",
+                description: content.process_step_5_desc || "We handle the deployment process, ensuring a smooth launch with minimal disruption to your operations.",
+              },
+              {
+                icon: HeartHandshake,
+                title: content.process_step_6_title || "Support",
+                description: content.process_step_6_desc || "Our relationship doesn't end at launch. We provide ongoing support and maintenance to ensure continued success.",
+              },
+            ]
+            return (
+              <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {steps.map((step, index) => (
+                  <div
+                    key={step.title}
+                    className="relative rounded-xl border border-border bg-background p-8 transition-all hover:shadow-md hover:border-primary/30"
+                  >
+                    <div className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                      {index + 1}
+                    </div>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mt-2">
+                      <step.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )
+          })()}
         </div>
       </section>
 

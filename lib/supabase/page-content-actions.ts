@@ -102,8 +102,10 @@ export async function savePageContent(
     }
 
     const publicRoute = pageRoutes[pageSlug] || `/${pageSlug}`
+    revalidatePath('/', 'layout')
     revalidatePath(publicRoute)
     revalidatePath('/admin/content')
+    revalidatePath(`/admin/content/${pageSlug}`)
 
     return { success: true }
   } catch (error: any) {

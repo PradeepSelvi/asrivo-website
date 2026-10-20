@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     // Send OTP email
     await resend.emails.send({
-      from: 'Asrivo Tech <noreply@asrivotech.com>',
+      from: 'Asrivo Tech <noreply@asrivotech.in>',
       to: email,
       subject: 'Your inquiry status verification code',
       html: `

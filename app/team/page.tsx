@@ -66,18 +66,12 @@ export default async function TeamPage() {
       {managementTeam.length > 0 && (
         <section className="py-20 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                {content.management_badge || "Leadership"}
-              </span>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                {content.management_title}
+            <div className="mx-auto max-w-2xl text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Management
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                {content.management_description}
-              </p>
             </div>
-            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {managementTeam.map((member) => (
                 <TeamCard
                   key={member.id}
@@ -101,18 +95,12 @@ export default async function TeamPage() {
       {developmentTeam.length > 0 && (
         <section className={`py-20 lg:py-28 ${managementTeam.length > 0 ? "bg-muted/30" : ""}`}>
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                {content.development_badge || "Engineers"}
-              </span>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                {content.development_title}
+            <div className="mx-auto max-w-2xl text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Developers
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                {content.development_description}
-              </p>
             </div>
-            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {developmentTeam.map((member) => (
                 <TeamCard
                   key={member.id}
@@ -169,8 +157,8 @@ export default async function TeamPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">{content.company_contact_email_label || "Email"}</p>
-                    <a href={`mailto:${content.company_contact_email || "info@asrivotech.com"}`} className="font-medium text-foreground hover:text-primary">
-                      {content.company_contact_email || "info@asrivotech.com"}
+                    <a href={`mailto:${content.company_contact_email || "info@asrivotech.in"}`} className="font-medium text-foreground hover:text-primary">
+                      {content.company_contact_email || "info@asrivotech.in"}
                     </a>
                   </div>
                 </div>

@@ -7,6 +7,8 @@ import { apiSuccess, apiError } from '@/lib/types/api'
 import { HTTP_STATUS } from '@/lib/constants'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { contactFormRateLimit } from '@/lib/utils/rate-limit'
+import { contactFormSchema } from '@/lib/utils/validation'
+import { ZodError } from 'zod'
 
 // 👉 GET (optional - to fetch contacts)
 export async function GET(request: NextRequest) {
@@ -50,17 +52,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    email = body?.email
-    name = body?.name
-    const { message, company, subject, type, captchaToken } = body || {}
-
-    // ✅ Validation
-    if (!email || !name || !message) {
-      return NextResponse.json(
-        apiError('Missing required fields: email, name, message', 'VALIDATION_ERROR'),
-        { status: HTTP_STATUS.BAD_REQUEST }
-      )
-    }
+    // ✅ Zod Validation
+    const validatedData = contactFormSchema.parse(body)
+    
+    email = validatedData.email
+    name = validatedData.name
+    const { message, company, subject, type, captchaToken } = validatedData
 
     // 🤖 CAPTCHA Verification
     const captchaResult = await verifyCaptcha(captchaToken, 'contact_form')
@@ -141,10 +138,19 @@ export async function POST(request: NextRequest) {
     )
 
   } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof ZodError) {
+      const firstError = error.errors[0]
+      return NextResponse.json(
+        apiError(`Validation failed: ${firstError.path.join('.')}: ${firstError.message}`, 'VALIDATION_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
+      )
+    }
+    
     logError('POST /api/contacts', error, { email, name })
     const errorDetail = handleApiError(error)
     return NextResponse.json(
-      apiError(errorDetail.message, errorDetail.code),
+      apiError('An error occurred processing your request', errorDetail.code),
       { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }

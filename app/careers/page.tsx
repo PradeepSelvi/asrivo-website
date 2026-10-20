@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import {
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { 
   ArrowRight,
   Briefcase,
   Calendar,
@@ -13,9 +16,6 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/server'
 import { getCareersContent } from '@/lib/supabase/content-helpers'
 
@@ -106,17 +106,16 @@ export default async function CareersPage() {
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-6" />
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-            Careers Page Temporarily Unavailable
+            {content.disabled_title || "Careers Page Temporarily Unavailable"}
           </h1>
           <p className="text-lg text-slate-500 dark:text-slate-400 mb-8">
-            We're currently updating our careers section. Please check back soon or contact us
-            directly for any inquiries.
+            {content.disabled_description || "We're currently updating our careers section. Please check back soon or contact us directly for any inquiries."}
           </p>
           <Link
             href="/contact"
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
           >
-            Contact Us
+            {content.disabled_button || "Contact Us"}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -142,7 +141,7 @@ export default async function CareersPage() {
           <div className="relative max-w-5xl mx-auto px-4 py-24 lg:py-32 text-center">
             <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 text-sm font-medium text-blue-300 mb-6">
               <Sparkles className="w-4 h-4" />
-              We&apos;re Hiring
+              {content.careers_badge || "We're Hiring"}
             </div>
             <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">
               {content.hero_title.split(' at')[0]} at{' '}
@@ -290,13 +289,13 @@ export default async function CareersPage() {
                               href={applyUrl}
                               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap"
                             >
-                              Apply Now
+                              {content.job_button_apply || "Apply Now"}
                               <ArrowRight className="w-4 h-4" />
                             </Link>
                           ) : (
                             <div className="text-center">
                               <span className="inline-block text-xs font-semibold px-4 py-2 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20">
-                                Applications Closed
+                                {content.job_button_closed || "Applications Closed"}
                               </span>
                             </div>
                           )}
@@ -310,16 +309,16 @@ export default async function CareersPage() {
               {/* CTA Footer */}
               <div className="mt-12 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-8 text-center">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                  Don&apos;t see a perfect fit?
+                  {content.cta_footer_title || "Don't see a perfect fit?"}
                 </h3>
                 <p className="text-slate-500 dark:text-slate-400 mb-4">
-                  We&apos;re always looking for exceptional talent. Send us your CV and we&apos;ll keep you in mind.
+                  {content.cta_footer_description || "We're always looking for exceptional talent. Send us your CV and we'll keep you in mind."}
                 </p>
                 <Link
                   href="/contact"
                   className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
                 >
-                  Contact Us
+                  {content.cta_footer_button || "Contact Us"}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
