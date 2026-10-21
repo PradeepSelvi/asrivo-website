@@ -65,7 +65,7 @@ function ApplyContent() {
           ...formData,
           job_title: jobTitle || null,
           position_id: positionId ? parseInt(positionId) : null,
-          captchaToken,
+          captchaToken: captchaToken || undefined,
         }),
       })
 
@@ -73,14 +73,18 @@ function ApplyContent() {
 
       if (!response.ok) {
         console.error('Error from server:', result)
-        throw new Error(result.error || 'Failed to submit application')
+        const errorMsg =
+          typeof result?.error === 'object' && result?.error !== null
+            ? result.error.message || JSON.stringify(result.error)
+            : result?.error || result?.message || 'Failed to submit application'
+        throw new Error(errorMsg)
       }
 
       console.log('Success:', result)
       setSubmitted(true)
     } catch (error) {
       console.error('Error submitting form:', error)
-      alert('Failed to submit application. Please try again.')
+      alert(error instanceof Error ? error.message : 'Failed to submit application. Please try again.')
     } finally {
       setLoading(false)
     }

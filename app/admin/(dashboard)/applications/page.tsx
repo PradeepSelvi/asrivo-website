@@ -60,12 +60,19 @@ export default function JobApplicationsPage() {
   const fetchApplications = async () => {
     try {
       setLoading(true)
-      const { data: appsData, error: appsError } = await supabase
-        .from('job_applications')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/job-applications')
+      const result = await response.json()
+      let appsData: JobApplication[] = result.success ? result.data : null
 
-      if (appsError) throw appsError
+      if (!appsData) {
+        const { data: directData, error: appsError } = await supabase
+          .from('job_applications')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (appsError) throw appsError
+        appsData = directData
+      }
 
       const { data: jobsData } = await supabase
         .from('job_postings')
@@ -88,6 +95,26 @@ export default function JobApplicationsPage() {
       console.error('Error fetching applications:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    try {
+      const response = await fetch('/api/job-applications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus }),
+      })
+      const result = await response.json()
+      if (result.success) {
+        setApplications(prev =>
+          prev.map(app => (app.id === id ? { ...app, status: newStatus as any } : app))
+        )
+      } else {
+        alert(result.error?.message || result.error || 'Failed to update status')
+      }
+    } catch (err) {
+      console.error('Error updating status:', err)
     }
   }
 
@@ -352,9 +379,22 @@ export default function JobApplicationsPage() {
                         )}
                       </div>
                       <div>
-                        <Badge className={statusConfig.color}>
-                          {statusConfig.label}
-                        </Badge>
+                        <Select
+                          value={app.status}
+                          onValueChange={(val) => handleStatusChange(app.id, val)}
+                        >
+                          <SelectTrigger className={`h-7 px-2 text-xs border rounded-md font-medium w-auto ${statusConfig.color}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="reviewed">Reviewed</SelectItem>
+                            <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                            <SelectItem value="interviewed">Interviewed</SelectItem>
+                            <SelectItem value="hired">Hired</SelectItem>
+                            <SelectItem value="rejected">Rejected</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Calendar className="h-4 w-4" />
@@ -397,9 +437,22 @@ export default function JobApplicationsPage() {
                           <GraduationCap className="h-3.5 w-3.5 text-blue-600" />
                           {app.experience_years} years
                         </div>
-                        <Badge className={statusConfig.color}>
-                          {statusConfig.label}
-                        </Badge>
+                        <Select
+                          value={app.status}
+                          onValueChange={(val) => handleStatusChange(app.id, val)}
+                        >
+                          <SelectTrigger className={`h-6 px-2 text-xs border rounded-md font-medium w-auto ${statusConfig.color}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="reviewed">Reviewed</SelectItem>
+                            <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                            <SelectItem value="interviewed">Interviewed</SelectItem>
+                            <SelectItem value="hired">Hired</SelectItem>
+                            <SelectItem value="rejected">Rejected</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {new Date(app.created_at).toLocaleDateString()}

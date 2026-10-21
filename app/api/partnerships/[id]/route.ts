@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createApiClient } from '@/lib/supabase/api-client'
 
 export async function PATCH(
   request: NextRequest,
@@ -9,11 +9,7 @@ export async function PATCH(
     const params = await context.params
     console.log('PATCH request received for ID:', params.id)
     
-    // Use anon key for now since RLS is disabled
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createApiClient({ useServiceRole: true })
 
     const body = await request.json()
     const { status } = body
@@ -57,14 +53,11 @@ export async function PATCH(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const { id } = await context.params
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('partnerships')

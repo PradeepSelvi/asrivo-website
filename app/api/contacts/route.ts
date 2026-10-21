@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/mail'
 import { verifyCaptcha } from '@/lib/utils/captcha'
@@ -13,7 +13,7 @@ import { ZodError } from 'zod'
 // 👉 GET (optional - to fetch contacts)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('contacts')
@@ -59,16 +59,18 @@ export async function POST(request: NextRequest) {
     name = validatedData.name
     const { message, company, subject, type, captchaToken } = validatedData
 
-    // 🤖 CAPTCHA Verification
-    const captchaResult = await verifyCaptcha(captchaToken, 'contact_form')
-    if (!captchaResult.success) {
-      return NextResponse.json(
-        apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
-        { status: HTTP_STATUS.FORBIDDEN }
-      )
+    // 🤖 CAPTCHA Verification (if token provided)
+    if (captchaToken) {
+      const captchaResult = await verifyCaptcha(captchaToken, 'contact_form')
+      if (!captchaResult.success) {
+        return NextResponse.json(
+          apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
+          { status: HTTP_STATUS.FORBIDDEN }
+        )
+      }
     }
 
-    const supabase = await createClient()
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('contacts')

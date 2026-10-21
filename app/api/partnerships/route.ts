@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create Supabase client with anon key (public access)
-    const supabase = createApiClient()
+    // Create Supabase client with service role (bypasses RLS for server-side form submission)
+    const supabase = createApiClient({ useServiceRole: true })
 
     // Insert partnership submission
     const { data, error } = await supabase
@@ -101,8 +101,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Create Supabase client with anon key for public read access
-    const supabase = createApiClient()
+    // Create Supabase client with service role for admin read access
+    const supabase = createApiClient({ useServiceRole: true })
 
     const searchParams = request.nextUrl.searchParams
     const limit = parseInt(searchParams.get('limit') || '50')

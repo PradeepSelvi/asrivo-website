@@ -1,5 +1,5 @@
 import React from 'react'
-import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { redirect, notFound } from 'next/navigation'
 import ComplaintDetailClient from './complaint-detail'
@@ -15,7 +15,7 @@ export default async function ComplaintDetailPage({
   params: Promise<{ id: string }> 
 }) {
   const { id } = await params
-  const supabase = await createClient()
+  const supabase = createApiClient({ useServiceRole: true })
   const adminResult = await getCurrentAdmin()
 
   if (!adminResult.success || !adminResult.user) {

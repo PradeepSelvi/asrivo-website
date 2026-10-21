@@ -3,6 +3,7 @@ import { createApiClient } from '@/lib/supabase/api-client'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
 import { complaintSchema } from '@/lib/utils/validation'
+import { verifyCaptcha } from '@/lib/utils/captcha'
 import { ZodError } from 'zod'
 import { apiSuccess, apiError } from '@/lib/types/api'
 import { HTTP_STATUS } from '@/lib/constants'
@@ -11,12 +12,22 @@ import { logError } from '@/lib/utils/error-handler'
 // GET - Fetch all complaints (for admin)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createApiClient()
+    const supabase = createApiClient({ useServiceRole: true })
+    const searchParams = request.nextUrl.searchParams
+    const status = searchParams.get('status')
+    const limit = parseInt(searchParams.get('limit') || '100')
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('complaints')
       .select('*')
       .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (status && status !== 'all') {
+      query = query.eq('status', status)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       return NextResponse.json(
@@ -25,7 +36,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ success: true, data })
+    return NextResponse.json({ success: true, count: data?.length || 0, data })
 
   } catch (error: any) {
     return NextResponse.json(
@@ -35,7 +46,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create a new complaint (NO AUTHENTICATION REQUIRED)
+// POST - Create a new complaint (Public submission)
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, formSubmitRateLimit)
   if (limited) return limited
@@ -51,9 +62,20 @@ export async function POST(request: NextRequest) {
     
     name = validatedData.name
     email = validatedData.email
-    const { phone, subject, description, category, priority, proofDocumentUrl } = validatedData
+    const { phone, subject, description, category, priority, proofDocumentUrl, captchaToken } = validatedData
 
-    const supabase = createApiClient()
+    // CAPTCHA verification (if token provided)
+    if (captchaToken) {
+      const captchaResult = await verifyCaptcha(captchaToken, 'complaint')
+      if (!captchaResult.success) {
+        return NextResponse.json(
+          apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
+          { status: HTTP_STATUS.FORBIDDEN }
+        )
+      }
+    }
+
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('complaints')
@@ -76,7 +98,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       logError('POST /api/complaints - Database error', error, { email, name })
       return NextResponse.json(
-        apiError('Failed to submit complaint', 'DATABASE_ERROR'),
+        apiError(error.message || 'Failed to submit complaint', 'DATABASE_ERROR'),
         { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
@@ -98,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     logError('POST /api/complaints', error, { email, name })
     return NextResponse.json(
-      apiError('An error occurred processing your request', 'INTERNAL_SERVER_ERROR'),
+      apiError(error instanceof Error ? error.message : 'An error occurred processing your request', 'INTERNAL_SERVER_ERROR'),
       { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }

@@ -43,57 +43,81 @@ export default function PartnershipStatusPage() {
   const [searched, setSearched] = useState(false)
   const supabase = createClient()
 
+  // Polling sync & Realtime listener
   useEffect(() => {
-    if (partnerships.length === 0) return
+    if (!searched || !email.trim()) return
 
-    // Set up real-time subscription for status updates
+    const trimmedEmail = email.trim().toLowerCase()
+
+    // Function to check latest status
+    const refreshStatus = async () => {
+      try {
+        const response = await fetch('/api/partnerships/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: trimmedEmail }),
+        })
+        const result = await response.json()
+        if (result.success && Array.isArray(result.data)) {
+          setPartnerships(prev => {
+            // Check if any status changed to notify user
+            result.data.forEach((newItem: Partnership) => {
+              const oldItem = prev.find(p => p.id === newItem.id)
+              if (oldItem && oldItem.status !== newItem.status) {
+                if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+                  new Notification('Partnership Status Updated', {
+                    body: `${newItem.company_name} status is now: ${newItem.status}`,
+                    icon: '/asrivo.png',
+                  })
+                }
+              }
+            })
+            return result.data
+          })
+        }
+      } catch (err) {
+        console.error('Error refreshing status:', err)
+      }
+    }
+
+    // Set up real-time websocket subscription for status updates
     const channel = supabase
-      .channel('partnership-status-updates')
+      .channel(`partnership-status-${trimmedEmail}`)
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
           table: 'partnerships',
-          filter: `email=eq.${email}`,
         },
-        (payload) => {
-          console.log('Partnership status updated:', payload)
-          // Update the partnership in the list
-          setPartnerships((prev) =>
-            prev.map((p) =>
-              p.id === (payload.new as Partnership).id
-                ? (payload.new as Partnership)
-                : p
-            )
-          )
-
-          // Show browser notification if status changed
-          if (Notification.permission === 'granted') {
-            const newPartnership = payload.new as Partnership
-            new Notification('Partnership Status Updated', {
-              body: `Your partnership request status is now: ${newPartnership.status}`,
-              icon: '/asrivo.png',
-            })
-          }
+        () => {
+          refreshStatus()
         }
       )
       .subscribe()
 
+    // Polling interval every 4 seconds to ensure live updates even if websockets are blocked by RLS/network
+    const pollInterval = setInterval(refreshStatus, 4000)
+
     // Request notification permission
-    if (Notification.permission === 'default') {
+    if (typeof window !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission()
     }
 
     return () => {
+      clearInterval(pollInterval)
       supabase.removeChannel(channel)
     }
-  }, [partnerships, email])
+  }, [searched, email])
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!email.trim()) return
+
     setLoading(true)
     setSearched(true)
+
+    const trimmedEmail = email.trim().toLowerCase()
 
     try {
       const response = await fetch('/api/partnerships/check', {
@@ -101,16 +125,19 @@ export default function PartnershipStatusPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: trimmedEmail }),
       })
 
       const result = await response.json()
 
-      if (result.success) {
+      if (result.success && Array.isArray(result.data)) {
         setPartnerships(result.data)
+      } else {
+        setPartnerships([])
       }
     } catch (error) {
       console.error('Error fetching partnerships:', error)
+      setPartnerships([])
     } finally {
       setLoading(false)
     }

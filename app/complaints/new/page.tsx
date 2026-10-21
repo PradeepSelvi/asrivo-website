@@ -112,7 +112,10 @@ export default function RaiseComplaintPage() {
       console.log('API response:', result)
 
       if (!response.ok) {
-        const errorMessage = result.error || 'Failed to submit complaint'
+        const errorMessage =
+          typeof result?.error === 'object' && result?.error !== null
+            ? result.error.message || JSON.stringify(result.error)
+            : result?.error || result?.message || 'Failed to submit complaint'
         console.error('Submission error:', errorMessage)
         alert(`Error: ${errorMessage}`)
         setLoading(false)

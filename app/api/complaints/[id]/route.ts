@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET - Fetch single complaint by ID
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const supabase = await createClient()
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('complaints')
@@ -43,7 +43,7 @@ export async function PATCH(
     const body = await request.json()
     const { status, priority } = body
 
-    const supabase = await createClient()
+    const supabase = createApiClient({ useServiceRole: true })
 
     // Build update object
     const updateData: any = {

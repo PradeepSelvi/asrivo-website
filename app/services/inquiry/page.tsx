@@ -323,7 +323,11 @@ export default function ServiceInquiryPage() {
       console.log('API response:', data)
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit inquiry. Please try again.')
+        const errorMsg =
+          typeof data?.error === 'object' && data?.error !== null
+            ? data.error.message || JSON.stringify(data.error)
+            : data?.error || data?.message || 'Failed to submit inquiry. Please try again.'
+        throw new Error(errorMsg)
       }
 
       // Clear saved form data after successful submission

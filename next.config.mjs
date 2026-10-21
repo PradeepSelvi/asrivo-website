@@ -68,6 +68,32 @@ const nextConfig = {
           }
         ],
       },
+      {
+        source: '/reset-password',
+        headers: [
+          {
+            key: 'Referrer-Policy',
+            value: 'no-referrer'
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow'
+          }
+        ],
+      },
+      {
+        source: '/auth/:path*',
+        headers: [
+          {
+            key: 'Referrer-Policy',
+            value: 'no-referrer'
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow'
+          }
+        ],
+      },
     ]
   },
 

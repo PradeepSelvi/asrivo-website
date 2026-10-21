@@ -14,21 +14,23 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    const cleanEmail = email.trim().toLowerCase()
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(cleanEmail)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
       )
     }
 
-    const supabase = createApiClient()
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('complaints')
       .select('*')
-      .eq('email', email)
+      .ilike('email', cleanEmail)
       .order('created_at', { ascending: false })
 
     if (error) {

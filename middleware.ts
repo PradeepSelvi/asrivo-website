@@ -18,7 +18,19 @@ export async function middleware(request: NextRequest) {
     return new NextResponse('Not Found', { status: 404 })
   }
 
-  // Skip non-admin routes immediately
+  // Publicly accessible routes that never require authentication
+  const isPublicRoute =
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname === '/forgot-password' ||
+    pathname.startsWith('/auth')
+
+  if (isPublicRoute) {
+    return NextResponse.next()
+  }
+
+  // Skip non-admin routes immediately (reset-password enforces its own session guard)
   if (!pathname.startsWith('/admin')) {
     return NextResponse.next()
   }

@@ -64,12 +64,21 @@ export default function ServiceInquiriesPage() {
   const fetchInquiries = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('client_inquiries')
-        .select('*')
-        .order('created_at', { ascending: false })
+      // Fetch via API route using service role to bypass RLS restrictions
+      const response = await fetch('/api/inquiries')
+      const result = await response.json()
+      let data: ClientInquiry[] = result.success ? result.data : null
 
-      if (error) throw error
+      // Fallback to direct supabase client if needed
+      if (!data) {
+        const { data: directData, error } = await supabase
+          .from('client_inquiries')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+        data = directData
+      }
 
       const filtered = statusFilter === 'all' 
         ? data 

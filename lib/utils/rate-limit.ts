@@ -105,6 +105,12 @@ export const lightRateLimit = new RateLimiter({
   uniqueTokenPerInterval: 10, // 10 per minute
 })
 
+// Password reset requests — 5 requests per hour to prevent brute force / flooding
+export const forgotPasswordRateLimit = new RateLimiter({
+  interval: 60 * 60 * 1000,   // 1 hour
+  uniqueTokenPerInterval: 5,  // 5 requests per hour
+})
+
 /**
  * Get client identifier from request
  */

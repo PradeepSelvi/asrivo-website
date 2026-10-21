@@ -49,6 +49,48 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var p = window.location.pathname || '';
+                  if (p === '/reset-password') return;
+
+                  var h = window.location.hash || '';
+                  var q = window.location.search || '';
+
+                  // 1. Intercept hash fragments from Supabase recovery redirect
+                  var hasAuthHash = (
+                    h.indexOf('access_token=') !== -1 ||
+                    h.indexOf('type=recovery') !== -1 ||
+                    h.indexOf('type=invite') !== -1 ||
+                    (h.indexOf('error=') !== -1 && (
+                      h.indexOf('recovery') !== -1 ||
+                      h.indexOf('otp') !== -1 ||
+                      h.indexOf('access_denied') !== -1 ||
+                      h.indexOf('token') !== -1
+                    ))
+                  );
+
+                  // 2. Intercept query parameters (PKCE code, token_hash, or type=recovery)
+                  var hasRecoveryQuery = (
+                    q.indexOf('type=recovery') !== -1 ||
+                    q.indexOf('token_hash=') !== -1 ||
+                    (p === '/' && q.indexOf('code=') !== -1) ||
+                    (p === '/' && q.indexOf('error=') !== -1)
+                  );
+
+                  if (hasAuthHash) {
+                    window.location.replace('/reset-password' + h);
+                  } else if (hasRecoveryQuery) {
+                    window.location.replace('/reset-password' + q);
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="font-sans antialiased">
         <ConditionalLayout>{children}</ConditionalLayout>
