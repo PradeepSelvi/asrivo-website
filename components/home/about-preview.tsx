@@ -247,7 +247,7 @@ export function AboutPreview({ content }: { content: HomeContent }) {
                     <Zap className="h-5 w-5 text-emerald-600" />
                   </div>
                   <p className="text-sm font-medium text-slate-700">
-                    We are currently accepting new projects for Q3 2026.
+                    We are currently accepting new projects.
                   </p>
                </div>
             </div>

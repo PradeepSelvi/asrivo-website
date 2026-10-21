@@ -1,0 +1,44 @@
+{
+  "id": "FEAT-003",
+  "type": "refactor",
+  "description": "Create comprehensive DataTable component for admin list pages, eliminating the largest source of duplication (~2,400 lines). Convert contacts, inquiries, and complaints pages to use the new component. This is the most complex feature with the highest impact.",
+  "status": "pending",
+  "steps": [
+    "Create types/admin-table.ts with Column<T> and DataTableProps<T> interfaces",
+    "Create components/admin/data-table.tsx with support for: configurable columns, desktop table grid layout, mobile card view via mobileCardRenderer prop, loading state, empty state with icon and message",
+    "Define column configurations for Contacts page: contact info, subject, type, status, date, actions columns with appropriate render functions",
+    "Update app/admin/(dashboard)/contacts/page.tsx to use <DataTable> component, replacing both desktop table header/rows and mobile card JSX (~200 lines removed)",
+    "Define column configurations for Inquiries page: company, contact, project types, budget, status, date, actions",
+    "Update app/admin/(dashboard)/inquiries/page.tsx to use <DataTable> component (~250 lines removed)",
+    "Define column configurations for Complaints page: user, subject, category, proof, priority, status, date, actions",
+    "Update app/admin/(dashboard)/complaints/page.tsx to use <DataTable> component (~200 lines removed)",
+    "Test DataTable component responsive behavior on desktop and mobile viewports",
+    "Verify all links, badges, and icons render correctly in both layouts"
+  ],
+  "acceptance_criteria": [
+    "DataTable component accepts generic type T and Column<T>[] configuration",
+    "Contacts, inquiries, and complaints admin pages use <DataTable> component",
+    "Desktop view shows proper table grid with all columns",
+    "Mobile view shows cards via mobileCardRenderer",
+    "Loading and empty states display correctly",
+    "All status badges, priority badges, and action links work as before",
+    "TypeScript types pass: pnpm type-check",
+    "Build succeeds: pnpm build",
+    "Responsive test: Both desktop and mobile viewports render correctly"
+  ],
+  "verification": [
+    "pnpm type-check",
+    "pnpm lint",
+    "pnpm build",
+    "Desktop test: Visit localhost:3000/admin/contacts in full browser window, verify table displays with all columns (Contact, Subject, Type, Status, Date, Actions)",
+    "Mobile test: Resize to mobile viewport or use dev tools, verify cards display with all information",
+    "Desktop test: Visit localhost:3000/admin/inquiries, verify table with Company, Contact, Type, Budget, Status, Date, Actions columns",
+    "Mobile test: Same page in mobile viewport, verify inquiry cards",
+    "Desktop test: Visit localhost:3000/admin/complaints, verify table",
+    "Mobile test: Complaints page in mobile viewport",
+    "Click test: Click 'View' link on contacts page, verify it navigates to detail page",
+    "Empty state test: If possible, view a page with no data and verify empty message displays"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

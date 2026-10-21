@@ -15,78 +15,7 @@ export interface TestimonialItem {
   avatar?: string | null
 }
 
-const DEFAULT_TESTIMONIALS: TestimonialItem[] = [
-  {
-    content: "Asrivo Tech transformed our outdated systems into a modern, efficient platform. Their team's expertise and dedication exceeded our expectations.",
-    author: "Jennifer Walsh",
-    role: "CTO, TechCorp Industries",
-    company: "TechCorp Industries",
-    rating: 5,
-  },
-  {
-    content: "The mobile app they developed for us has significantly improved our customer engagement. Professional team with excellent communication.",
-    author: "Robert Martinez",
-    role: "CEO, HealthFirst",
-    company: "HealthFirst",
-    rating: 5,
-  },
-  {
-    content: "Working with Asrivo Tech was a game-changer. They delivered our e-commerce platform on time and the results speak for themselves.",
-    author: "Amanda Foster",
-    role: "Founder, ShopEase",
-    company: "ShopEase",
-    rating: 5,
-  },
-  {
-    content: "Outstanding service and delivery! The AI-powered analytics dashboard they built has revolutionized how we make business decisions. Highly recommended.",
-    author: "Michael Chen",
-    role: "VP of Technology, DataDrive Inc",
-    company: "DataDrive Inc",
-    rating: 5,
-  },
-  {
-    content: "From concept to deployment, Asrivo Tech demonstrated exceptional technical expertise. Our IoT platform now handles millions of requests seamlessly.",
-    author: "Sarah Johnson",
-    role: "Director of Engineering, SmartHome Solutions",
-    company: "SmartHome Solutions",
-    rating: 5,
-  },
-  {
-    content: "The team's attention to detail and commitment to quality is unmatched. They delivered a scalable cloud infrastructure that supports our rapid growth.",
-    author: "David Kumar",
-    role: "CTO, CloudNine Technologies",
-    company: "CloudNine Technologies",
-    rating: 5,
-  },
-  {
-    content: "Asrivo Tech's blockchain solution provided the security and transparency we needed for our financial platform. Exceptional work from start to finish.",
-    author: "Emily Rodriguez",
-    role: "CEO, FinSecure",
-    company: "FinSecure",
-    rating: 5,
-  },
-  {
-    content: "Their DevOps transformation saved us countless hours and significantly reduced our deployment time. The ROI was evident within the first month.",
-    author: "James Anderson",
-    role: "Head of Infrastructure, TechFlow Systems",
-    company: "TechFlow Systems",
-    rating: 5,
-  },
-  {
-    content: "The custom CRM they developed has streamlined our entire sales process. Intuitive design coupled with powerful features. Couldn't be happier!",
-    author: "Lisa Thompson",
-    role: "Sales Director, GrowthHub",
-    company: "GrowthHub",
-    rating: 5,
-  },
-  {
-    content: "Asrivo Tech delivered beyond expectations. Their microservices architecture improved our application performance by 300%. True professionals!",
-    author: "Mark Williams",
-    role: "Chief Architect, ScaleUp Solutions",
-    company: "ScaleUp Solutions",
-    rating: 5,
-  },
-]
+const DEFAULT_TESTIMONIALS: TestimonialItem[] = []
 
 function TestimonialCardItem({
   testimonial,
@@ -208,6 +137,9 @@ export function Testimonials({
         ),
       ]
     : DEFAULT_TESTIMONIALS
+
+  // Hide the section entirely when there are no testimonials to display
+  if (combinedTestimonials.length === 0) return null
 
   // Ensure there are at least 8 items in the sequence so the marquee smoothly spans any screen size
   let marqueeItems = combinedTestimonials

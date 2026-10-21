@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
 import { AlertTriangle, RefreshCcw, Home } from 'lucide-react'
 
 export default function Error({
@@ -52,13 +53,13 @@ export default function Error({
             Try Again
           </button>
           
-          <a
+          <Link
             href="/"
             className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors"
           >
             <Home className="w-4 h-4" />
             Go Home
-          </a>
+          </Link>
         </div>
 
         {error.digest && (

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     url: 'https://asrivotech.in',
     images: [
       {
-        url: '/asrivo.png',
+        url: 'https://asrivotech.in/asrivo.png',
         width: 1200,
         height: 630,
         alt: 'Asrivo Tech - Digital Solutions',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Asrivo Tech - Building Tomorrow\'s Digital Solutions',
     description: 'Innovative software development and digital transformation services',
-    images: ['/asrivo.png'],
+    images: ['https://asrivotech.in/asrivo.png'],
   },
   generator: 'Next.js'
 }

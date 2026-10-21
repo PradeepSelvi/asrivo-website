@@ -3,21 +3,17 @@
 import Link from "next/link"
 import { Linkedin, Github, Mail, MapPin, Phone, Instagram, Twitter } from "lucide-react"
 import { useEffect, useState } from "react"
+import { SERVICES, getServiceLink } from "@/config/services"
 
 const navigation = {
   company: [
     { name: "About Us", href: "/about" },
     { name: "Our Team", href: "/team" },
   ],
-  services: [
-    { name: "Software Development", href: "/services#software" },
-    { name: "Web Applications", href: "/services#web" },
-    { name: "Mobile Applications", href: "/services#mobile" },
-    { name: "Cloud & DevOps", href: "/services#cloud" },
-    { name: "AI & Automation", href: "/services#ai" },
-    { name: "Digital Marketing", href: "/services/digital-marketing" },
-    { name: "IT Consulting", href: "/services#consulting" },
-  ],
+  services: SERVICES.slice(0, 7).map((s) => ({
+    name: s.title,
+    href: getServiceLink(s),
+  })),
   resources: [
     { name: "Projects", href: "/projects" },
     { name: "Case Studies", href: "/projects" },

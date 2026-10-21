@@ -1,5 +1,5 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
 import { complaintSchema } from '@/lib/utils/validation'
@@ -11,10 +11,7 @@ import { logError } from '@/lib/utils/error-handler'
 // GET - Fetch all complaints (for admin)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createApiClient()
 
     const { data, error } = await supabase
       .from('complaints')
@@ -56,10 +53,7 @@ export async function POST(request: NextRequest) {
     email = validatedData.email
     const { phone, subject, description, category, priority, proofDocumentUrl } = validatedData
 
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createApiClient()
 
     const { data, error } = await supabase
       .from('complaints')

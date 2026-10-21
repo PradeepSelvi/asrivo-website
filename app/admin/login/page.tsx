@@ -93,14 +93,14 @@ function AdminLoginContent() {
       </div>
 
       {/* Back to Website Button */}
-      <a
+      <Link
         href="/"
         className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border hover:bg-muted transition-all text-sm font-medium text-foreground shadow-sm"
       >
         <ArrowLeft className="w-4 h-4" />
         <span className="hidden sm:inline">Back to Website</span>
         <span className="sm:hidden"><Home className="w-4 h-4" /></span>
-      </a>
+      </Link>
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8 flex flex-col items-center">

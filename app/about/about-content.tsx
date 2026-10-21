@@ -223,8 +223,8 @@ export function AboutContent({ content }: AboutContentProps) {
                 title: content.journey_milestone_4_title || "Global Expansion",
                 desc: content.journey_milestone_4_desc || "Building AI-powered products, expanding globally, and creating opportunities for the next generation of technology professionals."
               }
-            ].map((milestone) => (
-              <div key={milestone.year} className="relative p-8 rounded-2xl bg-white border border-slate-100 shadow-lg hover:-translate-y-2 transition-transform duration-500">
+            ].map((milestone, index) => (
+              <div key={`${milestone.year}-${index}`} className="relative p-8 rounded-2xl bg-white border border-slate-100 shadow-lg hover:-translate-y-2 transition-transform duration-500">
                 <div className="absolute -top-4 left-8 px-4 py-1 rounded-full bg-blue-600 text-white font-bold text-sm">
                   {milestone.year}
                 </div>
@@ -331,7 +331,7 @@ export function AboutContent({ content }: AboutContentProps) {
               <h2 className="text-4xl font-bold text-slate-900 tracking-tight">{content.profile_title || "Enterprise Overview"}</h2>
               <div className="grid gap-4">
                 {[
-                   { i: Building2, l: content.profile_entity_label || "Entity", v: content.profile_entity_value || "Asrivo Tech Solutions Inc." },
+                   { i: Building2, l: content.profile_entity_label || "Entity", v: content.profile_entity_value || "Asrivo Tech" },
                    { i: Award, l: content.profile_sector_label || "Sector", v: content.profile_sector_value || "Enterprise Software & Cloud Services" },
                    { i: ShieldCheck, l: content.profile_compliance_label || "Compliance", v: content.profile_compliance_value || "Secure Software Development Practices" }
                 ].map((item) => (

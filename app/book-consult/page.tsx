@@ -203,7 +203,7 @@ export default function BookConsultPage() {
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                title: "10+ Projects Built",
+                title: "2+ Projects Built",
                 description: "Proven track record of delivering successful digital products across industries.",
               },
               {

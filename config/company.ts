@@ -77,7 +77,7 @@ export const COMPANY = {
     services: 9,
     projectsCompleted: 2,
     reliability: 99.9,
-    support: '24/7',
+    support: 'Mon–Sat',
     yearsExperience: 1,
     clientsServed: 2,
     teamMembers: 9,

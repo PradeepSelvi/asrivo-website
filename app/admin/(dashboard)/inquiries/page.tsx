@@ -25,6 +25,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { StatusBadge } from '@/components/ui/status-badge'
+import type { StatusVariant } from '@/lib/utils/status-config'
 
 
 interface ClientInquiry {
@@ -124,17 +126,6 @@ export default function ServiceInquiriesPage() {
       supabase.removeChannel(channel)
     }
   }, [statusFilter])
-
-  const getStatusConfig = (status: string) => {
-    const configs = {
-      new: { label: 'New', variant: 'default' as const, color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
-      contacted: { label: 'Contacted', variant: 'secondary' as const, color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' },
-      qualified: { label: 'Qualified', variant: 'secondary' as const, color: 'bg-purple-500/10 text-purple-600 border-purple-500/20' },
-      converted: { label: 'Converted', variant: 'secondary' as const, color: 'bg-green-500/10 text-green-600 border-green-500/20' },
-      rejected: { label: 'Rejected', variant: 'destructive' as const, color: 'bg-red-500/10 text-red-600 border-red-500/20' },
-    }
-    return configs[status as keyof typeof configs] || configs.new
-  }
 
   const stats = [
     {
@@ -273,7 +264,6 @@ export default function ServiceInquiriesPage() {
             {/* Inquiries List */}
             <div>
               {inquiries.map((inquiry) => {
-                const statusConfig = getStatusConfig(inquiry.status)
                 return (
                   <div key={inquiry.id}>
                     {/* Desktop View */}
@@ -322,9 +312,7 @@ export default function ServiceInquiriesPage() {
                         </span>
                       </div>
                       <div className="min-w-0">
-                        <Badge className={`${statusConfig.color} whitespace-nowrap`}>
-                          {statusConfig.label}
-                        </Badge>
+                        <StatusBadge status={inquiry.status} size="sm" />
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
                         <Calendar className="h-4 w-4 flex-shrink-0" />
@@ -385,9 +373,7 @@ export default function ServiceInquiriesPage() {
                           <DollarSign className="h-3.5 w-3.5 text-green-600" />
                           {inquiry.budget_range}
                         </div>
-                        <Badge className={statusConfig.color}>
-                          {statusConfig.label}
-                        </Badge>
+                        <StatusBadge status={inquiry.status} size="sm" />
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {new Date(inquiry.created_at).toLocaleDateString()}

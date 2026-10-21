@@ -12,7 +12,7 @@
  * @returns Promise with success status and score
  */
 export async function verifyCaptcha(
-  token: string,
+  token: string | undefined,
   _action: string // Prefix with underscore to indicate intentionally unused
 ): Promise<{ success: boolean; score?: number; error?: string }> {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY
@@ -20,6 +20,10 @@ export async function verifyCaptcha(
   if (!secretKey) {
     console.warn('RECAPTCHA_SECRET_KEY not configured')
     return { success: true } // Pass through in development
+  }
+
+  if (!token) {
+    return { success: false, error: 'Missing captcha token' }
   }
 
   try {

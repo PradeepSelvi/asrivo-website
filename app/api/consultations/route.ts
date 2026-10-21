@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import { createClient } from '@supabase/supabase-js'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
 import { consultationSchema } from '@/lib/utils/validation'
@@ -27,10 +27,7 @@ export async function POST(request: NextRequest) {
     const { phone, whatsapp, availability, preferredMode, message } = validatedData
 
     // Use anon client for public submissions
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createApiClient()
 
     // Insert consultation request
     const { data, error } = await supabase

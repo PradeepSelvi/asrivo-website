@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     // ✅ Zod Validation
     const validatedData = jobApplicationSchema.parse(body)
     
-    name = validatedData.name
+    name = validatedData.name || validatedData.full_name
     email = validatedData.email
     const {
       phone,

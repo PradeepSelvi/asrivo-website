@@ -21,6 +21,7 @@ export interface ApiErrorResponse {
 export interface ApiSuccessResponse<T = unknown> {
   success: true
   data: T
+  message?: string
   meta?: {
     total?: number
     page?: number
@@ -35,9 +36,17 @@ export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse
 // Helper function to create success response
 export function apiSuccess<T>(
   data: T,
+  messageOrMeta?: string | ApiSuccessResponse<T>['meta'],
   meta?: ApiSuccessResponse<T>['meta']
 ): ApiSuccessResponse<T> {
-  return { success: true, data, ...(meta && { meta }) }
+  const message = typeof messageOrMeta === 'string' ? messageOrMeta : undefined
+  const finalMeta = typeof messageOrMeta === 'object' ? messageOrMeta : meta
+  return {
+    success: true,
+    data,
+    ...(message && { message }),
+    ...(finalMeta && { meta: finalMeta }),
+  }
 }
 
 // Helper function to create error response

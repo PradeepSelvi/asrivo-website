@@ -518,7 +518,7 @@ const DEFAULT_HOME_CONTENT: HomeContent = {
   about_feature_6: 'Post-Launch Maintenance',
   about_cta_primary: 'View Our Work',
   about_cta_secondary: 'Book a Consultation',
-  about_availability_text: 'We are currently accepting new projects for Q3 2026.',
+  about_availability_text: 'We are currently accepting new projects.',
   
   // Services Preview Section
   services_badge: 'Our Services',
@@ -765,12 +765,12 @@ const DEFAULT_CONTACT_CONTENT: ContactContent = {
   
   // Contact Info
   contact_email: 'hello@asrivotech.in',
-  contact_phone: '+91 (555) 123-4567',
+  contact_phone: '+91 99764 22558',
   contact_address: 'Bangalore, Karnataka, India',
   contact_hours: 'Mon-Fri: 9AM-6PM IST',
   contact_linkedin: 'https://linkedin.com/company/asrivotech',
   contact_github: 'https://github.com/asrivotech',
-  contact_twitter: 'https://twitter.com/asrivotech',
+  contact_twitter: 'https://x.com/asrivotech',
   contact_instagram: 'https://instagram.com/asrivotech',
   
   // Additional Company Email Addresses
@@ -848,7 +848,7 @@ const DEFAULT_TEAM_CONTENT: TeamContent = {
   company_contact_linkedin_label: 'LinkedIn',
   company_contact_github: 'https://github.com/asrivotech',
   company_contact_github_label: 'GitHub',
-  company_contact_whatsapp: 'https://wa.me/1234567890',
+  company_contact_whatsapp: 'https://wa.me/919976422558',
   company_contact_whatsapp_label: 'WhatsApp',
   company_contact_button: 'Get in Touch',
   
@@ -1251,6 +1251,10 @@ export async function getContactContent(): Promise<ContactContent> {
     contact_github: content.contact_github || DEFAULT_CONTACT_CONTENT.contact_github,
     contact_twitter: content.contact_twitter || DEFAULT_CONTACT_CONTENT.contact_twitter,
     contact_instagram: content.contact_instagram || DEFAULT_CONTACT_CONTENT.contact_instagram,
+    media_email: content.media_email || DEFAULT_CONTACT_CONTENT.media_email,
+    cto_email: content.cto_email || DEFAULT_CONTACT_CONTENT.cto_email,
+    hr_team_email: content.hr_team_email || DEFAULT_CONTACT_CONTENT.hr_team_email,
+    noreplay_email: content.noreplay_email || DEFAULT_CONTACT_CONTENT.noreplay_email,
     complaint_title: content.complaint_title || DEFAULT_CONTACT_CONTENT.complaint_title,
     complaint_description: content.complaint_description || DEFAULT_CONTACT_CONTENT.complaint_description,
     complaint_email: content.complaint_email || DEFAULT_CONTACT_CONTENT.complaint_email,
