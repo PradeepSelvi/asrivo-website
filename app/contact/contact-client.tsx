@@ -44,47 +44,10 @@ const LocationMap = dynamic(() => import("@/components/location-map").then(mod =
   ),
 })
 
+import type { ContactContent } from "@/lib/supabase/content-helpers"
+
 interface ContactPageProps {
-  content: {
-    hero_title: string
-    hero_subtitle: string
-    contact_badge: string
-    form_title: string
-    form_description: string
-    info_title: string
-    info_description: string
-    form_label_name: string
-    form_label_email: string
-    form_label_phone: string
-    form_label_company: string
-    form_label_subject: string
-    form_label_message: string
-    form_placeholder_name: string
-    form_placeholder_email: string
-    form_placeholder_phone: string
-    form_placeholder_company: string
-    form_placeholder_subject: string
-    form_placeholder_message: string
-    contact_email: string
-    contact_phone: string
-    contact_address: string
-    contact_hours: string
-    contact_linkedin: string
-    contact_github: string
-    contact_twitter: string
-    contact_instagram: string
-    complaint_title: string
-    complaint_description: string
-    complaint_email: string
-    complaint_phone: string
-    complaint_form_title: string
-    complaint_form_description: string
-    complaint_submit_button: string
-    status_check_title: string
-    status_check_description: string
-    status_check_button: string
-    status_check_placeholder: string
-  }
+  content: ContactContent
 }
 
 
@@ -227,7 +190,7 @@ export default function ContactPageClient({ content }: ContactPageProps) {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Contact Us
+              {content.contact_badge}
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
               {content.hero_title}
@@ -267,42 +230,42 @@ export default function ContactPageClient({ content }: ContactPageProps) {
                 <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName">{content.form_label_name} (First)</Label>
                       <Input
                         id="firstName"
                         name="firstName"
-                        placeholder="first name"
+                        placeholder={content.form_placeholder_name}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName">{content.form_label_name} (Last)</Label>
                       <Input
                         id="lastName"
                         name="lastName"
-                        placeholder="Last name"
+                        placeholder={content.form_placeholder_name}
                         required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">{content.form_label_email}</Label>
                     <Input
                       id="email"
                       name="email"
                       type="email"
-                      placeholder="yourgmail@gmail.com"
+                      placeholder={content.form_placeholder_email}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="company">Company (Optional)</Label>
+                    <Label htmlFor="company">{content.form_label_company} (Optional)</Label>
                     <Input
                       id="company"
                       name="company"
-                      placeholder="Your Company"
+                      placeholder={content.form_placeholder_company}
                     />
                   </div>
 
@@ -322,21 +285,21 @@ export default function ContactPageClient({ content }: ContactPageProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
+                    <Label htmlFor="subject">{content.form_label_subject}</Label>
                     <Input
                       id="subject"
                       name="subject"
-                      placeholder="How can we help?"
+                      placeholder={content.form_placeholder_subject}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                    <Label htmlFor="message">{content.form_label_message}</Label>
                     <Textarea
                       id="message"
                       name="message"
-                      placeholder="Tell us about your project..."
+                      placeholder={content.form_placeholder_message}
                       rows={5}
                       required
                     />
@@ -361,12 +324,11 @@ export default function ContactPageClient({ content }: ContactPageProps) {
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
                     <AlertCircle className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold">Raise a Complaint</h3>
+                  <h3 className="text-2xl font-bold">{content.complaint_title}</h3>
                 </div>
                 
                 <p className="text-white/90 mb-6 leading-relaxed">
-                  Clients, partners, and users can file complaints or concerns and track their status. 
-                  No login required - just fill out the form with your details.
+                  {content.complaint_description}
                 </p>
 
                 <div className="space-y-3 mb-6">
@@ -414,19 +376,18 @@ export default function ContactPageClient({ content }: ContactPageProps) {
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold">Check Complaint Status</h3>
+                  <h3 className="text-xl font-bold">{content.status_check_title}</h3>
                 </div>
                 
                 <p className="text-white/80 mb-6 text-sm">
-                  Enter your email to check the status of all your submitted complaints. 
-                  Real-time updates from our admin team.
+                  {content.status_check_description}
                 </p>
 
                 <form onSubmit={handleCheckStatus} className="space-y-4">
                   <div>
                     <Input
                       type="email"
-                      placeholder="Enter your email address"
+                      placeholder={content.status_check_placeholder}
                       value={statusEmail}
                       onChange={(e) => setStatusEmail(e.target.value)}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40"
@@ -444,7 +405,7 @@ export default function ContactPageClient({ content }: ContactPageProps) {
                       "Checking..."
                     ) : (
                       <>
-                        Check Status
+                        {content.status_check_button}
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </>
                     )}

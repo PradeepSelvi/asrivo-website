@@ -21,43 +21,13 @@ export async function POST(request: NextRequest) {
 
     // ✅ Zod Validation
     const validatedData = serviceInquirySchema.parse(body)
-    
-    email = validatedData.email
-    name = validatedData.name
-    const {
-      company,
-      phone,
-      countryCode,
-      whatsapp,
-      whatsappCountryCode,
-      preferredContact,
-      projectTypes,
-      otherProjectType,
-      projectDescription,
-      service,
-      service_type,
-      budget,
-      budgetRange,
-      timeline,
-      message,
-      project_description,
-      hasExisting,
-      has_existing,
-      existingLink,
-      targetPlatform,
-      keyFeatures,
-      otherKeyFeature,
-      targetAudience,
-      painPoints,
-      referenceLinks,
-      hearAboutUs,
-      prdFileUrl,
-      prdFileName,
-      prdText,
-      captchaToken,
-    } = validatedData
+    const raw = validatedData as any
+
+    email = raw.email
+    name = raw.name
 
     // 🤖 CAPTCHA Verification (if token provided)
+    const captchaToken = raw.captchaToken
     if (captchaToken) {
       const captchaResult = await verifyCaptcha(captchaToken, 'service_inquiry')
       if (!captchaResult.success) {
@@ -69,27 +39,32 @@ export async function POST(request: NextRequest) {
     }
 
     // Format phone and whatsapp with country code if provided
-    const formattedPhone = phone
-      ? (countryCode && !phone.startsWith('+') ? `${countryCode}${phone}` : phone)
+    const formattedPhone = raw.phone
+      ? (raw.countryCode && !raw.phone.startsWith('+') ? `${raw.countryCode}${raw.phone}` : raw.phone)
       : null
 
-    const formattedWhatsapp = whatsapp
-      ? (whatsappCountryCode && !whatsapp.startsWith('+') ? `${whatsappCountryCode}${whatsapp}` : whatsapp)
+    const formattedWhatsapp = raw.whatsapp
+      ? (raw.whatsappCountryCode && !raw.whatsapp.startsWith('+') ? `${raw.whatsappCountryCode}${raw.whatsapp}` : raw.whatsapp)
       : null
 
     // Determine project types list
-    const resolvedProjectTypes = (projectTypes && projectTypes.length > 0)
-      ? projectTypes
-      : (service_type ? [service_type] : (service ? [service] : []))
+    const projectTypes = (Array.isArray(raw.projectTypes) && raw.projectTypes.length > 0)
+      ? raw.projectTypes
+      : ((Array.isArray(raw.project_types) && raw.project_types.length > 0)
+          ? raw.project_types
+          : (raw.service_type || raw.service ? [raw.service_type || raw.service] : ['General Inquiry']))
 
     // Determine project description
-    const resolvedDescription = projectDescription || project_description || message || null
+    const projectDescription = raw.projectDescription || raw.project_description || raw.message || null
 
     // Determine budget range
-    const resolvedBudget = budgetRange || budget || null
+    const budgetRange = raw.budgetRange || raw.budget_range || raw.budget || null
+
+    // Determine timeline
+    const timeline = raw.timeline || null
 
     // Determine has_existing boolean
-    const resolvedHasExisting = hasExisting === 'yes' || hasExisting === true || has_existing === true
+    const hasExisting = raw.hasExisting === 'yes' || raw.hasExisting === true || raw.has_existing === true
 
     // Create Supabase client with service role (bypasses RLS for public inquiry submissions)
     const supabase = createApiClient({ useServiceRole: true })
@@ -99,27 +74,27 @@ export async function POST(request: NextRequest) {
       .insert({
         email,
         name,
-        company: company || null,
+        company: raw.company || null,
         phone: formattedPhone,
         whatsapp: formattedWhatsapp,
-        preferred_contact: preferredContact || 'email',
-        project_types: resolvedProjectTypes,
-        other_project_type: otherProjectType || null,
-        project_description: resolvedDescription,
-        has_existing: resolvedHasExisting,
-        existing_link: existingLink || null,
-        target_platform: targetPlatform && targetPlatform.length > 0 ? targetPlatform : null,
-        key_features: keyFeatures && keyFeatures.length > 0 ? keyFeatures : null,
-        other_key_feature: otherKeyFeature || null,
-        budget_range: resolvedBudget,
-        timeline: timeline || null,
-        target_audience: targetAudience || null,
-        pain_points: painPoints || null,
-        reference_links: referenceLinks || null,
-        hear_about_us: hearAboutUs || null,
-        prd_file_url: prdFileUrl || null,
-        prd_file_name: prdFileName || null,
-        prd_text: prdText || null,
+        preferred_contact: raw.preferredContact || raw.preferred_contact || 'email',
+        project_types: projectTypes,
+        other_project_type: raw.otherProjectType || raw.other_project_type || null,
+        project_description: projectDescription,
+        has_existing: hasExisting,
+        existing_link: raw.existingLink || raw.existing_link || null,
+        target_platform: raw.targetPlatform || raw.target_platform || null,
+        key_features: raw.keyFeatures || raw.key_features || null,
+        other_key_feature: raw.otherKeyFeature || raw.other_key_feature || null,
+        budget_range: budgetRange,
+        timeline,
+        target_audience: raw.targetAudience || raw.target_audience || null,
+        pain_points: raw.painPoints || raw.pain_points || null,
+        reference_links: raw.referenceLinks || raw.reference_links || null,
+        hear_about_us: raw.hearAboutUs || raw.hear_about_us || null,
+        prd_file_url: raw.prdFileUrl || raw.prd_file_url || null,
+        prd_file_name: raw.prdFileName || raw.prd_file_name || null,
+        prd_text: raw.prdText || raw.prd_text || null,
         status: 'new',
       })
       .select()
@@ -195,4 +170,3 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-

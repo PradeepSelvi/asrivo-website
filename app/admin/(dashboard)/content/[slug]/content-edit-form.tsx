@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
-type PageSlug = 'home' | 'about' | 'services' | 'contact' | 'projects' | 'team' | 'careers'
+type PageSlug = 'home' | 'about' | 'services' | 'contact' | 'projects' | 'team' | 'careers' | 'schedule' | 'book-consult'
 
 interface ContentEditFormProps {
   slug: PageSlug

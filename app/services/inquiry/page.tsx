@@ -324,9 +324,11 @@ export default function ServiceInquiryPage() {
 
       if (!response.ok) {
         const errorMsg =
-          typeof data?.error === 'object' && data?.error !== null
-            ? data.error.message || JSON.stringify(data.error)
-            : data?.error || data?.message || 'Failed to submit inquiry. Please try again.'
+          (typeof data?.error === 'string'
+            ? data.error
+            : data?.error?.message || (data?.error ? JSON.stringify(data.error) : null)) ||
+          data?.message ||
+          'Failed to submit inquiry. Please try again.'
         throw new Error(errorMsg)
       }
 
@@ -334,9 +336,15 @@ export default function ServiceInquiryPage() {
       clearSavedData()
       
       router.push('/services/inquiry/success')
-    } catch (err) {
+    } catch (err: any) {
       console.error('Submission error:', err)
-      setError(err instanceof Error ? err.message : 'Failed to submit inquiry. Please try again later.')
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'string'
+          ? err
+          : err?.error?.message || err?.message || 'Failed to submit inquiry. Please try again later.'
+      setError(errorMsg)
       setIsSubmitting(false)
     }
   }

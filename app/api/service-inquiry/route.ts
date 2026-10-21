@@ -24,18 +24,27 @@ export async function POST(request: NextRequest) {
     
     email = validatedData.email
     name = validatedData.name
-    const {
-      company,
-      phone,
-      service_type,
-      project_description,
-      timeline,
-      budget,
-      captchaToken,
-    } = validatedData
+    const fullPhone = validatedData.phone
+      ? (validatedData.phone.startsWith('+') ? validatedData.phone : `${validatedData.countryCode || ''}${validatedData.phone}`)
+      : ''
+
+    const fullWhatsapp = validatedData.whatsapp
+      ? (validatedData.whatsapp.startsWith('+') ? validatedData.whatsapp : `${validatedData.whatsappCountryCode || ''}${validatedData.whatsapp}`)
+      : null
+
+    const projectTypes = Array.isArray(validatedData.projectTypes) && validatedData.projectTypes.length > 0
+      ? validatedData.projectTypes
+      : (Array.isArray(validatedData.project_types) && validatedData.project_types.length > 0
+          ? validatedData.project_types
+          : (validatedData.service_type || validatedData.service ? [validatedData.service_type || validatedData.service] : ['General Inquiry']))
+
+    const projectDescription = validatedData.projectDescription || validatedData.project_description || validatedData.message || 'No description provided'
+    const budgetRange = validatedData.budgetRange || validatedData.budget_range || validatedData.budget || 'Flexible'
+    const timeline = validatedData.timeline || 'Flexible'
+    const hasExisting = validatedData.hasExisting === 'yes' || validatedData.hasExisting === true || validatedData.has_existing === true
 
     // 🤖 CAPTCHA Verification
-    const captchaResult = await verifyCaptcha(captchaToken, 'service_inquiry')
+    const captchaResult = await verifyCaptcha(validatedData.captchaToken || undefined, 'service_inquiry')
     if (!captchaResult.success) {
       return NextResponse.json(
         apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
@@ -50,30 +59,36 @@ export async function POST(request: NextRequest) {
       .insert({
         email,
         name,
-        company,
-        phone: phone || null,
-        project_types: [service_type],
-        project_description: project_description || null,
-        timeline: timeline || null,
-        budget_range: budget || null,
+        company: validatedData.company || null,
+        phone: fullPhone || validatedData.phone,
+        whatsapp: fullWhatsapp,
+        preferred_contact: validatedData.preferredContact || validatedData.preferred_contact || 'email',
+        project_types: projectTypes,
+        other_project_type: validatedData.otherProjectType || validatedData.other_project_type || null,
+        project_description: projectDescription,
+        has_existing: hasExisting,
+        existing_link: validatedData.existingLink || validatedData.existing_link || null,
+        target_platform: validatedData.targetPlatform || validatedData.target_platform || [],
+        key_features: validatedData.keyFeatures || validatedData.key_features || [],
+        other_key_feature: validatedData.otherKeyFeature || validatedData.other_key_feature || null,
+        budget_range: budgetRange,
+        timeline,
+        target_audience: validatedData.targetAudience || validatedData.target_audience || null,
+        pain_points: validatedData.painPoints || validatedData.pain_points || null,
+        reference_links: validatedData.referenceLinks || validatedData.reference_links || null,
+        hear_about_us: validatedData.hearAboutUs || validatedData.hear_about_us || null,
+        prd_file_url: validatedData.prdFileUrl || validatedData.prd_file_url || null,
+        prd_file_name: validatedData.prdFileName || validatedData.prd_file_name || null,
+        prd_text: validatedData.prdText || validatedData.prd_text || null,
         status: 'new',
-        // Fields with no form input — left as null / column defaults
-        whatsapp: null,
-        preferred_contact: null,
-        has_existing: null,
-        target_platform: null,
-        key_features: null,
-        target_audience: null,
-        pain_points: null,
-        reference_links: null,
-        hear_about_us: null,
       })
       .select()
+      .single()
 
     if (error) {
       logError('POST /api/service-inquiry - Supabase error', error, { email, name })
       return NextResponse.json(
-        apiError('Failed to submit inquiry', 'DATABASE_ERROR'),
+        apiError(error.message || 'Failed to submit inquiry', 'DATABASE_ERROR'),
         { status: HTTP_STATUS.BAD_REQUEST }
       )
     }

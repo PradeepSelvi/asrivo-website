@@ -54,7 +54,7 @@ export default function ScheduleConsultationPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit')
+        throw new Error(data.error?.message || (typeof data.error === 'string' ? data.error : null) || data.message || 'Failed to submit')
       }
 
       setSubmitted(true)

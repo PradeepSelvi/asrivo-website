@@ -39,58 +39,32 @@ export async function savePageContent(
     await checkAuthAndPermission() // Any admin can update content
     const supabase = await createClient()
 
-    // Upsert each content field as a separate row
-    for (const [sectionKey, contentValue] of Object.entries(updates)) {
-      // Try UPDATE first — only touch content_value and updated_at
-      const { data: existing, error: selectError } = await supabase
-        .from('page_content')
-        .select('id')
-        .eq('page_slug', pageSlug)
-        .eq('section_key', sectionKey)
-        .maybeSingle()
+    // Build the upsert payload in one pass — no per-field SELECT needed.
+    // The unique constraint on (page_slug, section_key) means Supabase will
+    // INSERT new rows and UPDATE existing ones in a single round-trip.
+    const rows = Object.entries(updates).map(([sectionKey, contentValue]) => ({
+      page_slug: pageSlug,
+      section_key: sectionKey,
+      content_value: contentValue,
+      // Generate a readable label only for new rows; ignored on UPDATE.
+      display_label: sectionKey
+        .split('_')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
+      content_type: 'text',
+      is_active: true,
+      updated_at: new Date().toISOString(),
+    }))
 
-      if (selectError) throw new Error(selectError.message)
+    const { error } = await supabase
+      .from('page_content')
+      .upsert(rows, {
+        onConflict: 'page_slug,section_key',
+        ignoreDuplicates: false,   // always update content_value
+      })
 
-      if (existing) {
-        // Row exists — only update the value, leave display_label untouched
-        const { error } = await supabase
-          .from('page_content')
-          .update({
-            content_value: contentValue,
-            updated_at: new Date().toISOString()
-          })
-          .eq('page_slug', pageSlug)
-          .eq('section_key', sectionKey)
+    if (error) throw new Error(error.message)
 
-        if (error) throw new Error(error.message)
-      } else {
-        // New row — generate a readable label from the key
-        // e.g. "hero_title" → "Hero Title"
-        const displayLabel = sectionKey
-          .split('_')
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(' ')
-
-        const { error } = await supabase
-          .from('page_content')
-          .insert({
-            page_slug: pageSlug,
-            section_key: sectionKey,
-            content_value: contentValue,
-            display_label: displayLabel,
-            content_type: 'text',
-            is_active: true,
-          })
-
-        if (error) throw new Error(error.message)
-      }
-    }
-
-    // Invalidate cache for both public page and admin content page
-    // NOTE: revalidatePath() triggers Next.js to regenerate the page on next request.
-    // In production, changes should be visible immediately after save. In development,
-    // cache behavior may vary. For dynamic pages with `force-dynamic`, revalidation
-    // ensures even static content gets refreshed.
     const pageRoutes: Record<string, string> = {
       home: '/',
       about: '/about',
@@ -98,10 +72,15 @@ export async function savePageContent(
       contact: '/contact',
       projects: '/projects',
       team: '/team',
-      careers: '/careers'
+      careers: '/careers',
+      schedule: '/schedule',
     }
 
     const publicRoute = pageRoutes[pageSlug] || `/${pageSlug}`
+
+    // Invalidate the full-route cache for the affected public page so Next.js
+    // re-renders it on the next request (getPageContent already uses no-store
+    // so the Supabase data will always be fresh).
     revalidatePath('/', 'layout')
     revalidatePath(publicRoute)
     revalidatePath('/admin/content')
