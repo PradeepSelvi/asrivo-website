@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create Supabase client with anon key (public access)
-    const supabase = createApiClient()
+    // Create Supabase client (using service role on server to bypass RLS for validated submissions)
+    const supabase = createApiClient({ useServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY })
 
     // Insert partnership submission
     const { data, error } = await supabase

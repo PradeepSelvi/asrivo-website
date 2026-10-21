@@ -12,7 +12,9 @@ import {
   AlertCircle,
   CheckCircle2,
   Info,
+  ArrowLeft,
 } from 'lucide-react'
+import Link from 'next/link'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface SiteSetting {
@@ -129,6 +131,14 @@ export default function CareersSettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
+        <div className="flex items-center gap-4 mb-4">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/admin/settings">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Settings
+            </Link>
+          </Button>
+        </div>
         <h1 className="text-3xl font-bold tracking-tight">Careers Page Settings</h1>
         <p className="text-muted-foreground mt-1">
           Control the visibility and behavior of the careers page and job applications

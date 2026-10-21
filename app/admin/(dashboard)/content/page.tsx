@@ -19,9 +19,11 @@ const PAGE_NAMES: Record<string, string> = {
   projects: 'Projects Page',
   team: 'Team Page',
   careers: 'Careers Page',
+  schedule: 'Schedule Page',
+  'book-consult': 'Book Consultation Page',
 }
 
-const ALL_PAGES = ['home', 'about', 'services', 'contact', 'projects', 'team', 'careers']
+const ALL_PAGES = ['home', 'about', 'services', 'contact', 'projects', 'team', 'careers', 'schedule', 'book-consult']
 
 export default async function ContentManagementPage() {
   await requireAdmin()

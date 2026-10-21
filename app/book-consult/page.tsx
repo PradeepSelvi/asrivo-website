@@ -1,15 +1,24 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Calendar, Clock, Users, ArrowRight, CheckCircle2 } from "lucide-react"
 import { MobileBackButton } from "@/components/mobile-back-button"
+import { getBookConsultContent } from "@/lib/supabase/content-helpers"
 
-export const metadata: Metadata = {
-  title: "Book a Consultation - Asrivo Tech",
-  description: "Schedule a free consultation with our expert team. Let's discuss your project and explore how we can help you achieve your goals.",
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getBookConsultContent()
+  return {
+    title: content.meta_title ?? 'Book a Consultation - Asrivo Tech',
+    description: content.meta_description ?? 'Schedule a free consultation with our expert team. Let\'s discuss your project and explore how we can help you achieve your goals.',
+  }
 }
 
-export default function BookConsultPage() {
+export default async function BookConsultPage() {
+  const content = await getBookConsultContent()
+
   return (
     <div className="flex flex-col">
       <MobileBackButton />
@@ -22,14 +31,13 @@ export default function BookConsultPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Let&apos;s Talk
+              {content.hero_badge}
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              Book a Consultation
+              {content.hero_title}
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Schedule a free consultation with our expert team. We&apos;ll discuss your project requirements, 
-              technical challenges, and explore how we can help bring your vision to life.
+              {content.hero_subtitle}
             </p>
           </div>
         </div>
@@ -40,10 +48,10 @@ export default function BookConsultPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-2xl text-center mb-16">
             <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
-              What to Expect
+              {content.expect_section_title}
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Our consultation process is designed to understand your needs and provide actionable insights.
+              {content.expect_section_subtitle}
             </p>
           </div>
 
@@ -52,10 +60,9 @@ export default function BookConsultPage() {
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                 <Users className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">1. Discovery Call</h3>
+              <h3 className="text-xl font-bold text-foreground mb-3">{content.expect_step_1_title}</h3>
               <p className="text-muted-foreground">
-                We&apos;ll start with a friendly conversation to understand your business goals, 
-                technical requirements, and project timeline.
+                {content.expect_step_1_desc}
               </p>
             </div>
 
@@ -63,10 +70,9 @@ export default function BookConsultPage() {
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                 <CheckCircle2 className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">2. Solution Design</h3>
+              <h3 className="text-xl font-bold text-foreground mb-3">{content.expect_step_2_title}</h3>
               <p className="text-muted-foreground">
-                Our experts will propose tailored solutions, technology stack recommendations, 
-                and architecture designs suited to your needs.
+                {content.expect_step_2_desc}
               </p>
             </div>
 
@@ -74,10 +80,9 @@ export default function BookConsultPage() {
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                 <Calendar className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">3. Project Roadmap</h3>
+              <h3 className="text-xl font-bold text-foreground mb-3">{content.expect_step_3_title}</h3>
               <p className="text-muted-foreground">
-                We&apos;ll create a detailed roadmap with milestones, timelines, and cost estimates 
-                to bring your project to life.
+                {content.expect_step_3_desc}
               </p>
             </div>
           </div>
@@ -90,7 +95,7 @@ export default function BookConsultPage() {
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <div>
               <h2 className="text-3xl font-bold text-foreground sm:text-4xl mb-6">
-                Free 30-Minute Consultation
+                {content.consult_title}
               </h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
@@ -98,10 +103,9 @@ export default function BookConsultPage() {
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">No Commitment Required</h4>
+                    <h4 className="font-semibold text-foreground mb-1">{content.benefit_1_title}</h4>
                     <p className="text-muted-foreground">
-                      Our consultation is completely free with no strings attached. 
-                      Get expert advice even if you decide not to work with us.
+                      {content.benefit_1_desc}
                     </p>
                   </div>
                 </div>
@@ -111,10 +115,9 @@ export default function BookConsultPage() {
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Expert Guidance</h4>
+                    <h4 className="font-semibold text-foreground mb-1">{content.benefit_2_title}</h4>
                     <p className="text-muted-foreground">
-                      Meet with our senior engineers and technical leads who have years of 
-                      experience building successful products.
+                      {content.benefit_2_desc}
                     </p>
                   </div>
                 </div>
@@ -124,10 +127,9 @@ export default function BookConsultPage() {
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Flexible Scheduling</h4>
+                    <h4 className="font-semibold text-foreground mb-1">{content.benefit_3_title}</h4>
                     <p className="text-muted-foreground">
-                      Choose a time that works best for you. We offer consultations across 
-                      different time zones to accommodate your schedule.
+                      {content.benefit_3_desc}
                     </p>
                   </div>
                 </div>
@@ -137,10 +139,9 @@ export default function BookConsultPage() {
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Actionable Insights</h4>
+                    <h4 className="font-semibold text-foreground mb-1">{content.benefit_4_title}</h4>
                     <p className="text-muted-foreground">
-                      Walk away with clear next steps, technology recommendations, 
-                      and a better understanding of your project scope.
+                      {content.benefit_4_desc}
                     </p>
                   </div>
                 </div>
@@ -150,9 +151,9 @@ export default function BookConsultPage() {
             <div className="bg-card border border-border rounded-2xl p-8 shadow-xl">
               <div className="mb-6">
                 <Clock className="h-8 w-8 text-primary mb-3" />
-                <h3 className="text-2xl font-bold text-foreground">Schedule Your Consultation</h3>
+                <h3 className="text-2xl font-bold text-foreground">{content.card_title}</h3>
                 <p className="mt-2 text-muted-foreground">
-                  Choose how you&apos;d like to get in touch with us.
+                  {content.card_subtitle}
                 </p>
               </div>
 
@@ -160,14 +161,14 @@ export default function BookConsultPage() {
                 <Button size="lg" className="w-full" asChild>
                   <Link href="/schedule">
                     <Calendar className="mr-2 h-5 w-5" />
-                    Schedule Consultation Now
+                    {content.card_btn_schedule}
                   </Link>
                 </Button>
 
                 <Button size="lg" variant="outline" className="w-full" asChild>
                   <Link href="/services/inquiry">
                     <Users className="mr-2 h-5 w-5" />
-                    Fill Service Inquiry Form
+                    {content.card_btn_inquiry}
                   </Link>
                 </Button>
 
@@ -196,28 +197,16 @@ export default function BookConsultPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-2xl text-center mb-16">
             <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
-              Why Work With Asrivo Tech?
+              {content.why_section_title}
             </h2>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
-              {
-                title: "2+ Projects Built",
-                description: "Proven track record of delivering successful digital products across industries.",
-              },
-              {
-                title: "Expert Team",
-                description: "Skilled developers, designers, and technical leads with years of experience.",
-              },
-              {
-                title: "Client-Centric",
-                description: "We prioritize your vision and work collaboratively to achieve your goals.",
-              },
-              {
-                title: "Modern Stack",
-                description: "We use cutting-edge technologies to build fast, secure, and scalable solutions.",
-              },
+              { title: content.stat_1_title, description: content.stat_1_desc },
+              { title: content.stat_2_title, description: content.stat_2_desc },
+              { title: content.stat_3_title, description: content.stat_3_desc },
+              { title: content.stat_4_title, description: content.stat_4_desc },
             ].map((feature, index) => (
               <div key={index} className="text-center">
                 <div className="text-4xl font-bold text-primary mb-2">{feature.title.split(' ')[0]}</div>
@@ -234,10 +223,10 @@ export default function BookConsultPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl text-balance">
-              Ready to Start Your Project?
+              {content.cta_title}
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
-              Let&apos;s turn your ideas into reality. Book your free consultation today.
+              {content.cta_subtitle}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button 
@@ -246,7 +235,7 @@ export default function BookConsultPage() {
                 asChild
               >
                 <Link href="/services/inquiry">
-                  Book Now
+                  {content.cta_btn_primary}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -256,7 +245,7 @@ export default function BookConsultPage() {
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent" 
                 asChild
               >
-                <Link href="/team">View Our Team</Link>
+                <Link href="/team">{content.cta_btn_secondary}</Link>
               </Button>
             </div>
           </div>

@@ -180,7 +180,7 @@ export default function RaiseComplaintPage() {
                 <Input
                   id="name"
                   name="name"
-                  placeholder="John Doe"
+                  placeholder="Yourname"
                   required
                 />
               </div>
@@ -190,7 +190,7 @@ export default function RaiseComplaintPage() {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="john@example.com"
+                  placeholder="yourname@example.com"
                   required
                 />
               </div>
@@ -202,7 +202,7 @@ export default function RaiseComplaintPage() {
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="+1 (234) 567-890"
+                placeholder="+91 XXXXXXXXXXX"
               />
             </div>
 

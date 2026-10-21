@@ -1,4 +1,32 @@
 import { createClient } from './server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+/**
+ * Creates a Supabase client specifically for public CMS content reads.
+ *
+ * Uses the plain supabase-js client (not the SSR cookie client) so we can
+ * attach Next.js fetch cache options.
+ *
+ * cache: 'no-store' ensures that on every request the latest Supabase data
+ * is returned. This pairs with `force-dynamic` on the public pages so that
+ * admin CMS edits are visible immediately on the next page visit.
+ */
+function createContentClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (url, options = {}) =>
+          fetch(url, {
+            ...options,
+            cache: 'no-store',
+          }),
+      },
+    }
+  )
+}
 
 // ============================================
 // TypeScript Interfaces for Page Content
@@ -900,7 +928,10 @@ const DEFAULT_CAREERS_CONTENT: CareersContent = {
  */
 export async function getPageContent(pageSlug: string): Promise<Record<string, string>> {
   try {
-    const supabase = await createClient()
+    // Use the no-store client so Next.js never serves a cached Supabase response.
+    // This pairs with `force-dynamic` on every public page to ensure CMS edits
+    // are visible immediately on the next page visit.
+    const supabase = createContentClient()
     
     const { data, error } = await supabase
       .from('page_content')
@@ -1435,5 +1466,240 @@ export async function getAllPagesMetadata(): Promise<PageMetadata[]> {
   } catch (error) {
     console.error('Exception fetching pages metadata:', error)
     return []
+  }
+}
+
+// ============================================
+// Schedule Page Content
+// ============================================
+
+export interface ScheduleContent {
+  // Page heading section
+  hero_badge: string
+  hero_title: string
+  hero_subtitle: string
+
+  // Sidebar info card
+  call_type_title: string
+  call_type_duration: string
+  call_feature_1: string
+  call_feature_2: string
+  call_feature_3: string
+
+  // Urgent contact box
+  urgent_title: string
+  urgent_description: string
+
+  // SEO
+  meta_title?: string
+  meta_description?: string
+}
+
+const DEFAULT_SCHEDULE_CONTENT: ScheduleContent = {
+  hero_badge: 'Consultation',
+  hero_title: 'Schedule a Consultation Call',
+  hero_subtitle:
+    'Book a free 30-minute consultation with our experts to discuss your project requirements and how we can help.',
+
+  call_type_title: 'Consultation Call',
+  call_type_duration: '30 min • Video Call',
+  call_feature_1: 'Project requirements analysis',
+  call_feature_2: 'Technical feasibility discussion',
+  call_feature_3: 'Timeline and budget estimation',
+
+  urgent_title: 'Need a faster response?',
+  urgent_description: 'Call us directly or send an email for urgent inquiries.',
+}
+
+/**
+ * Fetches schedule page content with proper typing and fallback to defaults.
+ */
+export async function getScheduleContent(): Promise<ScheduleContent> {
+  const content = await getPageContent('schedule')
+
+  return {
+    hero_badge: content.hero_badge || DEFAULT_SCHEDULE_CONTENT.hero_badge,
+    hero_title: content.hero_title || DEFAULT_SCHEDULE_CONTENT.hero_title,
+    hero_subtitle: content.hero_subtitle || DEFAULT_SCHEDULE_CONTENT.hero_subtitle,
+
+    call_type_title: content.call_type_title || DEFAULT_SCHEDULE_CONTENT.call_type_title,
+    call_type_duration: content.call_type_duration || DEFAULT_SCHEDULE_CONTENT.call_type_duration,
+    call_feature_1: content.call_feature_1 || DEFAULT_SCHEDULE_CONTENT.call_feature_1,
+    call_feature_2: content.call_feature_2 || DEFAULT_SCHEDULE_CONTENT.call_feature_2,
+    call_feature_3: content.call_feature_3 || DEFAULT_SCHEDULE_CONTENT.call_feature_3,
+
+    urgent_title: content.urgent_title || DEFAULT_SCHEDULE_CONTENT.urgent_title,
+    urgent_description: content.urgent_description || DEFAULT_SCHEDULE_CONTENT.urgent_description,
+
+    meta_title: content.meta_title,
+    meta_description: content.meta_description,
+  }
+}
+
+// ============================================
+// Book-Consult Page Content
+// ============================================
+
+export interface BookConsultContent {
+  // Hero
+  hero_badge: string
+  hero_title: string
+  hero_subtitle: string
+
+  // "What to Expect" section
+  expect_section_title: string
+  expect_section_subtitle: string
+  expect_step_1_title: string
+  expect_step_1_desc: string
+  expect_step_2_title: string
+  expect_step_2_desc: string
+  expect_step_3_title: string
+  expect_step_3_desc: string
+
+  // "Free Consultation" detail section
+  consult_title: string
+  benefit_1_title: string
+  benefit_1_desc: string
+  benefit_2_title: string
+  benefit_2_desc: string
+  benefit_3_title: string
+  benefit_3_desc: string
+  benefit_4_title: string
+  benefit_4_desc: string
+
+  // Schedule card
+  card_title: string
+  card_subtitle: string
+  card_btn_schedule: string
+  card_btn_inquiry: string
+
+  // "Why Choose Us" section
+  why_section_title: string
+  stat_1_title: string
+  stat_1_desc: string
+  stat_2_title: string
+  stat_2_desc: string
+  stat_3_title: string
+  stat_3_desc: string
+  stat_4_title: string
+  stat_4_desc: string
+
+  // CTA section
+  cta_title: string
+  cta_subtitle: string
+  cta_btn_primary: string
+  cta_btn_secondary: string
+
+  // SEO
+  meta_title?: string
+  meta_description?: string
+}
+
+const DEFAULT_BOOK_CONSULT_CONTENT: BookConsultContent = {
+  hero_badge: "Let's Talk",
+  hero_title: 'Book a Consultation',
+  hero_subtitle:
+    "Schedule a free consultation with our expert team. We'll discuss your project requirements, technical challenges, and explore how we can help bring your vision to life.",
+
+  expect_section_title: 'What to Expect',
+  expect_section_subtitle:
+    'Our consultation process is designed to understand your needs and provide actionable insights.',
+  expect_step_1_title: '1. Discovery Call',
+  expect_step_1_desc:
+    "We'll start with a friendly conversation to understand your business goals, technical requirements, and project timeline.",
+  expect_step_2_title: '2. Solution Design',
+  expect_step_2_desc:
+    'Our experts will propose tailored solutions, technology stack recommendations, and architecture designs suited to your needs.',
+  expect_step_3_title: '3. Project Roadmap',
+  expect_step_3_desc:
+    "We'll create a detailed roadmap with milestones, timelines, and cost estimates to bring your project to life.",
+
+  consult_title: 'Free 30-Minute Consultation',
+  benefit_1_title: 'No Commitment Required',
+  benefit_1_desc:
+    'Our consultation is completely free with no strings attached. Get expert advice even if you decide not to work with us.',
+  benefit_2_title: 'Expert Guidance',
+  benefit_2_desc:
+    'Meet with our senior engineers and technical leads who have years of experience building successful products.',
+  benefit_3_title: 'Flexible Scheduling',
+  benefit_3_desc:
+    'Choose a time that works best for you. We offer consultations across different time zones to accommodate your schedule.',
+  benefit_4_title: 'Actionable Insights',
+  benefit_4_desc:
+    'Walk away with clear next steps, technology recommendations, and a better understanding of your project scope.',
+
+  card_title: 'Schedule Your Consultation',
+  card_subtitle: "Choose how you'd like to get in touch with us.",
+  card_btn_schedule: 'Schedule Consultation Now',
+  card_btn_inquiry: 'Fill Service Inquiry Form',
+
+  why_section_title: 'Why Work With Asrivo Tech?',
+  stat_1_title: '2+ Projects Built',
+  stat_1_desc: 'Proven track record of delivering successful digital products across industries.',
+  stat_2_title: 'Expert Team',
+  stat_2_desc: 'Skilled developers, designers, and technical leads with years of experience.',
+  stat_3_title: 'Client-Centric',
+  stat_3_desc: 'We prioritize your vision and work collaboratively to achieve your goals.',
+  stat_4_title: 'Modern Stack',
+  stat_4_desc: 'We use cutting-edge technologies to build fast, secure, and scalable solutions.',
+
+  cta_title: 'Ready to Start Your Project?',
+  cta_subtitle: "Let's turn your ideas into reality. Book your free consultation today.",
+  cta_btn_primary: 'Book Now',
+  cta_btn_secondary: 'View Our Team',
+}
+
+/**
+ * Fetches book-consult page content with proper typing and fallback to defaults.
+ */
+export async function getBookConsultContent(): Promise<BookConsultContent> {
+  const content = await getPageContent('book-consult')
+
+  return {
+    hero_badge: content.hero_badge || DEFAULT_BOOK_CONSULT_CONTENT.hero_badge,
+    hero_title: content.hero_title || DEFAULT_BOOK_CONSULT_CONTENT.hero_title,
+    hero_subtitle: content.hero_subtitle || DEFAULT_BOOK_CONSULT_CONTENT.hero_subtitle,
+
+    expect_section_title: content.expect_section_title || DEFAULT_BOOK_CONSULT_CONTENT.expect_section_title,
+    expect_section_subtitle: content.expect_section_subtitle || DEFAULT_BOOK_CONSULT_CONTENT.expect_section_subtitle,
+    expect_step_1_title: content.expect_step_1_title || DEFAULT_BOOK_CONSULT_CONTENT.expect_step_1_title,
+    expect_step_1_desc: content.expect_step_1_desc || DEFAULT_BOOK_CONSULT_CONTENT.expect_step_1_desc,
+    expect_step_2_title: content.expect_step_2_title || DEFAULT_BOOK_CONSULT_CONTENT.expect_step_2_title,
+    expect_step_2_desc: content.expect_step_2_desc || DEFAULT_BOOK_CONSULT_CONTENT.expect_step_2_desc,
+    expect_step_3_title: content.expect_step_3_title || DEFAULT_BOOK_CONSULT_CONTENT.expect_step_3_title,
+    expect_step_3_desc: content.expect_step_3_desc || DEFAULT_BOOK_CONSULT_CONTENT.expect_step_3_desc,
+
+    consult_title: content.consult_title || DEFAULT_BOOK_CONSULT_CONTENT.consult_title,
+    benefit_1_title: content.benefit_1_title || DEFAULT_BOOK_CONSULT_CONTENT.benefit_1_title,
+    benefit_1_desc: content.benefit_1_desc || DEFAULT_BOOK_CONSULT_CONTENT.benefit_1_desc,
+    benefit_2_title: content.benefit_2_title || DEFAULT_BOOK_CONSULT_CONTENT.benefit_2_title,
+    benefit_2_desc: content.benefit_2_desc || DEFAULT_BOOK_CONSULT_CONTENT.benefit_2_desc,
+    benefit_3_title: content.benefit_3_title || DEFAULT_BOOK_CONSULT_CONTENT.benefit_3_title,
+    benefit_3_desc: content.benefit_3_desc || DEFAULT_BOOK_CONSULT_CONTENT.benefit_3_desc,
+    benefit_4_title: content.benefit_4_title || DEFAULT_BOOK_CONSULT_CONTENT.benefit_4_title,
+    benefit_4_desc: content.benefit_4_desc || DEFAULT_BOOK_CONSULT_CONTENT.benefit_4_desc,
+
+    card_title: content.card_title || DEFAULT_BOOK_CONSULT_CONTENT.card_title,
+    card_subtitle: content.card_subtitle || DEFAULT_BOOK_CONSULT_CONTENT.card_subtitle,
+    card_btn_schedule: content.card_btn_schedule || DEFAULT_BOOK_CONSULT_CONTENT.card_btn_schedule,
+    card_btn_inquiry: content.card_btn_inquiry || DEFAULT_BOOK_CONSULT_CONTENT.card_btn_inquiry,
+
+    why_section_title: content.why_section_title || DEFAULT_BOOK_CONSULT_CONTENT.why_section_title,
+    stat_1_title: content.stat_1_title || DEFAULT_BOOK_CONSULT_CONTENT.stat_1_title,
+    stat_1_desc: content.stat_1_desc || DEFAULT_BOOK_CONSULT_CONTENT.stat_1_desc,
+    stat_2_title: content.stat_2_title || DEFAULT_BOOK_CONSULT_CONTENT.stat_2_title,
+    stat_2_desc: content.stat_2_desc || DEFAULT_BOOK_CONSULT_CONTENT.stat_2_desc,
+    stat_3_title: content.stat_3_title || DEFAULT_BOOK_CONSULT_CONTENT.stat_3_title,
+    stat_3_desc: content.stat_3_desc || DEFAULT_BOOK_CONSULT_CONTENT.stat_3_desc,
+    stat_4_title: content.stat_4_title || DEFAULT_BOOK_CONSULT_CONTENT.stat_4_title,
+    stat_4_desc: content.stat_4_desc || DEFAULT_BOOK_CONSULT_CONTENT.stat_4_desc,
+
+    cta_title: content.cta_title || DEFAULT_BOOK_CONSULT_CONTENT.cta_title,
+    cta_subtitle: content.cta_subtitle || DEFAULT_BOOK_CONSULT_CONTENT.cta_subtitle,
+    cta_btn_primary: content.cta_btn_primary || DEFAULT_BOOK_CONSULT_CONTENT.cta_btn_primary,
+    cta_btn_secondary: content.cta_btn_secondary || DEFAULT_BOOK_CONSULT_CONTENT.cta_btn_secondary,
+
+    meta_title: content.meta_title,
+    meta_description: content.meta_description,
   }
 }

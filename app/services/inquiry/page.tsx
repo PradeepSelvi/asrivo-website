@@ -323,16 +323,26 @@ export default function ServiceInquiryPage() {
       console.log('API response:', data)
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit inquiry. Please try again.')
+        const errorMsg =
+          (typeof data.error === 'string' ? data.error : data.error?.message) ||
+          data.message ||
+          'Failed to submit inquiry. Please try again.'
+        throw new Error(errorMsg)
       }
 
       // Clear saved form data after successful submission
       clearSavedData()
       
       router.push('/services/inquiry/success')
-    } catch (err) {
+    } catch (err: any) {
       console.error('Submission error:', err)
-      setError(err instanceof Error ? err.message : 'Failed to submit inquiry. Please try again later.')
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'string'
+          ? err
+          : err?.error?.message || err?.message || 'Failed to submit inquiry. Please try again later.'
+      setError(errorMsg)
       setIsSubmitting(false)
     }
   }

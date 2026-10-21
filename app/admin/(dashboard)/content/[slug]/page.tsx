@@ -9,7 +9,7 @@ import ContentEditForm from './content-edit-form'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-const ALLOWED_PAGES = ['home', 'about', 'services', 'contact', 'projects', 'team', 'careers'] as const
+const ALLOWED_PAGES = ['home', 'about', 'services', 'contact', 'projects', 'team', 'careers', 'schedule', 'book-consult'] as const
 type PageSlug = typeof ALLOWED_PAGES[number]
 
 const PAGE_NAMES: Record<PageSlug, string> = {
@@ -20,6 +20,8 @@ const PAGE_NAMES: Record<PageSlug, string> = {
   projects: 'Projects Page',
   team: 'Team Page',
   careers: 'Careers Page',
+  schedule: 'Schedule Page',
+  'book-consult': 'Book Consultation Page',
 }
 
 export default async function EditContentPage({
