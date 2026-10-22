@@ -11,6 +11,9 @@ const ALLOWED_BUCKETS = new Set([
   'inquiry-documents',
   'partnership-documents',
   'user-profiles',
+  'team-members',
+  'project-images',
+  'resumes',
 ])
 
 const VALID_DOC_TYPES = new Set([

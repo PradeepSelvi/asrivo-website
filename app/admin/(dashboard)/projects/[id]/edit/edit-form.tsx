@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { updateProject } from '@/lib/supabase/content-actions'
 import { ArrowLeft, Loader2, Save, X } from 'lucide-react'
 import Link from 'next/link'
+import ProjectImageUpload from '@/components/admin/project-image-upload'
 
 interface EditProjectFormProps {
   project: any
@@ -188,25 +189,21 @@ export default function EditProjectForm({ project }: EditProjectFormProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Image URL</label>
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-          </div>
+          <ProjectImageUpload
+            label="Project Image"
+            description="Main thumbnail for project cards and listings"
+            value={imageUrl}
+            onChange={(url) => setImageUrl(url)}
+            disabled={loading}
+          />
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Featured Image URL</label>
-            <input
-              type="url"
-              value={featuredImageUrl}
-              onChange={(e) => setFeaturedImageUrl(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-          </div>
+          <ProjectImageUpload
+            label="Featured Image"
+            description="High-resolution banner for featured sections and detail header"
+            value={featuredImageUrl}
+            onChange={(url) => setFeaturedImageUrl(url)}
+            disabled={loading}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

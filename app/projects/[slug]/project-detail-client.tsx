@@ -211,7 +211,8 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 lg:px-8 py-12">\n        <div className="grid gap-8 lg:grid-cols-3">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8 py-12">
+        <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Featured Image */}

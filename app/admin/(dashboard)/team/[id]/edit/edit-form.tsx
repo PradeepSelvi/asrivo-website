@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { updateTeamMember } from '@/lib/supabase/content-actions'
 import { ArrowLeft, Loader2, Save, X } from 'lucide-react'
 import Link from 'next/link'
+import TeamImageUpload from '@/components/admin/team-image-upload'
 
 interface EditTeamFormProps {
   member: any
@@ -161,12 +162,13 @@ export default function EditTeamForm({ member }: EditTeamFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Profile Image URL</label>
-          <input
-            type="url"
+          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            Profile Image
+          </label>
+          <TeamImageUpload
             value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            onChange={setImageUrl}
+            disabled={loading}
           />
         </div>
 

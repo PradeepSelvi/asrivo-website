@@ -116,6 +116,14 @@ export const VALIDATION = {
     MIN_LENGTH: 10,
     MAX_LENGTH: 15,
   },
+  TEAM_MEMBER_IMAGE: {
+    MAX_SIZE: 2 * 1024 * 1024, // 2MB
+    ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'],
+  },
+  PROJECT_IMAGE: {
+    MAX_SIZE: 10 * 1024 * 1024, // 10MB
+    ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png'],
+  },
 } as const
 
 // Storage Buckets
@@ -125,6 +133,8 @@ export const STORAGE_BUCKETS = {
   COMPLAINT_PROOFS: 'proof of complain',
   PARTNERSHIP_DOCUMENTS: 'partnership-documents',
   PROJECT_IMAGES: 'project-images',
+  TEAM_MEMBERS: 'team-members',
+  RESUMES: 'resumes',
 } as const
 
 // HTTP Status Codes (commonly used)

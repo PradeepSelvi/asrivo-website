@@ -17,6 +17,7 @@ import {
   Upload,
 } from 'lucide-react'
 import { loadRecaptchaScript, executeRecaptcha } from '@/lib/utils/captcha'
+import ResumeUpload from '@/components/resume-upload'
 
 function ApplyContent() {
   const searchParams = useSearchParams()
@@ -50,6 +51,12 @@ function ApplyContent() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    if (!formData.resume_url) {
+      alert('Please upload your resume in PDF format before submitting.')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -213,22 +220,16 @@ function ApplyContent() {
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="resume_url" className="flex items-center gap-2">
+                    <Label className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      Resume URL
+                      Resume (PDF Format) <span className="text-destructive">*</span>
                     </Label>
-                    <Input
-                      id="resume_url"
-                      name="resume_url"
-                      type="url"
-                      placeholder="https://drive.google.com/..."
+                    <ResumeUpload
                       value={formData.resume_url}
-                      onChange={handleChange}
+                      onChange={(url) => setFormData((prev) => ({ ...prev, resume_url: url }))}
+                      disabled={loading}
+                      required
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Upload your resume to Google Drive, Dropbox, or similar and paste the
-                      shareable link here
-                    </p>
                   </div>
 
                   <div className="space-y-2">
