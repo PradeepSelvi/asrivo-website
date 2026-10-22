@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { AuthGate } from "@/components/auth-gate"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -122,6 +123,7 @@ export default function ScheduleClient({
   }
 
   return (
+    <AuthGate message="Sign in to schedule a consultation. We'll send confirmation to your registered email.">
     <div className="min-h-screen bg-muted/30 pt-24 pb-20">
       <div className="mx-auto max-w-5xl px-4 lg:px-8">
         {/* Hero heading — driven by CMS */}
@@ -332,5 +334,6 @@ export default function ScheduleClient({
         </div>
       </div>
     </div>
+    </AuthGate>
   )
 }

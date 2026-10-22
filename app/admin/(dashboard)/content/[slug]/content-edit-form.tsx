@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
-type PageSlug = 'home' | 'about' | 'services' | 'contact' | 'projects' | 'team' | 'careers'
+type PageSlug = 'home' | 'about' | 'services' | 'contact' | 'projects' | 'team' | 'careers' | 'schedule' | 'book-consult'
 
 interface ContentEditFormProps {
   slug: PageSlug
@@ -69,6 +69,8 @@ export default function ContentEditForm({ slug, currentContent }: ContentEditFor
       {slug === 'projects' && <ProjectsFields register={register} />}
       {slug === 'team' && <TeamFields register={register} />}
       {slug === 'careers' && <CareersFields register={register} />}
+      {slug === 'schedule' && <ScheduleFields register={register} />}
+      {slug === 'book-consult' && <BookConsultFields register={register} />}
 
       {/* SEO Fields (common to all pages) */}
       <div className="border-t border-border pt-8 space-y-6">
@@ -1124,25 +1126,6 @@ function ServicesFields({ register }: { register: any }) {
       </div>
 
       <div className="space-y-6 border-t border-border pt-8">
-        <h3 className="text-lg font-semibold text-foreground">Project Status & Availability Section</h3>
-        
-        <div className="space-y-2">
-          <Label htmlFor="status_title">Status Title</Label>
-          <Input id="status_title" {...register('status_title')} placeholder="Currently Accepting Projects" />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status_description">Status Description</Label>
-          <Textarea
-            id="status_description"
-            {...register('status_description')}
-            placeholder="We have availability for new projects starting Q2 2025."
-            rows={2}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-6 border-t border-border pt-8">
         <h3 className="text-lg font-semibold text-foreground">CTA Section</h3>
         
         <div className="space-y-2">
@@ -1901,6 +1884,200 @@ function CareersFields({ register }: { register: any }) {
         <div className="space-y-2">
           <Label htmlFor="disabled_button">Disabled State Button</Label>
           <Input id="disabled_button" {...register('disabled_button')} placeholder="Notify Me" />
+        </div>
+      </div>
+    </>
+  )
+}
+
+function ScheduleFields({ register }: { register: any }) {
+  return (
+    <>
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold text-foreground">Hero Section</h3>
+        <div className="space-y-2">
+          <Label htmlFor="hero_badge">Hero Badge</Label>
+          <Input id="hero_badge" {...register('hero_badge')} placeholder="Consultation" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="hero_title">Hero Title</Label>
+          <Input id="hero_title" {...register('hero_title')} placeholder="Schedule a Consultation Call" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="hero_subtitle">Hero Subtitle</Label>
+          <Textarea id="hero_subtitle" {...register('hero_subtitle')} rows={3} />
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Consultation Call Info Card</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="call_type_title">Call Type Title</Label>
+            <Input id="call_type_title" {...register('call_type_title')} placeholder="Consultation Call" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="call_type_duration">Duration / Mode</Label>
+            <Input id="call_type_duration" {...register('call_type_duration')} placeholder="30 min • Video Call" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="call_feature_1">Feature 1</Label>
+            <Input id="call_feature_1" {...register('call_feature_1')} placeholder="Project requirements analysis" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="call_feature_2">Feature 2</Label>
+            <Input id="call_feature_2" {...register('call_feature_2')} placeholder="Technical feasibility discussion" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="call_feature_3">Feature 3</Label>
+            <Input id="call_feature_3" {...register('call_feature_3')} placeholder="Timeline and budget estimation" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Urgent Contact Box</h3>
+        <div className="space-y-2">
+          <Label htmlFor="urgent_title">Urgent Title</Label>
+          <Input id="urgent_title" {...register('urgent_title')} placeholder="Need a faster response?" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="urgent_description">Urgent Description</Label>
+          <Textarea id="urgent_description" {...register('urgent_description')} rows={2} />
+        </div>
+      </div>
+    </>
+  )
+}
+
+function BookConsultFields({ register }: { register: any }) {
+  return (
+    <>
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold text-foreground">Hero Section</h3>
+        <div className="space-y-2">
+          <Label htmlFor="hero_badge">Hero Badge</Label>
+          <Input id="hero_badge" {...register('hero_badge')} placeholder="Let's Talk" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="hero_title">Hero Title</Label>
+          <Input id="hero_title" {...register('hero_title')} placeholder="Book a Consultation" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="hero_subtitle">Hero Subtitle</Label>
+          <Textarea id="hero_subtitle" {...register('hero_subtitle')} rows={3} />
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">What to Expect Section</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="expect_section_title">Section Title</Label>
+            <Input id="expect_section_title" {...register('expect_section_title')} placeholder="What to Expect" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="expect_section_subtitle">Section Subtitle</Label>
+            <Input id="expect_section_subtitle" {...register('expect_section_subtitle')} />
+          </div>
+        </div>
+        {[1, 2, 3].map((n) => (
+          <div key={n} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`expect_step_${n}_title`}>Step {n} Title</Label>
+              <Input id={`expect_step_${n}_title`} {...register(`expect_step_${n}_title`)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`expect_step_${n}_desc`}>Step {n} Description</Label>
+              <Textarea id={`expect_step_${n}_desc`} {...register(`expect_step_${n}_desc`)} rows={2} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Free Consultation Details</h3>
+        <div className="space-y-2">
+          <Label htmlFor="consult_title">Section Title</Label>
+          <Input id="consult_title" {...register('consult_title')} placeholder="Free 30-Minute Consultation" />
+        </div>
+        {[1, 2, 3, 4].map((n) => (
+          <div key={n} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`benefit_${n}_title`}>Benefit {n} Title</Label>
+              <Input id={`benefit_${n}_title`} {...register(`benefit_${n}_title`)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`benefit_${n}_desc`}>Benefit {n} Description</Label>
+              <Textarea id={`benefit_${n}_desc`} {...register(`benefit_${n}_desc`)} rows={2} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Schedule Card</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="card_title">Card Title</Label>
+            <Input id="card_title" {...register('card_title')} placeholder="Schedule Your Consultation" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="card_subtitle">Card Subtitle</Label>
+            <Input id="card_subtitle" {...register('card_subtitle')} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="card_btn_schedule">Schedule Button</Label>
+            <Input id="card_btn_schedule" {...register('card_btn_schedule')} placeholder="Schedule Consultation Now" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="card_btn_inquiry">Inquiry Button</Label>
+            <Input id="card_btn_inquiry" {...register('card_btn_inquiry')} placeholder="Fill Service Inquiry Form" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">Why Work With Us Section</h3>
+        <div className="space-y-2">
+          <Label htmlFor="why_section_title">Section Title</Label>
+          <Input id="why_section_title" {...register('why_section_title')} placeholder="Why Work With Asrivo Tech?" />
+        </div>
+        {[1, 2, 3, 4].map((n) => (
+          <div key={n} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`stat_${n}_title`}>Stat {n} Title</Label>
+              <Input id={`stat_${n}_title`} {...register(`stat_${n}_title`)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`stat_${n}_desc`}>Stat {n} Description</Label>
+              <Textarea id={`stat_${n}_desc`} {...register(`stat_${n}_desc`)} rows={2} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-6 border-t border-border pt-8">
+        <h3 className="text-lg font-semibold text-foreground">CTA Section</h3>
+        <div className="space-y-2">
+          <Label htmlFor="cta_title">CTA Title</Label>
+          <Input id="cta_title" {...register('cta_title')} placeholder="Ready to Start Your Project?" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="cta_subtitle">CTA Subtitle</Label>
+          <Textarea id="cta_subtitle" {...register('cta_subtitle')} rows={2} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="cta_btn_primary">Primary Button</Label>
+            <Input id="cta_btn_primary" {...register('cta_btn_primary')} placeholder="Book Now" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cta_btn_secondary">Secondary Button</Label>
+            <Input id="cta_btn_secondary" {...register('cta_btn_secondary')} placeholder="View Our Team" />
+          </div>
         </div>
       </div>
     </>

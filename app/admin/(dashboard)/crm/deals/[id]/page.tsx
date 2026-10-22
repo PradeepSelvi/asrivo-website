@@ -1,5 +1,5 @@
 import { getDealById, getActivities, getTasks, getNotes } from '@/lib/supabase/crm-actions'
-import { Briefcase, DollarSign, Calendar, TrendingUp, Mail, Phone, Building2, User, Edit, ArrowLeft } from 'lucide-react'
+import { Briefcase, IndianRupee, Calendar, TrendingUp, Mail, Phone, Building2, User, Edit, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -67,10 +67,10 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-card border border-border rounded-xl p-4">
           <div className="flex items-center gap-3">
-            <DollarSign className="w-8 h-8 text-green-500" />
+            <IndianRupee className="w-8 h-8 text-green-500" />
             <div>
               <p className="text-xs text-muted-foreground uppercase font-semibold">Deal Value</p>
-              <p className="text-xl font-bold text-foreground">${(deal.deal_value || 0).toLocaleString()}</p>
+              <p className="text-xl font-bold text-foreground">₹{(deal.deal_value || 0).toLocaleString()}</p>
             </div>
           </div>
         </div>

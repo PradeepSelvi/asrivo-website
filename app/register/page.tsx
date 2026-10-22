@@ -1,14 +1,16 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Lock, Mail, Eye, EyeOff, ArrowLeft, Home, Loader2, User, Shield, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { checkPasswordBreach, getPasswordStrength } from '@/lib/utils/security-validation'
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirectTo') || '/'
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -164,8 +166,8 @@ export default function RegisterPage() {
         }
 
         // Success - user is logged in immediately (email confirmation disabled)
-        // Redirect to profile page to complete setup
-        router.push('/profile')
+        // Redirect to the original page or profile
+        router.push(redirectTo === '/' ? '/profile' : redirectTo)
         router.refresh()
       }
     } catch (err) {
@@ -446,5 +448,17 @@ export default function RegisterPage() {
         </p>
       </div>
     </main>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
   )
 }

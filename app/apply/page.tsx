@@ -17,6 +17,7 @@ import {
   Upload,
 } from 'lucide-react'
 import { loadRecaptchaScript, executeRecaptcha } from '@/lib/utils/captcha'
+import { AuthGate } from '@/components/auth-gate'
 
 function ApplyContent() {
   const searchParams = useSearchParams()
@@ -87,6 +88,7 @@ function ApplyContent() {
   }
 
   return (
+    <AuthGate message="Sign in to apply for jobs. Track your application status in your profile.">
     <div className="flex flex-col min-h-screen">
       <MobileBackButton />
       {/* Hero Section */}
@@ -300,6 +302,7 @@ function ApplyContent() {
         </div>
       </section>
     </div>
+    </AuthGate>
   )
 }
 
