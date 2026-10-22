@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { uploadRateLimit } from '@/lib/utils/rate-limit'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB in bytes
 
 export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, uploadRateLimit)
+  if (limited) return limited
+
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File

@@ -5,8 +5,15 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, Rocket } from "lucide-react"
 import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 
-export function CTASection() {
+import type { HomeContent } from "@/lib/supabase/content-helpers"
+
+export function CTASection({ content }: { content: HomeContent }) {
   const { ref, isVisible } = useScrollAnimation()
+  
+  // Use HomeContent directly
+  const title = content.cta_title
+  const description = content.cta_description
+  const buttonText = content.cta_button
 
   return (
     <section className="bg-muted/30 py-24 lg:py-32">
@@ -41,18 +48,16 @@ export function CTASection() {
             </div>
 
             <h2 className="text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl text-balance">
-              Let&apos;s Build Your Next
+              {title}
               <span className="block mt-2">
                 <span className="relative inline-block">
-                  Product Together
                   <Sparkles className="absolute -top-4 -right-6 h-6 w-6 text-accent animate-pulse" />
                 </span>
               </span>
             </h2>
             
             <p className="mx-auto mt-8 max-w-2xl text-lg text-primary-foreground/80 leading-relaxed">
-              Ready to transform your ideas into reality? Our team is here to help you build 
-              innovative solutions that drive your business forward.
+              {description}
             </p>
             
             <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -63,7 +68,7 @@ export function CTASection() {
                 asChild
               >
                 <Link href="/services/inquiry">
-                  Start a Project
+                  {buttonText}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>

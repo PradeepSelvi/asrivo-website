@@ -49,18 +49,21 @@ export async function GET(request: NextRequest) {
     // Fetch new service inquiries
     const { data: inquiries } = await supabase
       .from('client_inquiries')
-      .select('id, name, company, service_type, created_at, status')
+      .select('id, name, company, project_types, created_at, status')
       .eq('status', 'new')
       .order('created_at', { ascending: false })
       .limit(20)
 
     if (inquiries) {
       inquiries.forEach((inquiry: any) => {
+        const typesDesc = Array.isArray(inquiry.project_types) && inquiry.project_types.length > 0
+          ? inquiry.project_types.join(', ')
+          : 'Service Inquiry'
         notifications.push({
           id: `inquiry-${inquiry.id}`,
           type: 'inquiry',
           title: `New Inquiry: ${inquiry.name}`,
-          message: `${inquiry.company} - ${inquiry.service_type}`,
+          message: `${inquiry.company || 'Direct'} - ${typesDesc}`,
           link: `/admin/inquiries/${inquiry.id}`,
           created_at: inquiry.created_at,
           read: false
@@ -71,18 +74,21 @@ export async function GET(request: NextRequest) {
     // Fetch new consultations
     const { data: consultations } = await supabase
       .from('consultation_requests')
-      .select('id, name, email, consultation_type, created_at, status')
+      .select('id, name, email, preferred_modes, created_at, status')
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
       .limit(20)
 
     if (consultations) {
       consultations.forEach((consultation: any) => {
+        const modesDesc = Array.isArray(consultation.preferred_modes) && consultation.preferred_modes.length > 0
+          ? consultation.preferred_modes.join(', ')
+          : 'General'
         notifications.push({
           id: `consultation-${consultation.id}`,
           type: 'consultation',
           title: `New Consultation: ${consultation.name}`,
-          message: `${consultation.consultation_type || 'General'} consultation request`,
+          message: `${modesDesc} consultation request`,
           link: `/admin/consultations/${consultation.id}`,
           created_at: consultation.created_at,
           read: false
@@ -93,7 +99,7 @@ export async function GET(request: NextRequest) {
     // Fetch new job applications
     const { data: applications } = await supabase
       .from('job_applications')
-      .select('id, full_name, position_applied, created_at, status')
+      .select('id, full_name, job_title, created_at, status')
       .eq('status', 'new')
       .order('created_at', { ascending: false })
       .limit(20)
@@ -104,7 +110,7 @@ export async function GET(request: NextRequest) {
           id: `application-${app.id}`,
           type: 'application',
           title: `New Application: ${app.full_name}`,
-          message: `Applied for ${app.position_applied}`,
+          message: `Applied for ${app.job_title || 'Open Position'}`,
           link: `/admin/applications`,
           created_at: app.created_at,
           read: false
@@ -114,7 +120,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch new partnership requests
     const { data: partnerships } = await supabase
-      .from('partnership_requests')
+      .from('partnerships')
       .select('id, company_name, contact_person, created_at, status')
       .eq('status', 'new')
       .order('created_at', { ascending: false })
@@ -137,7 +143,7 @@ export async function GET(request: NextRequest) {
     // Fetch new complaints
     const { data: complaints } = await supabase
       .from('complaints')
-      .select('id, name, email, complaint_type, created_at, status')
+      .select('id, name, email, category, created_at, status')
       .eq('status', 'new')
       .order('created_at', { ascending: false })
       .limit(20)
@@ -148,7 +154,7 @@ export async function GET(request: NextRequest) {
           id: `complaint-${complaint.id}`,
           type: 'complaint',
           title: `New Complaint: ${complaint.name}`,
-          message: `${complaint.complaint_type || 'General complaint'}`,
+          message: `${complaint.category || 'General complaint'}`,
           link: `/admin/complaints/${complaint.id}`,
           created_at: complaint.created_at,
           read: false

@@ -216,8 +216,8 @@ export default function TermsOfServicePage() {
             </p>
             <div className="bg-muted p-6 rounded-lg">
               <p className="text-foreground"><strong>Asrivo Tech</strong></p>
-              <p className="text-muted-foreground">Email: legal@asrivotech.com</p>
-              <p className="text-muted-foreground">Email (General): contact@asrivotech.com</p>
+              <p className="text-muted-foreground">Email: legal@asrivotech.in</p>
+              <p className="text-muted-foreground">Email (General): contact@asrivotech.in</p>
               <p className="text-muted-foreground mt-2">
                 We will respond to your inquiry within 7 business days.
               </p>

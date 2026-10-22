@@ -18,8 +18,8 @@ export default tseslint.config(
     },
   },
   {
-    // Node.js scripts — give them full Node globals and allow require
-    files: ['**/*.js'],
+    // Node.js scripts and configs — give them full Node globals and allow require
+    files: ['**/*.js', '**/*.cjs', '**/*.mjs'],
     languageOptions: {
       globals: {
         require: 'readonly',

@@ -1,0 +1,7 @@
+{
+  "task_id": "task-cms-full-build",
+  "task_description": "Build a complete CMS (Content Management System) so admin users can edit the content of every public page through an admin panel, with changes immediately reflected on the website and stored in the database",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"],
+  "blocked_reason": null
+}

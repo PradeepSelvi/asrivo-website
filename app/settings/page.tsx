@@ -146,11 +146,11 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="twitter">Twitter URL</Label>
+              <Label htmlFor="twitter">X (Twitter) URL</Label>
               <Input
                 id="twitter"
                 type="url"
-                placeholder="https://twitter.com/yourcompany"
+                placeholder="https://x.com/yourcompany"
                 value={socialLinks.twitter}
                 onChange={(e) => setSocialLinks(prev => ({ ...prev, twitter: e.target.value }))}
               />

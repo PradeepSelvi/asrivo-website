@@ -1,11 +1,8 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { ConditionalLayout } from '@/components/conditional-layout'
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: 'Asrivo Tech - Building Tomorrow\'s Digital Solutions',
@@ -19,8 +16,23 @@ export const metadata: Metadata = {
     title: 'Asrivo Tech - Building Tomorrow\'s Digital Solutions',
     description: 'Innovative software development and digital transformation services',
     type: 'website',
+    url: 'https://asrivotech.in',
+    images: [
+      {
+        url: 'https://asrivotech.in/asrivo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Asrivo Tech - Digital Solutions',
+      },
+    ],
   },
-  generator: 'v0.app'
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Asrivo Tech - Building Tomorrow\'s Digital Solutions',
+    description: 'Innovative software development and digital transformation services',
+    images: ['https://asrivotech.in/asrivo.png'],
+  },
+  generator: 'Next.js'
 }
 
 export default function RootLayout({
@@ -30,7 +42,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} font-sans antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-sans antialiased">
         <ConditionalLayout>{children}</ConditionalLayout>
         <Analytics />
       </body>

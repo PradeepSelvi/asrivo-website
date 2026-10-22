@@ -310,8 +310,8 @@ export default function PartnershipPolicyPage() {
                 For partnership inquiries, questions about this policy, or to discuss partnership opportunities:
               </p>
               <div className="mt-4 space-y-2 text-muted-foreground">
-                <p><strong>Email:</strong> <a href="mailto:partnerships@asrivotech.com" className="text-primary hover:underline">partnerships@asrivotech.com</a></p>
-                <p><strong>Business Email:</strong> <a href="mailto:info@asrivotech.com" className="text-primary hover:underline">info@asrivotech.com</a></p>
+                <p><strong>Email:</strong> <a href="mailto:partnerships@asrivotech.in" className="text-primary hover:underline">partnerships@asrivotech.in</a></p>
+                <p><strong>Business Email:</strong> <a href="mailto:info@asrivotech.in" className="text-primary hover:underline">info@asrivotech.in</a></p>
                 <p><strong>Phone:</strong> +91 81252 75337</p>
                 <p><strong>Address:</strong> Asrivo Tech, Tamil Nadu, India</p>
               </div>

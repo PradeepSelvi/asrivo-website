@@ -1,16 +1,32 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ExternalLink, Eye } from "lucide-react"
+import { ArrowRight, Eye } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getProjectsContent } from "@/lib/supabase/content-helpers"
 
-export const metadata: Metadata = {
-  title: "Projects - Asrivo Tech",
-  description: "Explore our portfolio of successful projects across various industries. See how we've helped businesses transform through technology.",
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getProjectsContent()
+  
+  return {
+    title: content.meta_title || "Projects - Asrivo Tech",
+    description: content.meta_description || content.hero_subtitle || "Explore our portfolio of successful projects across various industries. See how we've helped businesses transform through technology.",
+    keywords: content.meta_keywords,
+  }
 }
 
 export default async function ProjectsPage() {
   const supabase = await createClient()
+  let content
+  try {
+    content = await getProjectsContent()
+  } catch (error) {
+    console.error('Error loading projects page content:', error)
+    content = await getProjectsContent() // Helper returns defaults on error
+  }
   
   const { data: projects, error } = await supabase
     .from('projects')
@@ -31,14 +47,13 @@ export default async function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Our Work
+              {content.projects_badge || "Our Work"}
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              Projects & Case Studies
+              {content.hero_title}
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Explore our portfolio of successful projects across various industries. 
-              See how we&apos;ve helped businesses transform through innovative technology solutions.
+              {content.hero_subtitle}
             </p>
           </div>
         </div>
@@ -48,17 +63,22 @@ export default async function ProjectsPage() {
       <section className="border-b border-border py-12">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-            {[
-              { value: "10+", label: "Projects Bulit" },
-              { value: "2+", label: "Start Up Partners" },
-              { value: "10+", label: "Developer Community" },
-              { value: "100%", label: "Commitment to Quality" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-3xl font-bold text-primary sm:text-4xl">{stat.value}</div>
-                <div className="mt-1 text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_total_value}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_total_label}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_active_value}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_active_label}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_community_value || "10+"}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_community_label || "Developer Community"}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary sm:text-4xl">{content.stats_quality_value || "100%"}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{content.stats_quality_label || "Commitment to Quality"}</div>
+            </div>
           </div>
         </div>
       </section>
@@ -68,7 +88,7 @@ export default async function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           {!projects || projects.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No projects found. Run the database migration to add sample projects.</p>
+              <p className="text-muted-foreground">{content.empty_state_message || "No projects found matching your criteria."}</p>
             </div>
           ) : (
             <div className="space-y-12">
@@ -172,10 +192,10 @@ export default async function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl text-balance">
-              Ready to Build Something Great?
+              {content.cta_title || "Ready to Build Something Great?"}
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80">
-              Let&apos;s discuss your project and see how we can help you achieve your goals.
+              {content.cta_description || "Let's discuss your project and see how we can help you achieve your goals."}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button 
@@ -184,7 +204,7 @@ export default async function ProjectsPage() {
                 asChild
               >
                 <Link href="/contact">
-                  Start a Product Innovation
+                  {content.cta_button || "Contact Us"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

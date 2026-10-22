@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { AuthGate } from "@/components/auth-gate"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -170,6 +171,7 @@ export default function PartnershipPage() {
   }
 
   return (
+    <AuthGate message="Sign in to submit a partnership proposal. We'll review and respond within 5 business days.">
     <div className="flex flex-col">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 py-20 lg:py-28">
@@ -670,5 +672,6 @@ export default function PartnershipPage() {
         </div>
       </section>
     </div>
+    </AuthGate>
   )
 }

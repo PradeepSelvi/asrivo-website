@@ -3,6 +3,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ExternalLink } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import type { HomeContent } from "@/lib/supabase/content-helpers"
 
 // Gradient presets based on category
 const categoryGradients: Record<string, string> = {
@@ -101,7 +102,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   )
 }
 
-export async function FeaturedProjects() {
+export async function FeaturedProjects({ content }: { content?: HomeContent }) {
   let displayProjects: Project[] = []
 
   try {
@@ -130,6 +131,11 @@ export async function FeaturedProjects() {
     console.warn('Unable to load featured projects from Supabase:', err)
   }
 
+  const title = content?.featured_projects_title ?? 'Featured Projects'
+  const description = content?.featured_projects_description ?? 'Explore some of our recent projects that showcase our expertise and innovation.'
+  const emptyMessage = content?.featured_projects_empty ?? 'No projects available yet. Check back soon!'
+  const ctaText = content?.featured_projects_cta ?? 'View All Projects'
+
   return (
     <section className="py-24 lg:py-32 relative overflow-hidden">
       {/* Background decoration */}
@@ -143,18 +149,18 @@ export async function FeaturedProjects() {
           <div>
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary uppercase tracking-wider px-4 py-1.5 bg-primary/5 rounded-full">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              Our Work
+              {content?.featured_projects_badge ?? 'Our Work'}
             </span>
             <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              Featured <span className="gradient-text">Projects</span>
+              {title}
             </h2>
             <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-              Explore some of our recent projects that showcase our expertise and innovation.
+              {description}
             </p>
           </div>
           <Button variant="outline" className="bg-transparent group h-12 px-6" asChild>
             <Link href="/projects">
-              View All Projects
+              {ctaText}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
@@ -162,7 +168,7 @@ export async function FeaturedProjects() {
 
         {displayProjects.length === 0 ? (
           <div className="mt-12 text-center py-12 border border-dashed border-border rounded-2xl">
-            <p className="text-muted-foreground">No projects available yet. Check back soon!</p>
+            <p className="text-muted-foreground">{emptyMessage}</p>
           </div>
         ) : (
           <div className="mt-12 grid gap-8 sm:grid-cols-2">

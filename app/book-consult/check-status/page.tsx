@@ -39,10 +39,10 @@ export default function CheckConsultationStatusPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center text-sm">
               <a 
-                href="mailto:info@asrivotech.com" 
+                href="mailto:info@asrivotech.in" 
                 className="text-primary hover:underline"
               >
-                info@asrivotech.com
+                info@asrivotech.in
               </a>
               <span className="hidden sm:inline text-muted-foreground">•</span>
               <a 

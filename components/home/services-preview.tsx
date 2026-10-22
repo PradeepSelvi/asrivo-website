@@ -12,6 +12,7 @@ import {
   ArrowRight 
 } from "lucide-react"
 import { useScrollAnimation, useTilt } from "@/hooks/use-scroll-animation"
+import type { HomeContent } from "@/lib/supabase/content-helpers"
 
 const services = [
   {
@@ -106,8 +107,13 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
   )
 }
 
-export function ServicesPreview() {
+export function ServicesPreview({ content }: { content?: HomeContent }) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
+
+  const badge = content?.services_badge ?? 'Our Services'
+  const title = content?.services_title ?? 'Comprehensive Technology Solutions'
+  const subtitle = content?.services_subtitle ?? 'From concept to deployment, we offer end-to-end services to bring your digital vision to life.'
+  const ctaText = content?.services_cta ?? 'View All Services'
 
   return (
     <section className="py-24 lg:py-32 relative overflow-hidden">
@@ -124,14 +130,14 @@ export function ServicesPreview() {
         >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary uppercase tracking-wider px-4 py-1.5 bg-primary/5 rounded-full">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Our Services
+            {badge}
           </span>
           <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
             Comprehensive Technology{" "}
             <span className="gradient-text">Solutions</span>
           </h2>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-            From concept to deployment, we offer end-to-end services to bring your digital vision to life.
+            {subtitle}
           </p>
         </div>
 
@@ -144,7 +150,7 @@ export function ServicesPreview() {
         <div className={`mt-16 text-center transition-all duration-700 delay-700 ${titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Button size="lg" className="h-14 px-10 group" asChild>
             <Link href="/services">
-              View All Services
+              {ctaText}
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>

@@ -21,6 +21,17 @@ const nextConfig = {
     ],
   },
 
+  // Redirects - consolidate duplicate pages
+  async redirects() {
+    return [
+      {
+        source: '/book-consult/schedule',
+        destination: '/schedule',
+        permanent: true, // 301 redirect
+      },
+    ]
+  },
+
   // Security headers
   async headers() {
     return [

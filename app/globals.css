@@ -335,12 +335,13 @@
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-408px * 10));
+    transform: translateX(-50%);
   }
 }
 
 .animate-scroll-testimonials {
   animation: scroll-testimonials 60s linear infinite;
+  will-change: transform;
 }
 
 

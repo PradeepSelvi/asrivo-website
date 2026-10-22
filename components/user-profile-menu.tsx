@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { User, Settings, LogOut, ChevronDown, UserCircle, Loader2 } from 'lucide-react'
+import { User, Settings, LogOut, ChevronDown, UserCircle, Loader2, AlertCircle } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface UserProfile {
@@ -173,6 +173,14 @@ export function UserProfileMenu() {
             >
               <Settings className="w-4 h-4 text-muted-foreground" />
               Settings
+            </Link>
+            <Link
+              href="/complaints/new"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors text-sm text-foreground"
+            >
+              <AlertCircle className="w-4 h-4 text-muted-foreground" />
+              Raise a Complaint
             </Link>
           </div>
 

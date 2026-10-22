@@ -6,72 +6,30 @@ import { Button } from "@/components/ui/button"
 import { Linkedin, Github, Mail, ArrowRight } from "lucide-react"
 import { useScrollAnimation, useTilt } from "@/hooks/use-scroll-animation"
 
-const teamMembers = [
-  {
-    name: "Aswin K A",
-    role: "Management Head & HR Manager",
-    image: "/team/aswin.jpeg",
-    bio: "Founder managing HR, administration, finance, and operations with strategic leadership and precision",
-    linkedin: "https://www.linkedin.com/in/aswin-k-a-77581a249",
-    github: "https://github.com/Aswin4532003",
-    email: "kaaswin4503@gmail.com",
-  },
-  {
-    name: "Siranjeevi B.U",
-    role: "Digital Marketing (SEO, SMO)",
-    image: "/team/siranjeevi.jpeg",
-    bio: "Leading brand growth through expert SEO, SMO strategies, and organizational excellence in talent and HR management.",
-    linkedin: "https://www.linkedin.com/in/siranjeevi-bu/",
-    github: "https://github.com/siranjj",
-    email: "siranjeevi.uthaman@gmail.com",
-  },
-  {
-    name: "M.Pradeep Kumar.DCSE",
-    role: "Legal & Chief Technical Developer",
-    image: "/team/pradeepkumar.jpeg",
-    bio: "Ensuring regulatory compliance, managing legal risks, protecting company integrity and ethical standards.",
-    linkedin: "https://www.linkedin.com/in/pradeep-kumar-3650982a9?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
-    github: "https://github.com/Selvipr",
-    email: "pradeepselvi126@gmail.com",
-  },
-  {
-    name: "Sargunan J.S",
-    role: "Chief Operating Officer",
-    image: "/team/sargunan.jpeg",
-    bio: "Strategic operations leader driving efficiency, growth, performance, and scalable business transformation globally.",
-    linkedin: "https://www.linkedin.com/in/sargunan-j-s-28915b2a9/",
-    github: "https://github.com/Sargunan-js",
-    email: "sargunanitl01@gmail.com",
-  },
-  {
-    id: "dev-sj",
-    name: "sivaganesh.J",
-    role: "TEAM LEAD, DATABASE, BACKEND",
-    bio: "Leading the team, backend and database optimization initiatives for robust, scalable application infrastructure.",
-    image: "/team/sivaganesh j.jpeg",
-    email: "sivaganesh73acm@gmail.com",
-    linkedin: "https://www.linkedin.com/in/sivaganesh-j",
-    github: "https://github.com/sivaganeshj",
-    featured: false,
-  },
-  {
-    name: "Krishan Kumar B.K",
-    role: "Project Manager",
-    image: "",
-    bio: "Frontend Developer & Project Manager driving seamless delivery and team coordination.",
-    linkedin: "https://www.linkedin.com/in/krishan-kumar-b-k/",
-    github: "https://github.com/krishankumar",
-    email: "krishan@asrivotech.com",
-  },
-]
+import type { HomeContent } from "@/lib/supabase/content-helpers"
 
-function TeamMemberCard({ member, index }: { member: typeof teamMembers[0]; index: number }) {
+interface TeamMember {
+  id: number
+  name: string
+  position: string
+  bio: string | null
+  image_url: string | null
+  email: string | null
+  social_links: {
+    linkedin?: string
+    github?: string
+  } | null
+  featured: boolean
+  active: boolean
+}
+
+function TeamMemberCard({ member, index }: { member: TeamMember; index: number }) {
   const { ref: tiltRef, transform } = useTilt(6)
   const { ref: scrollRef, isVisible } = useScrollAnimation(0.1)
   const [imgError, setImgError] = useState(false)
 
   const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 3)
-  const avatarSrc = member.image?.trim() ? member.image.trim() : null
+  const avatarSrc = member.image_url?.trim() ? member.image_url.trim() : null
   const showInitials = !avatarSrc || imgError
 
   return (
@@ -117,36 +75,44 @@ function TeamMemberCard({ member, index }: { member: typeof teamMembers[0]; inde
           <h3 className="mt-6 text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
             {member.name}
           </h3>
-          <p className="text-sm text-primary font-medium">{member.role}</p>
-          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{member.bio}</p>
+          <p className="text-sm text-primary font-medium">{member.position}</p>
+          {member.bio && (
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{member.bio}</p>
+          )}
           
           {/* Social links with hover effects */}
           <div className="mt-5 flex justify-center gap-3">
-            <a
-              href={member.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#0077B5] hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-[#0077B5]/30"
-            >
-              <span className="sr-only">LinkedIn</span>
-              <Linkedin className="h-4 w-4" />
-            </a>
-            <a
-              href={member.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#333] hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-gray-500/30"
-            >
-              <span className="sr-only">GitHub</span>
-              <Github className="h-4 w-4" />
-            </a>
-            <a
-              href={`mailto:${member.email}`}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#EA4335] hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-[#EA4335]/30"
-            >
-              <span className="sr-only">Email</span>
-              <Mail className="h-4 w-4" />
-            </a>
+            {member.social_links?.linkedin && (
+              <a
+                href={member.social_links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#0077B5] hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-[#0077B5]/30"
+              >
+                <span className="sr-only">LinkedIn</span>
+                <Linkedin className="h-4 w-4" />
+              </a>
+            )}
+            {member.social_links?.github && (
+              <a
+                href={member.social_links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#333] hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-gray-500/30"
+              >
+                <span className="sr-only">GitHub</span>
+                <Github className="h-4 w-4" />
+              </a>
+            )}
+            {member.email && (
+              <a
+                href={`mailto:${member.email}`}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-[#EA4335] hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-[#EA4335]/30"
+              >
+                <span className="sr-only">Email</span>
+                <Mail className="h-4 w-4" />
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -154,8 +120,21 @@ function TeamMemberCard({ member, index }: { member: typeof teamMembers[0]; inde
   )
 }
 
-export function TeamPreview() {
+export function TeamPreview({ members, content }: { members?: TeamMember[]; content?: HomeContent }) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
+
+  // Show only featured or first 6 active members
+  const displayMembers = members 
+    ? members.filter(m => m.active && m.featured).slice(0, 6) 
+    : []
+
+  if (displayMembers.length === 0) {
+    return null
+  }
+
+  const badge = content?.team_badge ?? 'Our Team'
+  const title = content?.team_title ?? 'Meet the Experts'
+  const subtitle = content?.team_subtitle ?? 'Our talented team of professionals is dedicated to delivering exceptional results.'
 
   return (
     <section className="bg-muted/30 py-24 lg:py-32 relative overflow-hidden">
@@ -172,19 +151,19 @@ export function TeamPreview() {
         >
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary uppercase tracking-wider px-4 py-1.5 bg-primary/5 rounded-full">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Our Team
+            {badge}
           </span>
           <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
             Meet the <span className="gradient-text">Experts</span>
           </h2>
           <p className="mt-6 text-lg text-muted-foreground">
-            Our talented team of professionals is dedicated to delivering exceptional results.
+            {subtitle}
           </p>
         </div>
 
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-          {teamMembers.map((member, index) => (
-            <TeamMemberCard key={member.name} member={member} index={index} />
+          {displayMembers.map((member, index) => (
+            <TeamMemberCard key={member.id} member={member} index={index} />
           ))}
         </div>
 

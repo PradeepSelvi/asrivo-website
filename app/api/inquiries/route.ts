@@ -1,105 +1,147 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyCaptcha } from '@/lib/utils/captcha'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
+import { serviceInquirySchema } from '@/lib/utils/validation'
+import { ZodError } from 'zod'
+import { apiSuccess, apiError } from '@/lib/types/api'
+import { HTTP_STATUS } from '@/lib/constants'
+import { logError } from '@/lib/utils/error-handler'
 
 export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, formSubmitRateLimit)
+  if (limited) return limited
+
+  let email: string | undefined
+  let name: string | undefined
+
   try {
     const body = await request.json()
+
+    // ✅ Zod Validation
+    const validatedData = serviceInquirySchema.parse(body)
     
-    console.log('Received inquiry submission:', body)
+    email = validatedData.email
+    name = validatedData.name
+    const fullPhone = validatedData.phone
+      ? (validatedData.phone.startsWith('+') ? validatedData.phone : `${validatedData.countryCode || ''}${validatedData.phone}`)
+      : ''
 
-    // Validate required fields
-    if (!body.name || !body.email || !body.phone) {
+    const fullWhatsapp = validatedData.whatsapp
+      ? (validatedData.whatsapp.startsWith('+') ? validatedData.whatsapp : `${validatedData.whatsappCountryCode || ''}${validatedData.whatsapp}`)
+      : null
+
+    const projectTypes = Array.isArray(validatedData.projectTypes) && validatedData.projectTypes.length > 0
+      ? validatedData.projectTypes
+      : (Array.isArray(validatedData.project_types) && validatedData.project_types.length > 0
+          ? validatedData.project_types
+          : (validatedData.service_type || validatedData.service ? [validatedData.service_type || validatedData.service] : ['General Inquiry']))
+
+    const projectDescription = validatedData.projectDescription || validatedData.project_description || validatedData.message || 'No description provided'
+    const budgetRange = validatedData.budgetRange || validatedData.budget_range || validatedData.budget || 'Flexible'
+    const timeline = validatedData.timeline || 'Flexible'
+    const hasExisting = validatedData.hasExisting === 'yes' || validatedData.hasExisting === true || validatedData.has_existing === true
+
+    // 🤖 CAPTCHA Verification
+    const captchaResult = await verifyCaptcha(validatedData.captchaToken || undefined, 'service_inquiry')
+    if (!captchaResult.success) {
       return NextResponse.json(
-        { error: 'Name, email, and phone are required' },
-        { status: 400 }
+        apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
+        { status: HTTP_STATUS.FORBIDDEN }
       )
     }
 
-    if (!body.projectTypes || body.projectTypes.length === 0) {
-      return NextResponse.json(
-        { error: 'Please select at least one project type' },
-        { status: 400 }
-      )
-    }
+    const supabase = createApiClient({ useServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY })
 
-    if (!body.projectDescription || body.projectDescription.length < 20) {
-      return NextResponse.json(
-        { error: 'Project description is too short (minimum 20 characters)' },
-        { status: 400 }
-      )
-    }
-
-    if (!body.budgetRange || !body.timeline) {
-      return NextResponse.json(
-        { error: 'Budget range and timeline are required' },
-        { status: 400 }
-      )
-    }
-
-    const supabase = await createClient()
-
-    // Insert inquiry into database
     const { data, error } = await supabase
       .from('client_inquiries')
       .insert({
-        name: body.name,
-        company: body.company || null,
-        email: body.email,
-        phone: `${body.countryCode}${body.phone}`,
-        whatsapp: body.whatsapp ? `${body.whatsappCountryCode}${body.whatsapp}` : null,
-        preferred_contact: body.preferredContact,
-        project_types: body.projectTypes,
-        other_project_type: body.otherProjectType || null,
-        project_description: body.projectDescription,
-        has_existing: body.hasExisting === 'yes',
-        existing_link: body.existingLink || null,
-        target_platform: body.targetPlatform,
-        key_features: body.keyFeatures,
-        other_key_feature: body.otherKeyFeature || null,
-        budget_range: body.budgetRange,
-        timeline: body.timeline,
-        target_audience: body.targetAudience || null,
-        pain_points: body.painPoints || null,
-        reference_links: body.referenceLinks || null,
-        hear_about_us: body.hearAboutUs || null,
-        prd_file_url: body.prdFileUrl || null,
-        prd_file_name: body.prdFileName || null,
-        prd_text: body.prdText || null,
+        email,
+        name,
+        company: validatedData.company || null,
+        phone: fullPhone || validatedData.phone,
+        whatsapp: fullWhatsapp,
+        preferred_contact: validatedData.preferredContact || validatedData.preferred_contact || 'email',
+        project_types: projectTypes,
+        other_project_type: validatedData.otherProjectType || validatedData.other_project_type || null,
+        project_description: projectDescription,
+        has_existing: hasExisting,
+        existing_link: validatedData.existingLink || validatedData.existing_link || null,
+        target_platform: validatedData.targetPlatform || validatedData.target_platform || [],
+        key_features: validatedData.keyFeatures || validatedData.key_features || [],
+        other_key_feature: validatedData.otherKeyFeature || validatedData.other_key_feature || null,
+        budget_range: budgetRange,
+        timeline,
+        target_audience: validatedData.targetAudience || validatedData.target_audience || null,
+        pain_points: validatedData.painPoints || validatedData.pain_points || null,
+        reference_links: validatedData.referenceLinks || validatedData.reference_links || null,
+        hear_about_us: validatedData.hearAboutUs || validatedData.hear_about_us || null,
+        prd_file_url: validatedData.prdFileUrl || validatedData.prd_file_url || null,
+        prd_file_name: validatedData.prdFileName || validatedData.prd_file_name || null,
+        prd_text: validatedData.prdText || validatedData.prd_text || null,
         status: 'new',
       })
       .select()
       .single()
 
     if (error) {
-      console.error('Database error:', error)
-      
-      // Check if table doesn't exist
-      if (error.code === '42P01') {
-        return NextResponse.json(
-          { error: 'Database table not set up. Please run CLIENT_INQUIRIES_SCHEMA.sql first.' },
-          { status: 500 }
-        )
-      }
-      
+      logError('POST /api/inquiries - Supabase error', error, { email, name })
       return NextResponse.json(
-        { error: `Database error: ${error.message}` },
-        { status: 500 }
+        apiError(error.message || 'Failed to submit inquiry', 'DATABASE_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
-    console.log('Successfully saved inquiry:', data)
-
-    // TODO: Send email notification using Resend
-    // You can add email notification here using your existing Resend setup
-
     return NextResponse.json(
-      { success: true, data },
-      { status: 201 }
+      apiSuccess(data, 'Service inquiry submitted successfully'),
+      { status: HTTP_STATUS.CREATED }
     )
   } catch (error) {
-    console.error('Inquiry submission error:', error)
+    // Handle Zod validation errors
+    if (error instanceof ZodError) {
+      const firstError = error.errors[0]
+      return NextResponse.json(
+        apiError(`Validation failed: ${firstError.path.join('.')}: ${firstError.message}`, 'VALIDATION_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
+      )
+    }
+
+    logError('POST /api/inquiries', error, { email, name })
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      apiError('An error occurred processing your request', 'INTERNAL_SERVER_ERROR'),
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+    )
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+
+    const { data: inquiries, error } = await supabase
+      .from('client_inquiries')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      count: inquiries?.length || 0,
+      data: inquiries
+    })
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     )
   }

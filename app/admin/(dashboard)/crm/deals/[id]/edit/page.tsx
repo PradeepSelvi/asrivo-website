@@ -3,14 +3,8 @@
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { getDealById, updateDeal } from '@/lib/supabase/crm-actions'
-import { getCurrencies } from '@/lib/crm/currency-utils'
 import { ArrowLeft, Loader2, Save, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-
-// Force dynamic rendering to prevent static generation errors
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 
 export default function EditDealPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
@@ -18,7 +12,6 @@ export default function EditDealPage({ params }: { params: Promise<{ id: string 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [currencies, setCurrencies] = useState<Array<{ code: string; symbol: string; name: string }>>([])
 
   // Form state
   const [dealName, setDealName] = useState('')
@@ -31,15 +24,11 @@ export default function EditDealPage({ params }: { params: Promise<{ id: string 
   const [expectedCloseDate, setExpectedCloseDate] = useState('')
   const [dealType, setDealType] = useState('')
   const [productService, setProductService] = useState('')
-  const [currency, setCurrency] = useState('USD')
+  const currency = 'INR' // Fixed to Indian Rupees
   const [description, setDescription] = useState('')
   const [notes, setNotes] = useState('')
 
   useEffect(() => {
-    // Load currencies
-    const loadedCurrencies = getCurrencies()
-    setCurrencies(loadedCurrencies)
-
     // Load deal data
     async function loadDeal() {
       const result = await getDealById(parseInt(resolvedParams.id))
@@ -55,7 +44,7 @@ export default function EditDealPage({ params }: { params: Promise<{ id: string 
         setExpectedCloseDate(deal.expected_close_date || '')
         setDealType(deal.deal_type || '')
         setProductService(deal.product_service || '')
-        setCurrency(deal.currency || 'USD')
+        // Note: currency is now always INR, ignoring database value
         setDescription(deal.description || '')
         setNotes(deal.notes || '')
       } else {
@@ -239,9 +228,9 @@ export default function EditDealPage({ params }: { params: Promise<{ id: string 
         <div>
           <h3 className="text-lg font-semibold text-foreground mb-4">Value & Timeline</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="md:col-span-2">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                Deal Value
+                Deal Value (₹ INR)
               </label>
               <input
                 type="number"
@@ -250,27 +239,8 @@ export default function EditDealPage({ params }: { params: Promise<{ id: string 
                 className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="50000"
               />
-            </div>
-
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                Currency
-              </label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                {currencies.map((curr) => (
-                  <option key={curr.code} value={curr.code}>
-                    {curr.code} ({curr.symbol}) - {curr.name}
-                  </option>
-                ))}
-              </select>
               <p className="text-xs text-muted-foreground mt-1">
-                <Link href="/admin/crm/settings" className="text-primary hover:underline">
-                  Manage currencies
-                </Link>
+                All amounts are in Indian Rupees (₹)
               </p>
             </div>
 

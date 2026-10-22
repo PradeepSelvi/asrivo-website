@@ -1,25 +1,19 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createDeal, getLeadById } from '@/lib/supabase/crm-actions'
-import { getCurrencies, getDefaultCurrency } from '@/lib/crm/currency-utils'
 import { ArrowLeft, Loader2, Save } from 'lucide-react'
 import Link from 'next/link'
 
-// Force dynamic rendering to prevent static generation errors
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
 
-
-export default function NewDealPage() {
+function NewDealContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const leadId = searchParams.get('lead_id')
   
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [currencies, setCurrencies] = useState<Array<{ code: string; symbol: string; name: string }>>([])
 
   // Form state
   const [dealName, setDealName] = useState('')
@@ -27,7 +21,7 @@ export default function NewDealPage() {
   const [contactEmail, setContactEmail] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [dealValue, setDealValue] = useState('')
-  const [currency, setCurrency] = useState('')
+  const currency = 'INR' // Fixed to Indian Rupees
   const [stage, setStage] = useState('qualification')
   const [probability, setProbability] = useState('50')
   const [expectedCloseDate, setExpectedCloseDate] = useState('')
@@ -35,13 +29,6 @@ export default function NewDealPage() {
   const [productService, setProductService] = useState('')
   const [description, setDescription] = useState('')
   const [notes, setNotes] = useState('')
-
-  // Load currencies on mount
-  useEffect(() => {
-    const loadedCurrencies = getCurrencies()
-    setCurrencies(loadedCurrencies)
-    setCurrency(getDefaultCurrency())
-  }, [])
 
   // Load lead data if lead_id is provided
   React.useEffect(() => {
@@ -172,7 +159,7 @@ export default function NewDealPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                Deal Value
+                Deal Value (₹ INR)
               </label>
               <input
                 type="number"
@@ -182,27 +169,8 @@ export default function NewDealPage() {
                 placeholder="50000"
                 step="0.01"
               />
-            </div>
-
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                Currency
-              </label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                {currencies.map((curr) => (
-                  <option key={curr.code} value={curr.code}>
-                    {curr.code} ({curr.symbol}) - {curr.name}
-                  </option>
-                ))}
-              </select>
               <p className="text-xs text-muted-foreground mt-1">
-                <Link href="/admin/crm/settings" className="text-primary hover:underline">
-                  Manage currencies
-                </Link>
+                All amounts are in Indian Rupees (₹)
               </p>
             </div>
           </div>
@@ -345,5 +313,19 @@ export default function NewDealPage() {
         </div>
       </form>
     </div>
+  )
+}
+
+export default function NewDealPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <NewDealContent />
+    </React.Suspense>
   )
 }

@@ -12,10 +12,7 @@ export interface Currency {
 }
 
 export const DEFAULT_CURRENCIES: Currency[] = [
-  { code: 'USD', symbol: '$', name: 'US Dollar', isDefault: true, exchangeRate: 1.0 },
-  { code: 'EUR', symbol: '€', name: 'Euro', isDefault: false, exchangeRate: 0.92 },
-  { code: 'GBP', symbol: '£', name: 'British Pound', isDefault: false, exchangeRate: 0.79 },
-  { code: 'INR', symbol: '₹', name: 'Indian Rupee', isDefault: false, exchangeRate: 83.12 },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee', isDefault: true, exchangeRate: 1.0 },
 ]
 
 /**
@@ -46,7 +43,7 @@ export function getCurrencies(): Currency[] {
 export function getDefaultCurrency(): string {
   const currencies = getCurrencies()
   const defaultCurrency = currencies.find(c => c.isDefault)
-  return defaultCurrency?.code || 'USD'
+  return defaultCurrency?.code || 'INR'
 }
 
 /**
@@ -55,13 +52,13 @@ export function getDefaultCurrency(): string {
 export function getCurrencySymbol(code: string): string {
   const currencies = getCurrencies()
   const currency = currencies.find(c => c.code === code)
-  return currency?.symbol || '$'
+  return currency?.symbol || '₹'
 }
 
 /**
  * Format currency value
  */
-export function formatCurrency(value: number, currencyCode: string = 'USD'): string {
+export function formatCurrency(value: number, currencyCode: string = 'INR'): string {
   const symbol = getCurrencySymbol(currencyCode)
   return `${symbol}${value.toLocaleString()}`
 }

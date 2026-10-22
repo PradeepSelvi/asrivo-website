@@ -7,10 +7,6 @@ import { calculateLeadScore, getPriorityFromScore } from '@/lib/crm/lead-scoring
 import { ArrowLeft, Loader2, Save } from 'lucide-react'
 import Link from 'next/link'
 
-// Force dynamic rendering to prevent static generation errors
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 
 export default function NewLeadPage() {
   const router = useRouter()

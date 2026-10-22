@@ -1,13 +1,17 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { createApiClient } from '@/lib/supabase/api-client'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
+import { complaintSchema } from '@/lib/utils/validation'
+import { ZodError } from 'zod'
+import { apiSuccess, apiError } from '@/lib/types/api'
+import { HTTP_STATUS } from '@/lib/constants'
+import { logError } from '@/lib/utils/error-handler'
 
 // GET - Fetch all complaints (for admin)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createApiClient()
 
     const { data, error } = await supabase
       .from('complaints')
@@ -33,31 +37,23 @@ export async function GET(request: NextRequest) {
 
 // POST - Create a new complaint (NO AUTHENTICATION REQUIRED)
 export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, formSubmitRateLimit)
+  if (limited) return limited
+
+  let email: string | undefined
+  let name: string | undefined
+
   try {
     const body = await request.json()
-    const { name, email, phone, subject, description, category, priority, proofDocumentUrl } = body
+    
+    // ✅ Zod Validation
+    const validatedData = complaintSchema.parse(body)
+    
+    name = validatedData.name
+    email = validatedData.email
+    const { phone, subject, description, category, priority, proofDocumentUrl } = validatedData
 
-    // Validation
-    if (!name || !email || !subject || !description) {
-      return NextResponse.json(
-        { error: 'Name, email, subject, and description are required' },
-        { status: 400 }
-      )
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email address' },
-        { status: 400 }
-      )
-    }
-
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createApiClient()
 
     const { data, error } = await supabase
       .from('complaints')
@@ -78,23 +74,32 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Database error:', error)
+      logError('POST /api/complaints - Database error', error, { email, name })
       return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
+        apiError('Failed to submit complaint', 'DATABASE_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
     return NextResponse.json(
-      { success: true, data },
-      { status: 201 }
+      apiSuccess(data, 'Complaint submitted successfully'),
+      { status: HTTP_STATUS.CREATED }
     )
 
-  } catch (error: any) {
-    console.error('Server error:', error)
+  } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof ZodError) {
+      const firstError = error.errors[0]
+      return NextResponse.json(
+        apiError(`Validation failed: ${firstError.path.join('.')}: ${firstError.message}`, 'VALIDATION_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
+      )
+    }
+
+    logError('POST /api/complaints', error, { email, name })
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      apiError('An error occurred processing your request', 'INTERNAL_SERVER_ERROR'),
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 }

@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Mail, User, Building, Clock, Eye } from 'lucide-react'
 import Link from 'next/link'
+import { StatusBadge } from '@/components/ui/status-badge'
+import type { StatusVariant } from '@/lib/utils/status-config'
 
 // Force dynamic rendering to prevent static generation errors
 export const dynamic = 'force-dynamic'
@@ -211,17 +213,7 @@ export default function AdminContactsPage() {
                       )}
                     </div>
                     <div>
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider w-fit ${
-                          contact.status === 'unread'
-                            ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                            : contact.status === 'read'
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        }`}
-                      >
-                        {contact.status}
-                      </span>
+                      <StatusBadge status={contact.status as StatusVariant} size="sm" />
                     </div>
                     <div className="text-xs text-muted-foreground font-mono">
                       <span className="flex items-center gap-1.5">
@@ -272,17 +264,7 @@ export default function AdminContactsPage() {
                           {contact.type}
                         </span>
                       )}
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                          contact.status === 'unread'
-                            ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                            : contact.status === 'read'
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        }`}
-                      >
-                        {contact.status}
-                      </span>
+                      <StatusBadge status={contact.status as StatusVariant} size="sm" />
                       <span className="text-xs text-muted-foreground font-mono flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {new Date(contact.created_at).toLocaleDateString()}

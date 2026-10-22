@@ -24,19 +24,19 @@ export default async function SiteConfigPage() {
 
   const supabase = await createClient()
 
-  // Fetch site settings
+  // Fetch site settings (keys prefixed with "site.")
   const { data: settings } = await supabase
     .from('site_settings')
-    .select('*')
-    .eq('category', 'site')
+    .select('setting_key, setting_value')
+    .like('setting_key', 'site.%')
 
-  // Convert array to object for easier access
+  // Convert array to object for easier access (strip "site." prefix)
   const settingsMap = settings?.reduce((acc, setting) => {
-    // Parse JSON value
+    const key = setting.setting_key.replace('site.', '')
     try {
-      acc[setting.key] = JSON.parse(setting.value)
+      acc[key] = JSON.parse(setting.setting_value)
     } catch {
-      acc[setting.key] = setting.value
+      acc[key] = setting.setting_value
     }
     return acc
   }, {} as Record<string, any>) || {}

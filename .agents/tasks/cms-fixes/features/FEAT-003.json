@@ -1,0 +1,25 @@
+{
+  "id": "FEAT-003",
+  "type": "fix",
+  "description": "Fix consultation_requests RLS policies (broken because they reference 'profiles.role' but actual table is 'admin_profiles') and create the public /careers page that lists active job postings from job_postings table. These two items are independent of each other and of FEAT-001/FEAT-002.",
+  "status": "pending",
+  "steps": [
+    "FIX 6 — Create supabase/migrations/fix_consultation_rls.sql. The file must DROP the two broken policies and CREATE corrected ones that reference admin_profiles instead of profiles, and remove the .role check (admin_profiles only has 'high'/'low' roles, not 'admin'/'super_admin'). SQL content:\n  DROP POLICY IF EXISTS \"Admins can view all consultation requests\" ON consultation_requests;\n  DROP POLICY IF EXISTS \"Admins can update consultation requests\" ON consultation_requests;\n  CREATE POLICY \"Admins can view all consultation requests\"\n    ON consultation_requests FOR SELECT TO authenticated\n    USING (EXISTS (SELECT 1 FROM admin_profiles WHERE admin_profiles.id = auth.uid()));\n  CREATE POLICY \"Admins can update consultation requests\"\n    ON consultation_requests FOR UPDATE TO authenticated\n    USING (EXISTS (SELECT 1 FROM admin_profiles WHERE admin_profiles.id = auth.uid()))\n    WITH CHECK (EXISTS (SELECT 1 FROM admin_profiles WHERE admin_profiles.id = auth.uid()));\nAlso create supabase/migrations/fix_consultation_rls.md with instructions to run this SQL in the Supabase SQL Editor.",
+    "FIX 8 — Create app/careers/page.tsx as a server component. It must:\n  (a) Import createClient from @/lib/supabase/server and fetch active job postings: supabase.from('job_postings').select('id, title, slug, description, requirements, salary_range, location, employment_type, experience_level, active, created_at').eq('active', true).order('created_at', { ascending: false })\n  (b) Display a page with the same visual style as app/about/page.tsx and app/services/page.tsx — light background (bg-slate-50 or white), slate-900 headings, blue-600 accents\n  (c) Hero section with heading 'Join Our Team' and subtext about building innovative tech together\n  (d) Job listing cards: for each job show title (font-bold text-slate-900), employment_type badge, experience_level badge, location with MapPin icon, salary_range with green text if present, description truncated to 3 lines (line-clamp-3), requirements as a bullet list (max 4 items shown), and an 'Apply Now' Button that links to '/contact?subject=Job Application: <title>'\n  (e) If no active jobs, show an empty state: 'No open positions right now. Check back soon or send us your resume via the contact page.'\n  (f) Export metadata with title 'Careers - Asrivo Tech'\n  (g) Export dynamic = 'force-dynamic' and revalidate = 0",
+    "FIX 8 (cont.) — Add 'Careers' link to public navigation in components/header.tsx. The navigation array is at the top of the file (lines 10-17). Add { name: 'Careers', href: '/careers' } after the Projects entry. This ensures the careers page is discoverable from the navbar."
+  ],
+  "acceptance_criteria": [
+    "supabase/migrations/fix_consultation_rls.sql exists with correct DROP/CREATE POLICY statements referencing admin_profiles",
+    "supabase/migrations/fix_consultation_rls.md exists with application instructions",
+    "app/careers/page.tsx renders a list of active job postings from job_postings table",
+    "When job_postings is empty, a friendly empty state is shown",
+    "The Careers link appears in the public site navbar",
+    "pnpm run type-check passes with no new errors"
+  ],
+  "verification": [
+    "pnpm run type-check — zero TypeScript errors",
+    "pnpm run build — builds successfully including /careers route"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

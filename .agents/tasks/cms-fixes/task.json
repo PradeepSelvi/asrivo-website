@@ -1,0 +1,7 @@
+{
+  "task_id": "task-cms-fixes",
+  "task_description": "Fix 9 identified issues in the Asrivo Tech admin/CMS panel: data routing bugs, table name mismatches, non-functional forms, missing API routes, missing admin sub-pages, broken RLS policies, and a missing public careers page.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

@@ -1,0 +1,62 @@
+-- ============================================
+-- SITE SETTINGS TABLE - FIXED VERSION
+-- ============================================
+-- Run this in Supabase SQL Editor
+
+-- Create site_settings table
+CREATE TABLE IF NOT EXISTS public.site_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category TEXT NOT NULL,
+  key TEXT NOT NULL,
+  value JSONB NOT NULL DEFAULT '{}'::jsonb,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(category, key)
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Allow public read access" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow admins to manage settings" ON public.site_settings;
+
+-- Policy 1: Public read access
+CREATE POLICY "Allow public read access" 
+  ON public.site_settings
+  FOR SELECT 
+  USING (true);
+
+-- Policy 2: Admin write access
+CREATE POLICY "Allow admins to manage settings" 
+  ON public.site_settings
+  FOR ALL 
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
+
+-- Create index for performance
+CREATE INDEX IF NOT EXISTS idx_site_settings_category_key 
+  ON public.site_settings(category, key);
+
+-- Insert default homepage settings
+INSERT INTO public.site_settings (category, key, value, description) VALUES
+  ('homepage', 'hero_title', '"Innovation Meets Excellence"', 'Main headline'),
+  ('homepage', 'hero_subtitle', '"Transform your digital presence with cutting-edge solutions"', 'Subheadline'),
+  ('homepage', 'hero_cta_primary', '"Get Started"', 'Primary button'),
+  ('homepage', 'hero_cta_secondary', '"Learn More"', 'Secondary button'),
+  ('homepage', 'featured_projects_title', '"Featured Projects"', 'Projects section title'),
+  ('homepage', 'featured_projects_description', '"Explore our portfolio of successful projects"', 'Projects description'),
+  ('homepage', 'about_title', '"Why Choose Asrivo Tech"', 'About section title'),
+  ('homepage', 'about_description', '"We are a team of passionate developers"', 'About description'),
+  ('homepage', 'cta_title', '"Let''s Build Your Next Product Together"', 'CTA title'),
+  ('homepage', 'cta_description', '"Ready to transform your ideas into reality?"', 'CTA description'),
+  ('homepage', 'cta_button', '"Start a Project"', 'CTA button text')
+ON CONFLICT (category, key) DO NOTHING;
+
+-- Show results
+SELECT category, key, value FROM public.site_settings WHERE category = 'homepage';

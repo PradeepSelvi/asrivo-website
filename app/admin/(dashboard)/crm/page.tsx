@@ -2,7 +2,7 @@ import React from 'react'
 import { getCRMStats, getLeadsByStatus, getDealsByStage, getLeads, getDeals, getTasks } from '@/lib/supabase/crm-actions'
 import {
   Users,
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   CheckSquare,
   User,
@@ -43,7 +43,7 @@ export default async function CRMDashboard() {
   const statCards = [
     { name: 'Total Leads', value: stats.totalLeads, icon: Users, color: 'text-blue-500 bg-blue-500/10', href: '/admin/crm/leads' },
     { name: 'Active Deals', value: stats.activeDeals, icon: Briefcase, color: 'text-green-500 bg-green-500/10', href: '/admin/crm/deals' },
-    { name: 'Pipeline Value', value: `$${Math.round(stats.pipelineValue).toLocaleString()}`, icon: DollarSign, color: 'text-purple-500 bg-purple-500/10', href: '/admin/crm/deals' },
+    { name: 'Pipeline Value', value: `₹${Math.round(stats.pipelineValue).toLocaleString()}`, icon: IndianRupee, color: 'text-purple-500 bg-purple-500/10', href: '/admin/crm/deals' },
     { name: 'Tasks Due Today', value: stats.tasksDueToday, icon: CheckSquare, color: 'text-orange-500 bg-orange-500/10', href: '/admin/crm/tasks' },
   ]
 
@@ -130,7 +130,7 @@ export default async function CRMDashboard() {
                   <span className="text-sm font-medium text-foreground capitalize">{stage.replace('-', ' ')}</span>
                   <span className="text-xs font-bold text-muted-foreground">{data.count} deals</span>
                 </div>
-                <div className="text-sm font-bold text-primary">${Math.round(data.value).toLocaleString()}</div>
+                <div className="text-sm font-bold text-primary">₹{Math.round(data.value).toLocaleString()}</div>
               </div>
             ))}
             {Object.keys(dealsByStage).length === 0 && (

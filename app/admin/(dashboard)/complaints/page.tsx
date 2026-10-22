@@ -2,6 +2,9 @@ import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { AlertCircle, Clock, Eye, User, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { StatusBadge } from '@/components/ui/status-badge'
+import { PriorityBadge } from '@/components/ui/priority-badge'
+import type { StatusVariant, PriorityVariant } from '@/lib/utils/status-config'
 
 // Force dynamic rendering to prevent static generation errors
 export const dynamic = 'force-dynamic'
@@ -139,24 +142,10 @@ export default async function AdminComplaintsPage() {
                       )}
                     </div>
                     <div>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider w-fit ${
-                        complaint.priority === 'urgent' ? 'bg-red-500/20 text-red-500 border border-red-500/30' :
-                        complaint.priority === 'high' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' :
-                        complaint.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :
-                        'bg-blue-500/20 text-blue-500 border border-blue-500/30'
-                      }`}>
-                        {complaint.priority}
-                      </span>
+                      <PriorityBadge priority={complaint.priority as PriorityVariant} size="sm" />
                     </div>
                     <div>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider w-fit ${
-                        complaint.status === 'new' ? 'bg-red-500/10 text-destructive border border-red-500/20' :
-                        complaint.status === 'in_progress' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                        complaint.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                        'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                      }`}>
-                        {complaint.status.replace('_', ' ')}
-                      </span>
+                      <StatusBadge status={complaint.status as StatusVariant} size="sm" />
                     </div>
                     <div className="text-xs text-muted-foreground font-mono">
                       <span className="flex items-center gap-1.5">
@@ -194,22 +183,8 @@ export default async function AdminComplaintsPage() {
                       {complaint.category && (
                         <span className="text-xs font-medium bg-muted px-2.5 py-1 rounded-full">{complaint.category}</span>
                       )}
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                        complaint.priority === 'urgent' ? 'bg-red-500/20 text-red-500 border border-red-500/30' :
-                        complaint.priority === 'high' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' :
-                        complaint.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :
-                        'bg-blue-500/20 text-blue-500 border border-blue-500/30'
-                      }`}>
-                        {complaint.priority}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                        complaint.status === 'new' ? 'bg-red-500/10 text-destructive border border-red-500/20' :
-                        complaint.status === 'in_progress' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                        complaint.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                        'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                      }`}>
-                        {complaint.status.replace('_', ' ')}
-                      </span>
+                      <PriorityBadge priority={complaint.priority as PriorityVariant} size="sm" />
+                      <StatusBadge status={complaint.status as StatusVariant} size="sm" />
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {new Date(complaint.created_at).toLocaleDateString()}

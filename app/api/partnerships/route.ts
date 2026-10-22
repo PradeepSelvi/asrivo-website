@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createApiClient } from '@/lib/supabase/api-client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,11 +47,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create Supabase client with anon key (public access)
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    // Create Supabase client (using service role on server to bypass RLS for validated submissions)
+    const supabase = createApiClient({ useServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY })
 
     // Insert partnership submission
     const { data, error } = await supabase
@@ -105,10 +102,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Create Supabase client with anon key for public read access
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createApiClient()
 
     const searchParams = request.nextUrl.searchParams
     const limit = parseInt(searchParams.get('limit') || '50')

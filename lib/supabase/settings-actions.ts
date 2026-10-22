@@ -22,7 +22,14 @@ async function requireHighAdmin() {
 // ==========================================
 // SITE SETTINGS ACTIONS
 // ==========================================
+// The DB table uses columns: setting_key (TEXT), setting_value (TEXT)
+// Category is encoded as a prefix in the key: "homepage.hero_title", "site.site_name"
+// Legacy keys without a prefix (e.g., "careers_page_enabled") are also supported.
 
+/**
+ * Fetch all site settings, optionally filtered by category prefix.
+ * Category is encoded in the setting_key as "category.keyName".
+ */
 export async function getSiteSettings(category?: string) {
   try {
     const supabase = await createClient()
@@ -30,15 +37,27 @@ export async function getSiteSettings(category?: string) {
     let query = supabase
       .from('site_settings')
       .select('*')
-      .order('key', { ascending: true })
+      .order('setting_key', { ascending: true })
     
     if (category) {
-      query = query.eq('category', category)
+      // Filter by keys that start with the category prefix
+      query = query.like('setting_key', `${category}.%`)
     }
     
     const { data, error } = await query
     
-    if (error) throw new Error(error.message)
+    if (error) {
+      // Return empty array gracefully when the table doesn't exist yet
+      if (
+        error.code === 'PGRST116' ||
+        error.message?.includes('does not exist') ||
+        error.message?.includes('relation') ||
+        error.code === '42P01'
+      ) {
+        return { success: true, data: [] as any[] }
+      }
+      throw new Error(error.message)
+    }
     
     return { success: true, data }
   } catch (error: any) {
@@ -46,20 +65,37 @@ export async function getSiteSettings(category?: string) {
   }
 }
 
+/**
+ * Get a single setting by its full key (e.g., "homepage.hero_title").
+ * For backward compatibility, also accepts (category, key) which are joined as "category.key".
+ */
 export async function getSiteSetting(category: string, key: string) {
   try {
     const supabase = await createClient()
     
+    const fullKey = `${category}.${key}`
+    
     const { data, error } = await supabase
       .from('site_settings')
-      .select('value')
-      .eq('category', category)
-      .eq('key', key)
+      .select('setting_value')
+      .eq('setting_key', fullKey)
       .single()
     
-    if (error) throw new Error(error.message)
+    if (error) {
+      // Return null gracefully when the table doesn't exist yet or row not found
+      if (
+        error.code === 'PGRST116' ||
+        error.code === 'PGRST100' ||
+        error.message?.includes('does not exist') ||
+        error.message?.includes('relation') ||
+        error.code === '42P01'
+      ) {
+        return { success: true, data: null }
+      }
+      throw new Error(error.message)
+    }
     
-    return { success: true, data: data.value }
+    return { success: true, data: data.setting_value }
   } catch (error: any) {
     return { success: false, error: error.message }
   }
@@ -74,14 +110,14 @@ export async function updateSiteSetting(
     await requireHighAdmin()
     const supabase = await createClient()
     
-    // Convert value to JSON if it's not already
-    const jsonValue = typeof value === 'string' ? JSON.stringify(value) : value
+    const fullKey = `${category}.${key}`
+    // Store as plain string value
+    const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
     
     const { data, error } = await supabase
       .from('site_settings')
-      .update({ value: jsonValue, updated_at: new Date().toISOString() })
-      .eq('category', category)
-      .eq('key', key)
+      .update({ setting_value: stringValue })
+      .eq('setting_key', fullKey)
       .select()
       .single()
     
@@ -112,13 +148,13 @@ export async function updateMultipleSettings(
     // Update each setting
     const results = await Promise.all(
       settings.map(async ({ category, key, value }) => {
-        const jsonValue = typeof value === 'string' ? JSON.stringify(value) : value
+        const fullKey = `${category}.${key}`
+        const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
         
         return supabase
           .from('site_settings')
-          .update({ value: jsonValue, updated_at: new Date().toISOString() })
-          .eq('category', category)
-          .eq('key', key)
+          .update({ setting_value: stringValue })
+          .eq('setting_key', fullKey)
       })
     )
     
@@ -153,17 +189,14 @@ export async function createSiteSetting(
     await requireHighAdmin()
     const supabase = await createClient()
     
-    const jsonValue = typeof value === 'string' ? JSON.stringify(value) : value
+    const fullKey = `${category}.${key}`
+    const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
     
     const { data, error } = await supabase
       .from('site_settings')
       .insert({
-        category,
-        key,
-        value: jsonValue,
-        description,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        setting_key: fullKey,
+        setting_value: stringValue,
       })
       .select()
       .single()
@@ -189,11 +222,12 @@ export async function deleteSiteSetting(category: string, key: string) {
     await requireHighAdmin()
     const supabase = await createClient()
     
+    const fullKey = `${category}.${key}`
+    
     const { error } = await supabase
       .from('site_settings')
       .delete()
-      .eq('category', category)
-      .eq('key', key)
+      .eq('setting_key', fullKey)
     
     if (error) throw new Error(error.message)
     
@@ -215,7 +249,7 @@ export async function deleteSiteSetting(category: string, key: string) {
 // HELPER FUNCTIONS
 // ==========================================
 
-// Get all settings formatted as an object
+// Get all settings formatted as a nested object { category: { key: value } }
 export async function getSettingsMap(category?: string) {
   const result = await getSiteSettings(category)
   
@@ -223,15 +257,23 @@ export async function getSettingsMap(category?: string) {
     return {}
   }
   
-  return result.data.reduce((acc, setting) => {
-    if (!acc[setting.category]) {
-      acc[setting.category] = {}
+  return result.data.reduce((acc: Record<string, Record<string, any>>, setting: any) => {
+    const settingKey = setting.setting_key as string
+    const settingValue = setting.setting_value as string
+    
+    // Parse "category.key" from setting_key
+    const dotIndex = settingKey.indexOf('.')
+    const cat = dotIndex > 0 ? settingKey.substring(0, dotIndex) : 'general'
+    const key = dotIndex > 0 ? settingKey.substring(dotIndex + 1) : settingKey
+    
+    if (!acc[cat]) {
+      acc[cat] = {}
     }
-    // Parse JSON value
+    // Parse JSON value if possible
     try {
-      acc[setting.category][setting.key] = JSON.parse(setting.value)
+      acc[cat][key] = JSON.parse(settingValue)
     } catch {
-      acc[setting.category][setting.key] = setting.value
+      acc[cat][key] = settingValue
     }
     return acc
   }, {} as Record<string, Record<string, any>>)

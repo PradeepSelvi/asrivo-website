@@ -250,7 +250,7 @@ Developed by Asrivo Tech
 
 ## 📞 Support
 
-For support, email admin@asrivotech.com
+For support, email admin@asrivotech.in
 
 ---
 

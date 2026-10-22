@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ShieldCheck, Globe, Zap, Users, Building2,Folder,CheckCircle  } from "lucide-react"
+import { ArrowRight, ShieldCheck, Globe, Users, Building2, Folder, CheckCircle } from "lucide-react"
 import { useScrollAnimation, useCountUp } from "@/hooks/use-scroll-animation"
 
 /**
@@ -99,7 +99,9 @@ function CompanyMetric({ value, suffix, label, icon: Icon }: { value: number; su
   )
 }
 
-export function HeroSection() {
+import type { HomeContent } from "@/lib/supabase/content-helpers"
+
+export function HeroSection({ content }: { content: HomeContent }) {
   const [mounted, setMounted] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
@@ -114,6 +116,12 @@ export function HeroSection() {
     window.addEventListener("mousemove", handleMove)
     return () => window.removeEventListener("mousemove", handleMove)
   }, [])
+
+  // Use HomeContent directly
+  const heroTitle = content.hero_title
+  const heroSubtitle = content.hero_subtitle
+  const heroCTAPrimary = content.hero_cta_primary
+  const heroCTASecondary = content.hero_cta_secondary
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -146,45 +154,44 @@ export function HeroSection() {
               </span>
             </div>
 
-            <h1 className={`text-6xl md:text-[100px] font-black text-slate-900 tracking-tighter leading-[0.85] mb-10 transition-all duration-1000 delay-200 ${mounted ? 'opacity-100' : 'opacity-0 -translate-y-6'}`}>
-              Building Robust <br />
+            <h1 className={`text-[clamp(2.25rem,9vw,6.25rem)] md:text-[100px] font-black text-slate-900 tracking-tighter leading-[1.05] md:leading-[0.9] mb-10 transition-all duration-1000 delay-200 ${mounted ? 'opacity-100' : 'opacity-0 -translate-y-6'}`}>
+              {heroTitle.split(' ').slice(0, -2).join(' ')} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-500 to-indigo-600 animate-text-shimmer drop-shadow-sm">
-                Digital Foundations
+                {heroTitle.split(' ').slice(-2).join(' ')}
               </span>
             </h1>
 
             <p className={`text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-16 font-medium leading-relaxed transition-all duration-1000 delay-400 ${mounted ? 'opacity-100' : 'opacity-0 translate-y-8'}`}>
-              Asrivo Tech develops resilient digital ecosystems for modern enterprises. 
-              We transform structural complexity into high-performance infrastructure components.
+              {heroSubtitle}
             </p>
 
             <div className={`flex flex-col sm:flex-row items-center justify-center gap-8 mb-32 transition-all duration-1000 delay-600 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               <Button size="lg" className="h-20 px-14 text-lg font-black rounded-3xl bg-primary hover:bg-primary/90 shadow-[0_20px_40px_rgba(59,130,246,0.3)] group active:scale-95 transition-all" asChild>
                 <Link href="/services/inquiry">
-                  Initialize Deployment
+                  {heroCTAPrimary}
                   <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-2" />
                 </Link>
               </Button>
               
               <Button size="lg" variant="outline" className="h-20 px-14 text-lg font-bold rounded-3xl border-slate-200 bg-white/40 backdrop-blur-xl text-slate-900 hover:bg-white shadow-xl transition-all" asChild>
                 <Link href="/projects">
-                  View Case Reports
+                  {heroCTASecondary}
                 </Link>
               </Button>
             </div>
 
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-1000 delay-800 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-              <CompanyMetric value={7} suffix="" label="Our Core Service" icon={Building2} />
-              <CompanyMetric value={99.9} suffix=".9%" label="System Reliability" icon={Users} />
-              <CompanyMetric value={7} suffix="+" label="Technology Expertise" icon={CheckCircle} />
-              <CompanyMetric value={25} suffix="/7" label="Live Support" icon={Zap} />
+              <CompanyMetric value={parseInt(content.stats_projects) || 2} suffix="+" label="Completed Projects" icon={Folder} />
+              <CompanyMetric value={parseInt(content.stats_clients) || 2} suffix="+" label="Happy Clients" icon={Users} />
+              <CompanyMetric value={parseInt(content.stats_team) || 9} suffix="" label="Team Members" icon={Building2} />
+              <CompanyMetric value={parseInt(content.stats_experience) || 1} suffix="yr" label="Years of Experience" icon={CheckCircle} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 opacity-30">
-        <span className="text-[10px] font-black tracking-[0.5em] uppercase text-slate-400">Scroll Analytics</span>
+        <span className="text-[10px] font-black tracking-[0.5em] uppercase text-slate-400">Explore</span>
         <div className="w-[2px] h-16 rounded-full bg-gradient-to-b from-primary to-transparent animate-bounce-slow" />
       </div>
 

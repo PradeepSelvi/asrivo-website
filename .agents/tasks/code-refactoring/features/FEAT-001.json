@@ -1,0 +1,50 @@
+{
+  "id": "FEAT-001",
+  "type": "refactor",
+  "description": "Create foundation utilities: unified API Supabase client factory, status badge components and utilities, and API route wrapper for common patterns. This eliminates ~450 lines of duplicate API boilerplate and 120+ lines of status badge ternary chains.",
+  "status": "pending",
+  "steps": [
+    "Create lib/supabase/api-client.ts with createApiClient() factory function that accepts useServiceRole option",
+    "Update app/api/complaints/route.ts to use createApiClient() instead of direct createClient(URL, KEY)",
+    "Update app/api/complaints/status/route.ts to use createApiClient()",
+    "Update app/api/consultations/route.ts to replace mixed client usage with createApiClient()",
+    "Update app/api/partnerships/route.ts to use createApiClient()",
+    "Create lib/utils/status-config.ts with getStatusConfig() and getPriorityConfig() utilities, defining all status/priority variants (contact, inquiry, complaint, consultation, lead, deal, partnership)",
+    "Create components/ui/status-badge.tsx component using status-config utility",
+    "Create components/ui/priority-badge.tsx component using status-config utility",
+    "Update app/admin/(dashboard)/contacts/page.tsx to replace inline status badge ternary chains with <StatusBadge> component (2 locations: desktop + mobile)",
+    "Update app/admin/(dashboard)/complaints/page.tsx to replace status and priority badge ternaries with components (4 locations total)",
+    "Update app/admin/(dashboard)/inquiries/page.tsx to remove getStatusConfig helper and use <StatusBadge> component",
+    "Update app/admin/(dashboard)/crm/leads/page.tsx to use <StatusBadge> component (2 locations)",
+    "Update app/admin/(dashboard)/crm/leads/[id]/page.tsx to use <StatusBadge>",
+    "Update app/contact/contact-client.tsx to use <StatusBadge>",
+    "Create lib/api/route-wrapper.ts with withApiHandler() HOF for common API patterns (rate limit, CAPTCHA, validation, error handling)",
+    "Create withGetHandler() simplified wrapper in lib/api/route-wrapper.ts for GET routes",
+    "Refactor app/api/contacts/route.ts POST handler to use withApiHandler, removing duplicate try-catch-ZodError pattern",
+    "Refactor app/api/inquiries/route.ts POST handler to use withApiHandler",
+    "Refactor app/api/newsletter/route.ts POST handler to use withApiHandler",
+    "Refactor app/api/contacts/route.ts GET handler to use withGetHandler",
+    "Refactor app/api/inquiries/route.ts GET handler to use withGetHandler"
+  ],
+  "acceptance_criteria": [
+    "All API routes using direct createClient(URL, KEY) now use createApiClient()",
+    "All status/priority badges across admin pages render using <StatusBadge> or <PriorityBadge> components",
+    "At least 5 API routes refactored to use withApiHandler wrapper",
+    "TypeScript types pass: pnpm type-check",
+    "Build succeeds: pnpm build",
+    "Manual test: submit contact form, verify success and error handling work",
+    "Manual test: visit admin/contacts, admin/complaints, admin/inquiries - verify badges render correctly"
+  ],
+  "verification": [
+    "pnpm type-check",
+    "pnpm lint",
+    "pnpm build",
+    "Manual testing: Submit contact form at localhost:3000/contact, verify API response",
+    "Manual testing: Visit localhost:3000/admin/contacts, verify status badges display correctly",
+    "Manual testing: Visit localhost:3000/admin/complaints, verify status and priority badges",
+    "Manual testing: Visit localhost:3000/admin/inquiries, verify status badges",
+    "Grep check: grep -r 'createClient.*SUPABASE_URL.*ANON_KEY' app/api/ should return fewer results"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

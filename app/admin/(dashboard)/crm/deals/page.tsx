@@ -31,7 +31,7 @@ export default async function CRMDealsPage() {
                   <div className="font-semibold text-foreground">{deal.deal_name}</div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {deal.company_name && <span>{deal.company_name} • </span>}
-                    {deal.currency} {deal.deal_value?.toLocaleString()} • {deal.stage}
+                    ₹{deal.deal_value?.toLocaleString()} • {deal.stage}
                   </div>
                 </Link>
                 <Link 

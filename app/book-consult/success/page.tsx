@@ -89,9 +89,9 @@ export default function ConsultationSuccessPage() {
         </div>
 
         <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-          <a href="mailto:info@asrivotech.com" className="flex items-center gap-2 hover:text-primary transition-colors">
+          <a href="mailto:info@asrivotech.in" className="flex items-center gap-2 hover:text-primary transition-colors">
             <Mail className="h-4 w-4" />
-            info@asrivotech.com
+            info@asrivotech.in
           </a>
         </div>
       </div>

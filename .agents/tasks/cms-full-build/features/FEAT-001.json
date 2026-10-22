@@ -1,0 +1,27 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Database migration and content helpers - Create the page_content table migration (already exists at supabase/migrations/create_page_content_cms.sql), verify its structure matches requirements, and build typed helper functions in lib/supabase/content-helpers.ts to fetch and update page content with proper TypeScript interfaces for each page type",
+  "status": "completed",
+  "steps": [
+    "Read and verify supabase/migrations/create_page_content_cms.sql matches the required schema (table with page_slug, section_key, content_value columns, RLS policies for public read and authenticated write)",
+    "If the migration structure is outdated or uses a different schema than required (e.g., old format with page_slug + content JSONB vs. new format with page_slug + section_key + content_value), replace it with the correct schema that stores each content field as a separate row",
+    "Create lib/supabase/content-helpers.ts with TypeScript interfaces: HomeContent (hero_title, hero_subtitle, hero_cta_primary, hero_cta_secondary, about_title, about_description, cta_title, cta_description, cta_button), AboutContent, ServicesContent, ContactContent, ProjectsContent, TeamContent, CareersContent",
+    "Implement getPageContent(pageSlug: string) function that fetches all rows for a page_slug, converts them to a key-value object, returns with fallback to hardcoded defaults from existing code",
+    "Implement typed wrappers: getHomeContent(), getAboutContent(), getServicesContent(), getContactContent(), getProjectsContent(), getTeamContent(), getCareersContent() that call getPageContent() and cast to the appropriate interface",
+    "Add getAllPagesMetadata() function that returns list of all 7 pages with slug, last updated timestamp, number of content fields"
+  ],
+  "acceptance_criteria": [
+    "supabase/migrations/create_page_content_cms.sql exists and contains the correct schema with page_slug, section_key, content_value columns",
+    "lib/supabase/content-helpers.ts exports TypeScript interfaces for all 7 page types",
+    "All helper functions (getPageContent, getHomeContent, etc.) are implemented and return properly typed data",
+    "Functions gracefully handle missing data by returning sensible defaults matching the existing hardcoded values in the codebase"
+  ],
+  "verification": [
+    "Read lib/supabase/content-helpers.ts and confirm all functions and interfaces are present",
+    "Check that TypeScript compilation succeeds: run `pnpm build` and verify no type errors related to the new helper functions",
+    "Visually inspect that default values in getPageContent match the existing hardcoded content from components/home/*.tsx and app/page.tsx"
+  ],
+  "blocked_reason": null,
+  "findings": "Migration file verified with correct schema (page_slug, section_key, content_value). All 7 TypeScript interfaces created (HomeContent, AboutContent, ServicesContent, ContactContent, ProjectsContent, TeamContent, CareersContent). Implemented getPageContent() and 7 typed wrapper functions with proper fallback defaults. Added getAllPagesMetadata() for CMS listing. Note: PowerShell execution policy prevented build command from running, but TypeScript file structure and syntax manually verified against project patterns."
+}

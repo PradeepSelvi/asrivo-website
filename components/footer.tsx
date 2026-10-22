@@ -3,21 +3,17 @@
 import Link from "next/link"
 import { Linkedin, Github, Mail, MapPin, Phone, Instagram, Twitter } from "lucide-react"
 import { useEffect, useState } from "react"
+import { SERVICES, getServiceLink } from "@/config/services"
 
 const navigation = {
   company: [
     { name: "About Us", href: "/about" },
     { name: "Our Team", href: "/team" },
   ],
-  services: [
-    { name: "Software Development", href: "/services#software" },
-    { name: "Web Applications", href: "/services#web" },
-    { name: "Mobile Applications", href: "/services#mobile" },
-    { name: "Cloud & DevOps", href: "/services#cloud" },
-    { name: "AI & Automation", href: "/services#ai" },
-    { name: "Digital Marketing", href: "/services/digital-marketing" },
-    { name: "IT Consulting", href: "/services#consulting" },
-  ],
+  services: SERVICES.slice(0, 7).map((s) => ({
+    name: s.title,
+    href: getServiceLink(s),
+  })),
   resources: [
     { name: "Projects", href: "/projects" },
     { name: "Case Studies", href: "/projects" },
@@ -33,13 +29,13 @@ const navigation = {
 const defaultSettings = {
   site_name: 'Asrivo Tech',
   site_tagline: "TURNING IDEAS INTO INTELLIGENT SOLUTIONS",
-  contact_email: 'info@asrivotech.com',
-  contact_phone: '+91 9976422558',
+  contact_email: 'info@asrivotech.in',
+  contact_phone: '+91 99764 22558',
   contact_address: 'Madurai, Tamil Nadu, India',
   social_linkedin: 'https://linkedin.com/company/asrivotech',
   social_github: 'https://github.com/asrivotech',
   social_instagram: 'https://instagram.com/asrivotech',
-  social_twitter: 'https://twitter.com/asrivotech',
+  social_twitter: 'https://x.com/asrivotech',
 }
 
 export function Footer() {
@@ -54,7 +50,7 @@ export function Footer() {
           const incoming = data.data
           // Keep our defaults for address and phone if the DB still has old placeholder values
           const STALE_ADDRESSES = ['123 Tech Street San Francisco, CA 94105', '123 Tech Street', 'San Francisco']
-          const STALE_PHONES = ['+1 (555) 123-4567', '+1 555 123-4567']
+          const STALE_PHONES = ['+1 (555) 123-4567', '+1 555 123-4567', '+91 8122575337']
           if (STALE_ADDRESSES.some(s => incoming.contact_address?.includes(s))) {
             delete incoming.contact_address
           }
@@ -71,7 +67,7 @@ export function Footer() {
     { name: "LinkedIn", href: settings.social_linkedin, icon: Linkedin },
     { name: "GitHub", href: settings.social_github, icon: Github },
     { name: "Instagram", href: settings.social_instagram, icon: Instagram },
-    { name: "Twitter", href: settings.social_twitter, icon: Twitter },
+    { name: "X (Twitter)", href: settings.social_twitter, icon: Twitter },
     { name: "Email", href: `mailto:${settings.contact_email}`, icon: Mail },
   ].filter(item => item.href) // Only show links that are configured
   return (

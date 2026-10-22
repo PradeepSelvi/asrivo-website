@@ -40,7 +40,7 @@ function useCountUp(end: number, duration: number = 2000) {
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp
       const progress = Math.min((timestamp - startTime) / duration, 1)
-      setCount(Math.floor(progress * end))
+      setCount(progress >= 1 ? end : Math.floor(progress * end))
       if (progress < 1) requestAnimationFrame(step)
     }
     requestAnimationFrame(step)
@@ -99,17 +99,44 @@ function AnimatedStat({ icon: Icon, value, label, description, delay }: {
   )
 }
 
+import type { HomeContent } from "@/lib/supabase/content-helpers"
+
 /** * MAIN COMPONENT: AboutPreview
  * A full-screen width section with floating background orbs and glass panels.
  */
-export function AboutPreview() {
+export function AboutPreview({ content }: { content: HomeContent }) {
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation()
 
+  // Use HomeContent directly
+  const title = content.about_title
+  const description = content.about_description
+
+  // Wire CMS stats fields to the highlights
   const highlights = [
-  { icon: Briefcase, value: "6+", label: "Core Services", description: "Comprehensive technology solutions for modern businesses." },
-  { icon: Users, value: "24/7", label: "Support Availability", description: "Continuous assistance for seamless operations." },
-  { icon: Globe, value: "10+", label: "Technology Stack", description: "Modern tools and frameworks powering solutions." }, 
-  { icon: ShieldCheckIcon, value: "99%", label: "System Reliability", description: "Stable infrastructure powering every service." }
+    { 
+      icon: Briefcase, 
+      value: content.stats_services, 
+      label: "Core Services", 
+      description: "Comprehensive technology solutions for modern businesses." 
+    },
+    { 
+      icon: Users, 
+      value: content.stats_support, 
+      label: "Support Availability", 
+      description: "Continuous assistance for seamless operations." 
+    },
+    { 
+      icon: Globe, 
+      value: content.stats_projects, 
+      label: "Technology Stack", 
+      description: "Modern tools and frameworks powering solutions." 
+    }, 
+    { 
+      icon: ShieldCheckIcon, 
+      value: content.stats_reliability, 
+      label: "System Reliability", 
+      description: "Stable infrastructure powering every service." 
+    }
   ]
 
   const features = [
@@ -155,16 +182,14 @@ export function AboutPreview() {
             </div>
             
             <h2 className="mt-8 text-5xl font-extrabold tracking-tight text-slate-900 sm:text-6xl">
-              Engineering the <br />
+              {title.split(' ').slice(0, -2).join(' ')} <br />
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                Next Digital Frontier
+                {title.split(' ').slice(-2).join(' ')}
               </span>
             </h2>
 
             <p className="mt-8 text-lg leading-8 text-slate-600">
-              Asrivo Tech isn't just a dev shop. We are a Digital Product Studio where 
-              performance meets aesthetics. We take the "impossible" ideas and build them into 
-              lightning-fast, secure, and beautiful realities.
+              {description}
             </p>
 
             {/* Feature Grid - Glass Cards */}
@@ -222,7 +247,7 @@ export function AboutPreview() {
                     <Zap className="h-5 w-5 text-emerald-600" />
                   </div>
                   <p className="text-sm font-medium text-slate-700">
-                    We are currently accepting new projects for Q3 2026.
+                    We are currently accepting new projects.
                   </p>
                </div>
             </div>

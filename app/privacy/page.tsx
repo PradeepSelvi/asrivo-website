@@ -140,7 +140,7 @@ export default function PrivacyPolicyPage() {
               <li><strong>Withdraw Consent:</strong> Unsubscribe from marketing communications</li>
             </ul>
             <p className="text-muted-foreground">
-              To exercise these rights, please contact us at privacy@asrivotech.com
+              To exercise these rights, please contact us at privacy@asrivotech.in
             </p>
           </section>
 
@@ -186,8 +186,8 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="bg-muted p-6 rounded-lg">
               <p className="text-foreground"><strong>Asrivo Tech</strong></p>
-              <p className="text-muted-foreground">Email: privacy@asrivotech.com</p>
-              <p className="text-muted-foreground">Email (General): contact@asrivotech.com</p>
+              <p className="text-muted-foreground">Email: privacy@asrivotech.in</p>
+              <p className="text-muted-foreground">Email (General): contact@asrivotech.in</p>
               <p className="text-muted-foreground mt-2">
                 We will respond to your inquiry within 30 days.
               </p>

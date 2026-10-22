@@ -54,7 +54,7 @@ export default function ScheduleConsultationPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit')
+        throw new Error(data.error?.message || (typeof data.error === 'string' ? data.error : null) || data.message || 'Failed to submit')
       }
 
       setSubmitted(true)
@@ -272,8 +272,8 @@ export default function ScheduleConsultationPage() {
         <div className="mt-8 text-center">
           <p className="text-sm text-muted-foreground">
             Need help? Contact us at{" "}
-            <a href="mailto:info@asrivotech.com" className="text-primary hover:underline">
-              info@asrivotech.com
+            <a href="mailto:info@asrivotech.in" className="text-primary hover:underline">
+              info@asrivotech.in
             </a>
           </p>
         </div>

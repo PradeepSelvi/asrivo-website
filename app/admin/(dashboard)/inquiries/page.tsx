@@ -25,10 +25,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-
-// Force dynamic rendering to prevent static generation errors
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+import { StatusBadge } from '@/components/ui/status-badge'
+import type { StatusVariant } from '@/lib/utils/status-config'
 
 
 interface ClientInquiry {
@@ -128,17 +126,6 @@ export default function ServiceInquiriesPage() {
       supabase.removeChannel(channel)
     }
   }, [statusFilter])
-
-  const getStatusConfig = (status: string) => {
-    const configs = {
-      new: { label: 'New', variant: 'default' as const, color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
-      contacted: { label: 'Contacted', variant: 'secondary' as const, color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' },
-      qualified: { label: 'Qualified', variant: 'secondary' as const, color: 'bg-purple-500/10 text-purple-600 border-purple-500/20' },
-      converted: { label: 'Converted', variant: 'secondary' as const, color: 'bg-green-500/10 text-green-600 border-green-500/20' },
-      rejected: { label: 'Rejected', variant: 'destructive' as const, color: 'bg-red-500/10 text-red-600 border-red-500/20' },
-    }
-    return configs[status as keyof typeof configs] || configs.new
-  }
 
   const stats = [
     {
@@ -264,7 +251,7 @@ export default function ServiceInquiriesPage() {
         ) : (
           <>
             {/* Table Header - Hidden on mobile */}
-            <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[2fr_2fr_1.5fr_120px_100px_120px_100px] px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <div className="hidden lg:grid bg-background/60 border-b border-border grid-cols-[minmax(180px,1.8fr)_minmax(200px,2fr)_minmax(180px,1.5fr)_minmax(110px,0.8fr)_minmax(100px,0.7fr)_minmax(110px,0.8fr)_minmax(100px,0.7fr)] gap-4 px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               <span>Company</span>
               <span>Contact</span>
               <span>Type</span>
@@ -277,61 +264,66 @@ export default function ServiceInquiriesPage() {
             {/* Inquiries List */}
             <div>
               {inquiries.map((inquiry) => {
-                const statusConfig = getStatusConfig(inquiry.status)
                 return (
                   <div key={inquiry.id}>
                     {/* Desktop View */}
-                    <div className="hidden lg:grid grid-cols-[2fr_2fr_1.5fr_120px_100px_120px_100px] items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
-                      <div className="flex items-center gap-3">
+                    <div className="hidden lg:grid grid-cols-[minmax(180px,1.8fr)_minmax(200px,2fr)_minmax(180px,1.5fr)_minmax(110px,0.8fr)_minmax(100px,0.7fr)_minmax(110px,0.8fr)_minmax(100px,0.7fr)] gap-4 items-center px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                           <Building2 className="h-5 w-5 text-primary" />
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-sm">{inquiry.company || 'Individual'}</p>
-                          <p className="text-xs text-muted-foreground">{inquiry.name}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm truncate" title={inquiry.company || 'Individual'}>
+                            {inquiry.company || 'Individual'}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate" title={inquiry.name}>
+                            {inquiry.name}
+                          </p>
                         </div>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm">
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm min-w-0">
                           <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                          <span className="truncate">{inquiry.email}</span>
+                          <span className="truncate" title={inquiry.email}>{inquiry.email}</span>
                         </div>
                         {inquiry.phone && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
                             <Phone className="h-4 w-4 flex-shrink-0" />
-                            <span>{inquiry.phone}</span>
+                            <span className="truncate" title={inquiry.phone}>{inquiry.phone}</span>
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1 min-w-0">
                         {inquiry.project_types.slice(0, 2).map((type, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
+                          <Badge key={idx} variant="outline" className="text-xs whitespace-nowrap">
                             {type}
                           </Badge>
                         ))}
                         {inquiry.project_types.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs whitespace-nowrap">
                             +{inquiry.project_types.length - 2}
                           </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-green-600" />
-                        <span className="text-sm font-medium">{inquiry.budget_range}</span>
+                      <div className="flex items-center gap-1 min-w-0">
+                        <DollarSign className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <span className="text-sm font-medium truncate" title={inquiry.budget_range}>
+                          {inquiry.budget_range}
+                        </span>
                       </div>
-                      <div>
-                        <Badge className={statusConfig.color}>
-                          {statusConfig.label}
-                        </Badge>
+                      <div className="min-w-0">
+                        <StatusBadge status={inquiry.status} size="sm" />
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(inquiry.created_at).toLocaleDateString()}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                        <Calendar className="h-4 w-4 flex-shrink-0" />
+                        <span className="whitespace-nowrap">
+                          {new Date(inquiry.created_at).toLocaleDateString()}
+                        </span>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Link href={`/admin/inquiries/${inquiry.id}`}>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
+                          <Button variant="ghost" size="sm" className="w-full">
+                            <Eye className="h-4 w-4 mr-1" />
                             View
                           </Button>
                         </Link>
@@ -381,9 +373,7 @@ export default function ServiceInquiriesPage() {
                           <DollarSign className="h-3.5 w-3.5 text-green-600" />
                           {inquiry.budget_range}
                         </div>
-                        <Badge className={statusConfig.color}>
-                          {statusConfig.label}
-                        </Badge>
+                        <StatusBadge status={inquiry.status} size="sm" />
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {new Date(inquiry.created_at).toLocaleDateString()}

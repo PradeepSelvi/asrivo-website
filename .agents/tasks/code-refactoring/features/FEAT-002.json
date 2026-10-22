@@ -1,0 +1,41 @@
+{
+  "id": "FEAT-002",
+  "type": "refactor",
+  "description": "Create reusable admin components: StatsGrid, StatsCard, and useRealtimeSubscription hook. This eliminates ~440 lines of repeated stats display logic and ~200 lines of realtime subscription boilerplate.",
+  "status": "pending",
+  "steps": [
+    "Create components/admin/stats-card.tsx component with props: label, value, color, borderColor, icon, className",
+    "Create components/admin/stats-grid.tsx component with props: stats (array), columns (2-5)",
+    "Create types/admin-stats.ts with StatItem interface",
+    "Update app/admin/(dashboard)/contacts/page.tsx to replace stats grid JSX with <StatsGrid> component",
+    "Update app/admin/(dashboard)/inquiries/page.tsx to replace stats grid JSX with <StatsGrid>",
+    "Update app/admin/(dashboard)/complaints/page.tsx to replace stats grid JSX (status + priority grids) with <StatsGrid>",
+    "Update app/admin/(dashboard)/consultations/page.tsx to replace stats grid with <StatsGrid> if present",
+    "Update app/admin/(dashboard)/partnerships/page.tsx to replace stats grid with <StatsGrid> if present",
+    "Create hooks/use-realtime-subscription.ts with useRealtimeSubscription() hook that handles INSERT/UPDATE/DELETE events",
+    "Create useRealtimeList() hook in hooks/use-realtime-subscription.ts for simplified list state management with realtime",
+    "Update app/admin/(dashboard)/contacts/page.tsx to replace manual realtime subscription useEffect with useRealtimeList hook",
+    "Update app/admin/(dashboard)/inquiries/page.tsx to replace manual realtime subscription with useRealtimeSubscription hook (it uses custom state management)"
+  ],
+  "acceptance_criteria": [
+    "StatsCard and StatsGrid components render stats with correct styling on at least 4 admin pages",
+    "useRealtimeSubscription hook handles INSERT, UPDATE, DELETE events correctly",
+    "At least 2 admin pages use the new realtime hooks",
+    "TypeScript types pass: pnpm type-check",
+    "Build succeeds: pnpm build",
+    "Manual test: Open admin/contacts page, submit a new contact form in another tab, verify new contact appears in realtime without refresh",
+    "Manual test: Stats grids show correct counts"
+  ],
+  "verification": [
+    "pnpm type-check",
+    "pnpm lint",
+    "pnpm build",
+    "Manual testing: Visit localhost:3000/admin/contacts, verify stats grid displays 'Unread', 'Read', 'Responded' counts",
+    "Manual testing: Visit localhost:3000/admin/complaints, verify both status and priority stats grids",
+    "Manual testing: Visit localhost:3000/admin/inquiries, verify stats grid with 5 stats",
+    "Realtime test: Open admin/contacts, submit contact form in another tab, verify new entry appears without page refresh",
+    "Realtime test: Same for inquiries page"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

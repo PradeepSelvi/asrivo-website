@@ -13,6 +13,7 @@ const navigation = [
   { name: "Services", href: "/services" },
   { name: "Team", href: "/team" },
   { name: "Projects", href: "/projects" },
+  { name: "Careers", href: "/careers" },
   { name: "Contact", href: "/contact" },
 ]
 
@@ -133,12 +134,12 @@ export function Header({ settings }: HeaderProps = {}) {
           </button>
         </div>
         
-        <div className="hidden lg:flex lg:gap-x-1">
+        <div className="hidden lg:flex lg:gap-x-0.5 xl:gap-x-1">
           {navigation.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className={`relative px-4 py-2 text-sm font-medium transition-all group ${
+              className={`relative px-2.5 xl:px-4 py-2 text-sm font-medium transition-all group whitespace-nowrap ${
                 scrolled 
                   ? "text-foreground/90 hover:text-[#4fd1ed]" 
                   : "text-muted-foreground hover:text-[#4fd1ed]"
@@ -150,9 +151,9 @@ export function Header({ settings }: HeaderProps = {}) {
           ))}
         </div>
         
-        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-5">
+        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-3 xl:gap-x-5">
           {settings && (
-            <div className="flex items-center gap-3 border-r pr-5 border-border/40">
+            <div className="flex items-center gap-2 xl:gap-3 border-r pr-3 xl:pr-5 border-border/40">
               {settings.social_linkedin && (
                 <a href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110 active:scale-95">
                   <LinkedInIcon className="h-5 w-5" />
@@ -168,10 +169,11 @@ export function Header({ settings }: HeaderProps = {}) {
 
           <AuthButtons />
 
-          <Button size="sm" className="bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg shadow-blue-500/20 transition-colors" asChild>
-            <Link href="/services/inquiry" className="gap-2">
+          <Button size="sm" className="bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg shadow-blue-500/20 transition-colors whitespace-nowrap" asChild>
+            <Link href="/services/inquiry" className="gap-1.5 xl:gap-2">
               <Sparkles className="h-4 w-4" />
-              Get Started
+              <span className="hidden xl:inline">Get Started</span>
+              <span className="xl:hidden">Start</span>
             </Link>
           </Button>
         </div>

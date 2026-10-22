@@ -120,7 +120,7 @@ export function SiteSettingsForm({ initialSettings }: SiteSettingsFormProps) {
             <input
               type="email"
               name="contact_email"
-              defaultValue={initialSettings.contact_email || "contact@asrivotech.com"}
+              defaultValue={initialSettings.contact_email || "contact@asrivotech.in"}
               className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               placeholder="your@email.com"
             />
@@ -173,7 +173,7 @@ export function SiteSettingsForm({ initialSettings }: SiteSettingsFormProps) {
               <input
                 type="email"
                 name="support_email"
-                defaultValue={initialSettings.support_email || "support@asrivotech.com"}
+                defaultValue={initialSettings.support_email || "support@asrivotech.in"}
                 className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
@@ -216,14 +216,14 @@ export function SiteSettingsForm({ initialSettings }: SiteSettingsFormProps) {
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground flex items-center gap-2">
               <Twitter className="w-4 h-4 text-blue-400" />
-              Twitter / X
+              Twitter / X (x.com)
             </label>
             <input
               type="url"
               name="social_twitter"
-              defaultValue={initialSettings.social_twitter || "https://twitter.com/asrivotech"}
+              defaultValue={initialSettings.social_twitter || "https://x.com/asrivotech"}
               className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-              placeholder="https://twitter.com/yourcompany"
+              placeholder="https://x.com/yourcompany"
             />
           </div>
 
