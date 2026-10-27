@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('partnerships')
       .select('*')
-      .ilike('email', email.trim())
+      .ilike('email', String(email).trim().replace(/[\\%_]/g, '\\$&'))
       .order('created_at', { ascending: false })
 
     if (error) {
