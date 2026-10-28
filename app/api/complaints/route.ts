@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiClient } from '@/lib/supabase/api-client'
+import { createServerClient } from '@/lib/supabase/server'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
 import { complaintSchema } from '@/lib/utils/validation'
@@ -46,10 +47,21 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create a new complaint (Public submission)
+// POST - Create a new complaint (Authenticated users only)
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, formSubmitRateLimit)
   if (limited) return limited
+
+  // Require authentication — matches the AuthGate on the complaints page
+  const supabaseAuth = await createServerClient()
+  const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+  if (authError || !user) {
+    return NextResponse.json(
+      apiError('Authentication required to submit a complaint', 'UNAUTHORIZED'),
+      { status: HTTP_STATUS.UNAUTHORIZED }
+    )
+  }
 
   let email: string | undefined
   let name: string | undefined

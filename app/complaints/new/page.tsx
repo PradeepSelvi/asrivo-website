@@ -98,8 +98,6 @@ export default function RaiseComplaintPage() {
       proofDocumentUrl: uploadedFile?.url || null,
     }
 
-    console.log('Submitting complaint data:', data)
-
     try {
       const response = await fetch('/api/complaints', {
         method: 'POST',
@@ -110,7 +108,6 @@ export default function RaiseComplaintPage() {
       })
 
       const result = await response.json()
-      console.log('API response:', result)
 
       if (!response.ok) {
         const errorMessage =
