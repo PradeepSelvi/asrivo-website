@@ -125,6 +125,12 @@ export default function PartnershipsPage() {
   }, [statusFilter])
 
   const updateStatus = async (id: number, newStatus: string) => {
+    const previousPartnerships = [...partnerships]
+    // Optimistically update the UI
+    setPartnerships((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, status: newStatus as any } : p))
+    )
+
     try {
       console.log('Updating partnership status:', { id, newStatus })
       console.log('Making PATCH request to:', `/api/partnerships/${id}`)
@@ -145,12 +151,14 @@ export default function PartnershipsPage() {
         console.log('Status updated successfully, refreshing list...')
         await fetchPartnerships()
       } else {
+        setPartnerships(previousPartnerships)
         const errorMsg = result.error || 'Unknown error'
         const details = result.details || ''
         console.error('Failed to update status:', { errorMsg, details, fullResult: result })
         alert(`Failed to update status: ${errorMsg}${details ? ' - ' + details : ''}`)
       }
     } catch (error) {
+      setPartnerships(previousPartnerships)
       console.error('Exception during update:', error)
       if (error instanceof Error) {
         alert(`Failed to update status: ${error.message}`)

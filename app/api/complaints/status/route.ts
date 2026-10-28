@@ -1,9 +1,21 @@
 import { createApiClient } from '@/lib/supabase/api-client'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-// GET - Fetch complaints by email
+// GET - Fetch complaints by email (authenticated users only, own complaints)
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication — users can only look up their own complaints
+    const supabaseAuth = await createServerClient()
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const email = searchParams.get('email')
 
@@ -14,21 +26,31 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    const cleanEmail = email.trim().toLowerCase()
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(cleanEmail)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
       )
     }
 
-    const supabase = createApiClient()
+    // Ensure the user can only look up their own complaints
+    if (user.email?.toLowerCase() !== cleanEmail) {
+      return NextResponse.json(
+        { error: 'You can only look up your own complaints' },
+        { status: 403 }
+      )
+    }
+
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('complaints')
       .select('*')
-      .eq('email', email)
+      .ilike('email', cleanEmail)
       .order('created_at', { ascending: false })
 
     if (error) {

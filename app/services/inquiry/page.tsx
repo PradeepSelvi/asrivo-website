@@ -247,7 +247,6 @@ export default function ServiceInquiryPage() {
   const handleNext = () => {
     if (validateStep(currentStep)) {
       const nextStep = Math.min(currentStep + 1, totalSteps)
-      console.log('Moving from step', currentStep, 'to step', nextStep)
       setCurrentStep(nextStep)
     }
   }
@@ -260,11 +259,9 @@ export default function ServiceInquiryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    console.log('handleSubmit called on step:', currentStep, 'canSubmit:', canSubmit)
     
     // Only allow submission if explicitly enabled (from Submit button click)
     if (!canSubmit) {
-      console.log('Submission blocked - canSubmit flag is false')
       return
     }
     
@@ -274,7 +271,6 @@ export default function ServiceInquiryPage() {
     }
 
     if (currentStep < totalSteps) {
-      console.log('Not on final step, should not submit')
       setCanSubmit(false) // Reset flag
       return
     }
@@ -307,7 +303,6 @@ export default function ServiceInquiryPage() {
         setUploadingFile(false)
       }
 
-      console.log('Submitting inquiry data:', formData)
       
       const response = await fetch('/api/inquiries', {
         method: 'POST',
@@ -320,12 +315,13 @@ export default function ServiceInquiryPage() {
       })
 
       const data = await response.json()
-      console.log('API response:', data)
 
       if (!response.ok) {
         const errorMsg =
-          (typeof data.error === 'string' ? data.error : data.error?.message) ||
-          data.message ||
+          (typeof data?.error === 'string'
+            ? data.error
+            : data?.error?.message || (data?.error ? JSON.stringify(data.error) : null)) ||
+          data?.message ||
           'Failed to submit inquiry. Please try again.'
         throw new Error(errorMsg)
       }

@@ -154,7 +154,7 @@ export default function ContactPageClient({ content }: ContactPageProps) {
       },
       body: JSON.stringify({
         ...data,
-        captchaToken,
+        captchaToken: captchaToken || undefined,
       }),
     });
 
@@ -162,15 +162,18 @@ export default function ContactPageClient({ content }: ContactPageProps) {
 
     if (!response.ok) {
       console.error('Error from server:', result);
-      throw new Error(result.error || 'Failed to send message');
+      const errorMsg =
+        typeof result?.error === 'object' && result?.error !== null
+          ? result.error.message || JSON.stringify(result.error)
+          : result?.error || result?.message || 'Failed to send message';
+      throw new Error(errorMsg);
     }
 
-    console.log('Success:', result);
     setSubmitted(true);
 
   } catch (error) {
     console.error('Error submitting form:', error);
-    alert('Failed to send message. Please try again.');
+    alert(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
   } finally {
     setLoading(false);
   }

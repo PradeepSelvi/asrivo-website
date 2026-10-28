@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
+import { AuthRecoveryListener } from '@/components/auth-recovery-listener'
 import { useEffect, useState } from 'react'
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
@@ -34,6 +35,7 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   // For public routes, show header and footer
   return (
     <>
+      <AuthRecoveryListener />
       <Header settings={settings || undefined} />
       <main>{children}</main>
       <Footer />

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { uploadRateLimit } from '@/lib/utils/rate-limit'
 import { randomBytes } from 'crypto'
@@ -11,6 +11,9 @@ const ALLOWED_BUCKETS = new Set([
   'inquiry-documents',
   'partnership-documents',
   'user-profiles',
+  'team-members',
+  'project-images',
+  'resumes',
 ])
 
 const VALID_DOC_TYPES = new Set([
@@ -70,18 +73,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const folder = (formData.get('folder') as string | null)?.replace(/^\/+|\/+$/g, '') ?? ''
+    const supabase = createApiClient({ useServiceRole: true })
 
     // Generate a safe filename — never use the original filename from the client
     const ext = EXT_MAP[file.type] ?? 'bin'
-    const safeName = `${Date.now()}-${randomBytes(8).toString('hex')}.${ext}`
+    const fileName = `${Date.now()}-${randomBytes(8).toString('hex')}.${ext}`
+    const safePath = folder ? `${folder}/${fileName}` : fileName
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
     const { data, error } = await supabase.storage
       .from(bucketInput)
-      .upload(safeName, buffer, { contentType: file.type, upsert: false })
+      .upload(safePath, buffer, { contentType: file.type, upsert: false })
 
     if (error) {
       console.error('Supabase storage error:', error.message)

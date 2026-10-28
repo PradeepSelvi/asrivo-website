@@ -211,7 +211,8 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 lg:px-8 py-12">\n        <div className="grid gap-8 lg:grid-cols-3">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8 py-12">
+        <div className="grid gap-8 lg:grid-cols-3">
           {/* Main Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Featured Image */}
@@ -439,12 +440,6 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
           </div>
         </div>
       )}
-
-      {/* Realtime Indicator */}
-      <div className="fixed bottom-4 right-4 flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 shadow-lg text-xs">
-        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-        <span className="text-muted-foreground">Live Updates</span>
-      </div>
     </div>
   )
 }

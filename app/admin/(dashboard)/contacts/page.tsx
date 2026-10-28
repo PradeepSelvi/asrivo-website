@@ -7,10 +7,6 @@ import Link from 'next/link'
 import { StatusBadge } from '@/components/ui/status-badge'
 import type { StatusVariant } from '@/lib/utils/status-config'
 
-// Force dynamic rendering to prevent static generation errors
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 
 interface Contact {
   id: number
@@ -37,12 +33,20 @@ export default function AdminContactsPage() {
     // Initial fetch
     const fetchContacts = async () => {
       try {
-        const { data, error } = await supabase
-          .from('contacts')
-          .select('*')
-          .order('created_at', { ascending: false })
+        const response = await fetch('/api/contacts')
+        const result = await response.json()
+        let data: Contact[] = result.success ? result.data : null
 
-        if (error) throw error
+        if (!data) {
+          const { data: directData, error } = await supabase
+            .from('contacts')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+          if (error) throw error
+          data = directData
+        }
+
         setContacts(data || [])
       } catch (err: any) {
         console.error('Error fetching contacts:', err)

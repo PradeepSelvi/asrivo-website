@@ -12,7 +12,7 @@
  * @returns Promise with success status and score
  */
 export async function verifyCaptcha(
-  token: string | undefined,
+  token: string | undefined | null,
   _action: string // Prefix with underscore to indicate intentionally unused
 ): Promise<{ success: boolean; score?: number; error?: string }> {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY

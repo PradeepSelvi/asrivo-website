@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
+// GET /api/inquiries/status — Authenticated users can only look up their own inquiries
 export async function POST(request: NextRequest) {
   try {
+    // Require session auth
+    const supabaseAuth = await createServerClient()
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const { email } = await request.json()
 
     if (!email) {
@@ -21,13 +34,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const cleanEmail = email.toLowerCase().trim()
+
+    // Users can only look up their own inquiries
+    if (user.email?.toLowerCase() !== cleanEmail) {
+      return NextResponse.json(
+        { error: 'You can only look up your own inquiries' },
+        { status: 403 }
+      )
+    }
+
+    const supabase = createApiClient({ useServiceRole: true })
 
     // Fetch all inquiries for this email
     const { data: inquiries, error } = await supabase
       .from('client_inquiries')
       .select('id, name, company, status, created_at, project_types, budget_range, timeline')
-      .eq('email', email.toLowerCase().trim())
+      .eq('email', cleanEmail)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -45,7 +68,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Return all inquiries for this email
     return NextResponse.json({
       success: true,
       inquiries: inquiries.map(inquiry => ({

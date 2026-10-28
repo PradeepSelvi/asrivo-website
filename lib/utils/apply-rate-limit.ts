@@ -16,6 +16,11 @@ export async function applyRateLimit(
   limiter: RateLimiter,
   identifier?: string
 ): Promise<NextResponse | null> {
+  // Allow testing in development without hitting rate limit locks
+  if (process.env.NODE_ENV === 'development') {
+    return null
+  }
+
   const id = identifier ?? getClientIdentifier(request)
   const result = await limiter.check(id)
 

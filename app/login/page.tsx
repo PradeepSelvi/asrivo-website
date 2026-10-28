@@ -9,7 +9,9 @@ import { Lock, Mail, Eye, EyeOff, ArrowLeft, Home, Loader2, CheckCircle } from '
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const resetSuccess = searchParams.get('reset') === 'success'
   const redirectTo = searchParams.get('redirectTo') || '/'
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -132,6 +134,23 @@ function LoginContent() {
         </div>
 
         <div className="bg-background border border-border rounded-2xl p-8 shadow-sm">
+          {resetSuccess && (
+            <div
+              role="status"
+              className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-start gap-3"
+            >
+              <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-emerald-700 dark:text-emerald-400 text-sm font-semibold">
+                  Password reset successfully!
+                </p>
+                <p className="text-emerald-600/90 dark:text-emerald-400/80 text-xs mt-0.5">
+                  Please sign in with your new password.
+                </p>
+              </div>
+            </div>
+          )}
+
           {errorMsg && (
             <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-xl">
               <div className="text-destructive text-sm">{errorMsg}</div>
@@ -256,11 +275,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </main>
+      }
+    >
       <LoginContent />
     </Suspense>
   )

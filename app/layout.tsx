@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { ConditionalLayout } from '@/components/conditional-layout'
+import { AuthRecoveryInterceptor } from '@/components/auth-recovery-interceptor'
 
 export const metadata: Metadata = {
   title: 'Asrivo Tech - Building Tomorrow\'s Digital Solutions',
@@ -51,6 +52,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
+        <AuthRecoveryInterceptor />
         <ConditionalLayout>{children}</ConditionalLayout>
         <Analytics />
       </body>

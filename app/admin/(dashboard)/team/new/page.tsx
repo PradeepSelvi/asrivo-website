@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createTeamMember } from '@/lib/supabase/content-actions'
 import { ArrowLeft, Loader2, Plus, X } from 'lucide-react'
 import Link from 'next/link'
+import TeamImageUpload from '@/components/admin/team-image-upload'
 
 
 export default function NewTeamMemberPage() {
@@ -154,13 +155,13 @@ export default function NewTeamMemberPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Profile Image URL</label>
-          <input
-            type="url"
+          <label className="text-xs font-semibold text-foreground uppercase tracking-wider">
+            Profile Image
+          </label>
+          <TeamImageUpload
             value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            placeholder="https://..."
+            onChange={setImageUrl}
+            disabled={loading}
           />
         </div>
 

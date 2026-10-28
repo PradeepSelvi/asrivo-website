@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createProject } from '@/lib/supabase/content-actions'
 import { FolderGit, ArrowLeft, Loader2, Plus, X, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import ProjectImageUpload from '@/components/admin/project-image-upload'
 
 export default function NewProjectPage() {
   const router = useRouter()
@@ -46,6 +47,7 @@ export default function NewProjectPage() {
   // Validation helpers
   const isValidUrl = (url: string): boolean => {
     if (!url) return true // Empty is valid (optional fields)
+    if (url.startsWith('/')) return true // Allow relative URLs (e.g. from local storage proxy)
     try {
       new URL(url)
       return true
@@ -326,49 +328,27 @@ export default function NewProjectPage() {
 
         {/* Images Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Image URL</label>
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => {
-                setImageUrl(e.target.value)
-                clearError('imageUrl')
-              }}
-              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
-                errors.imageUrl ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
-              }`}
-              placeholder="https://..."
-            />
-            {errors.imageUrl && (
-              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="w-3 h-3" />
-                {errors.imageUrl}
-              </p>
-            )}
-          </div>
+          <ProjectImageUpload
+            label="Project Image"
+            description="Main thumbnail for project cards and listings"
+            value={imageUrl}
+            onChange={(url) => {
+              setImageUrl(url)
+              clearError('imageUrl')
+            }}
+            disabled={loading}
+          />
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider">Featured Image URL</label>
-            <input
-              type="url"
-              value={featuredImageUrl}
-              onChange={(e) => {
-                setFeaturedImageUrl(e.target.value)
-                clearError('featuredImageUrl')
-              }}
-              className={`w-full bg-background border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-1 ${
-                errors.featuredImageUrl ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
-              }`}
-              placeholder="https://..."
-            />
-            {errors.featuredImageUrl && (
-              <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="w-3 h-3" />
-                {errors.featuredImageUrl}
-              </p>
-            )}
-          </div>
+          <ProjectImageUpload
+            label="Featured Image"
+            description="High-resolution banner for featured sections and detail header"
+            value={featuredImageUrl}
+            onChange={(url) => {
+              setFeaturedImageUrl(url)
+              clearError('featuredImageUrl')
+            }}
+            disabled={loading}
+          />
         </div>
 
         {/* Links Grid */}

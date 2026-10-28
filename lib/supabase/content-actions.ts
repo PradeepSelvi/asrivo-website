@@ -2,7 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { revalidatePath } from 'next/cache'
+import { randomBytes } from 'crypto'
 
 // Helper function to verify permissions
 async function checkAuthAndPermission(requiredRole?: 'high') {
@@ -295,12 +297,14 @@ export async function createTeamMember(data: {
     
     const supabase = await createClient()
 
+    // Exclude expertise because team_members table does not have an expertise column
+    const { expertise, ...memberData } = data
+
     const { data: newMember, error } = await supabase
       .from('team_members')
       .insert({
-        ...data,
-        expertise: data.expertise || [],
-        social_links: data.social_links || {},
+        ...memberData,
+        social_links: memberData.social_links || {},
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
@@ -335,10 +339,13 @@ export async function updateTeamMember(id: string | number, data: {
     await checkAuthAndPermission()
     const supabase = await createClient()
 
+    // Exclude expertise because team_members table does not have an expertise column
+    const { expertise, ...memberData } = data
+
     const { data: updatedMember, error } = await supabase
       .from('team_members')
       .update({
-        ...data,
+        ...memberData,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
@@ -382,6 +389,152 @@ export async function deleteTeamMember(id: string | number) {
       return { success: false, error: 'Session expired. Please log in again.', code: 'AUTH_EXPIRED' }
     }
     return { success: false, error: error.message }
+  }
+}
+
+export async function uploadTeamMemberImageAction(formData: FormData) {
+  try {
+    const adminResult = await getCurrentAdmin()
+    if (!adminResult.success || !adminResult.user) {
+      return { success: false, error: 'Unauthorized: Admin privileges required.' }
+    }
+
+    const file = formData.get('file') as File | null
+    if (!file) {
+      return { success: false, error: 'No image file was provided.' }
+    }
+
+    const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB constraint
+    if (file.size > MAX_FILE_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2)
+      return {
+        success: false,
+        error: `File size exceeds the 2 MB limit (Selected: ${sizeMB} MB). Please choose an image smaller than 2 MB.`,
+      }
+    }
+
+    const ALLOWED_MIME_TYPES = new Set([
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+    ])
+    if (!ALLOWED_MIME_TYPES.has(file.type)) {
+      return {
+        success: false,
+        error: 'Invalid file format. Allowed formats: JPG, PNG, WebP, and GIF.',
+      }
+    }
+
+    const extMap: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    }
+    const ext = extMap[file.type] || 'jpg'
+    const fileName = `${Date.now()}-${randomBytes(8).toString('hex')}.${ext}`
+    const safePath = `avatars/${fileName}`
+
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const supabase = createApiClient({ useServiceRole: true })
+    const { data, error } = await supabase.storage
+      .from('team-members')
+      .upload(safePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+        cacheControl: '3600',
+      })
+
+    if (error) {
+      return { success: false, error: `Upload failed: ${error.message}` }
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('team-members')
+      .getPublicUrl(data.path)
+
+    return {
+      success: true,
+      url: urlData.publicUrl,
+      path: data.path,
+    }
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to upload image' }
+  }
+}
+
+export async function uploadProjectImageAction(formData: FormData) {
+  try {
+    const adminResult = await getCurrentAdmin()
+    if (!adminResult.success || !adminResult.user) {
+      return { success: false, error: 'Unauthorized: Admin privileges required.' }
+    }
+
+    const file = formData.get('file') as File | null
+    if (!file) {
+      return { success: false, error: 'No image file was provided.' }
+    }
+
+    const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB constraint
+    if (file.size > MAX_FILE_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2)
+      return {
+        success: false,
+        error: `File size exceeds the 10 MB limit (Selected: ${sizeMB} MB). Please choose a smaller image.`,
+      }
+    }
+
+    const ALLOWED_MIME_TYPES = new Set([
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+    ])
+    if (!ALLOWED_MIME_TYPES.has(file.type)) {
+      return {
+        success: false,
+        error: 'Invalid file format. Allowed formats: JPG, JPEG, and PNG only.',
+      }
+    }
+
+    const extMap: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+    }
+    const ext = extMap[file.type] || 'jpg'
+    const fileName = `${Date.now()}-${randomBytes(8).toString('hex')}.${ext}`
+    const safePath = `projects/${fileName}`
+
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const supabase = createApiClient({ useServiceRole: true })
+    const { data, error } = await supabase.storage
+      .from('project-images')
+      .upload(safePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+        cacheControl: '31536000',
+      })
+
+    if (error) {
+      return { success: false, error: `Upload failed: ${error.message}` }
+    }
+
+    const servedUrl = `/api/projects/images/${data.path}`
+
+    return {
+      success: true,
+      url: servedUrl,
+      path: data.path,
+    }
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to upload project image' }
   }
 }
 

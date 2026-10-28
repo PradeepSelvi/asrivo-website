@@ -183,6 +183,12 @@ function AdminLoginContent() {
               </div>
             </div>
 
+            <div className="flex items-center justify-end text-sm">
+              <Link href="/forgot-password" className="text-primary hover:underline text-xs font-medium">
+                Forgot password?
+              </Link>
+            </div>
+
             <button
               type="submit"
               disabled={loading}

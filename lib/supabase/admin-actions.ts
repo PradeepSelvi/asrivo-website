@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { cache } from 'react'
+import { cookies } from 'next/headers'
 
 // Cached admin client - only create once per request
 const getAdminClient = cache(async () => {
@@ -72,7 +73,27 @@ export async function getCurrentAdmin() {
     const supabase = await createClient()
     
     // Get user with error handling
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    let { data: { user }, error: userError } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      try {
+        const cookieStore = await cookies()
+        const token =
+          cookieStore.get('sb-access-token')?.value ||
+          cookieStore.get('supabase-auth-token')?.value
+
+        if (token) {
+          const adminSupabase = await getAdminClient()
+          const { data: tokenData } = await adminSupabase.auth.getUser(token)
+          if (tokenData?.user) {
+            user = tokenData.user
+            userError = null
+          }
+        }
+      } catch (cookieErr) {
+        // Ignore cookie read failures
+      }
+    }
 
     if (userError) {
       console.error('getCurrentAdmin: Auth error:', userError.message)
