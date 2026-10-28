@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { InquiryStatusChecker } from "@/components/inquiry-status-checker"
 import { MobileBackButton } from "@/components/mobile-back-button"
 import { ServicesDisplay } from "@/components/services/services-content"
 import { getServicesContent } from "@/lib/supabase/content-helpers"
@@ -167,25 +166,6 @@ export default async function ServicesPage() {
               </div>
             )
           })()}
-        </div>
-      </section>
-
-      {/* Check Status Section */}
-      <section className="py-20 lg:py-28 bg-gradient-to-br from-muted/30 to-muted/10">
-        <div className="mx-auto max-w-3xl px-4 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Track Your Request
-            </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              {content.status_title}
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              {content.status_description}
-            </p>
-          </div>
-
-          <InquiryStatusChecker />
         </div>
       </section>
 

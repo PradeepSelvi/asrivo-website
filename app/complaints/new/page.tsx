@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select"
 import { ArrowLeft, FileText, Loader2, CheckCircle, X } from "lucide-react"
 import Link from "next/link"
+import { AuthGate } from "@/components/auth-gate"
 
 export default function RaiseComplaintPage() {
   const router = useRouter()
@@ -158,6 +159,7 @@ export default function RaiseComplaintPage() {
   }
 
   return (
+    <AuthGate message="Sign in to submit a complaint. We'll keep you updated on your case status.">
     <div className="min-h-screen bg-muted/30 py-12 lg:py-20">
       <div className="mx-auto max-w-3xl px-4">
         {/* Header */}
@@ -333,5 +335,6 @@ export default function RaiseComplaintPage() {
         </div>
       </div>
     </div>
+    </AuthGate>
   )
 }

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { MobileBackButton } from "@/components/mobile-back-button"
+import { AuthGate } from "@/components/auth-gate"
 import { 
   MapPin, 
   Phone, 
@@ -180,6 +181,7 @@ export default function ContactPageClient({ content }: ContactPageProps) {
 };
 
   return (
+    <AuthGate message="Sign in to send us a message, check complaint status, or raise a complaint.">
     <div className="flex flex-col">
       <MobileBackButton />
       {/* Hero Section */}
@@ -573,5 +575,6 @@ export default function ContactPageClient({ content }: ContactPageProps) {
         </div>
       </section>
     </div>
+    </AuthGate>
   )
 }

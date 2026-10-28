@@ -17,6 +17,7 @@ import {
   Upload,
 } from 'lucide-react'
 import { loadRecaptchaScript, executeRecaptcha } from '@/lib/utils/captcha'
+import { AuthGate } from '@/components/auth-gate'
 import ResumeUpload from '@/components/resume-upload'
 
 function ApplyContent() {
@@ -98,213 +99,215 @@ function ApplyContent() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <MobileBackButton />
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
-        </div>
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 text-sm font-medium text-primary mb-4">
-              <Briefcase className="w-4 h-4" />
-              Job Application
-            </div>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-              {jobTitle || 'Apply for a Position'}
-            </h1>
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              We're excited to learn more about you. Fill out the application form below
-              and we'll get back to you within 2-3 business days.
-            </p>
+    <AuthGate message="Sign in to apply for jobs. Track your application status in your profile.">
+      <div className="flex flex-col min-h-screen">
+        <MobileBackButton />
+        {/* Hero Section */}
+        <section className="relative overflow-hidden bg-muted/30 py-20 lg:py-28">
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
           </div>
-        </div>
-      </section>
-
-      {/* Application Form */}
-      <section className="py-20 lg:py-28">
-        <div className="mx-auto max-w-3xl px-4 lg:px-8">
-          {submitted ? (
-            <div className="rounded-xl border border-border bg-muted/30 p-12 text-center">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                <CheckCircle className="h-10 w-10 text-primary" />
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 text-sm font-medium text-primary mb-4">
+                <Briefcase className="w-4 h-4" />
+                Job Application
               </div>
-              <h3 className="mt-6 text-2xl font-semibold text-foreground">
-                Application Submitted!
-              </h3>
-              <p className="mt-3 text-muted-foreground">
-                Thank you for applying{jobTitle ? ` for ${jobTitle}` : ''}. We've
-                received your application and will review it shortly. You'll hear from us
-                within 2-3 business days.
+              <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
+                {jobTitle || 'Apply for a Position'}
+              </h1>
+              <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
+                We're excited to learn more about you. Fill out the application form below
+                and we'll get back to you within 2-3 business days.
               </p>
-              <Button className="mt-8" onClick={() => (window.location.href = '/careers')}>
-                View Other Positions
-              </Button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Personal Information */}
-              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-foreground mb-6">
-                  Personal Information
-                </h2>
+          </div>
+        </section>
 
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name">
-                      Full Name <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="full_name"
-                      name="full_name"
-                      placeholder="John Doe"
-                      value={formData.full_name}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+        {/* Application Form */}
+        <section className="py-20 lg:py-28">
+          <div className="mx-auto max-w-3xl px-4 lg:px-8">
+            {submitted ? (
+              <div className="rounded-xl border border-border bg-muted/30 p-12 text-center">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+                  <CheckCircle className="h-10 w-10 text-primary" />
+                </div>
+                <h3 className="mt-6 text-2xl font-semibold text-foreground">
+                  Application Submitted!
+                </h3>
+                <p className="mt-3 text-muted-foreground">
+                  Thank you for applying{jobTitle ? ` for ${jobTitle}` : ''}. We've
+                  received your application and will review it shortly. You'll hear from us
+                  within 2-3 business days.
+                </p>
+                <Button className="mt-8" onClick={() => (window.location.href = '/careers')}>
+                  View Other Positions
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Personal Information */}
+                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                  <h2 className="text-xl font-bold text-foreground mb-6">
+                    Personal Information
+                  </h2>
 
-                  <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="email">
-                        Email Address <span className="text-destructive">*</span>
+                      <Label htmlFor="full_name">
+                        Full Name <span className="text-destructive">*</span>
                       </Label>
                       <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="john@example.com"
-                        value={formData.email}
+                        id="full_name"
+                        name="full_name"
+                        placeholder="John Doe"
+                        value={formData.full_name}
                         onChange={handleChange}
                         required
                       />
                     </div>
 
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">
+                          Email Address <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="john@example.com"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          placeholder="+91 98765 43210"
+                          value={formData.phone}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="experience_years">
+                        Years of Experience <span className="text-destructive">*</span>
+                      </Label>
                       <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        placeholder="+91 98765 43210"
-                        value={formData.phone}
+                        id="experience_years"
+                        name="experience_years"
+                        type="number"
+                        min="0"
+                        placeholder="3"
+                        value={formData.experience_years}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Professional Links */}
+                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                  <h2 className="text-xl font-bold text-foreground mb-6">
+                    Professional Links &amp; Documents
+                  </h2>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Resume (PDF Format) <span className="text-destructive">*</span>
+                      </Label>
+                      <ResumeUpload
+                        value={formData.resume_url}
+                        onChange={(url) => setFormData((prev) => ({ ...prev, resume_url: url }))}
+                        disabled={loading}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="linkedin_url" className="flex items-center gap-2">
+                        <Linkedin className="h-4 w-4" />
+                        LinkedIn Profile
+                      </Label>
+                      <Input
+                        id="linkedin_url"
+                        name="linkedin_url"
+                        type="url"
+                        placeholder="https://linkedin.com/in/..."
+                        value={formData.linkedin_url}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="portfolio_url" className="flex items-center gap-2">
+                        <Globe className="h-4 w-4" />
+                        Portfolio / Website
+                      </Label>
+                      <Input
+                        id="portfolio_url"
+                        name="portfolio_url"
+                        type="url"
+                        placeholder="https://yourportfolio.com"
+                        value={formData.portfolio_url}
                         onChange={handleChange}
                       />
                     </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="experience_years">
-                      Years of Experience <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="experience_years"
-                      name="experience_years"
-                      type="number"
-                      min="0"
-                      placeholder="3"
-                      value={formData.experience_years}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
                 </div>
-              </div>
 
-              {/* Professional Links */}
-              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-foreground mb-6">
-                  Professional Links & Documents
-                </h2>
-
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      Resume (PDF Format) <span className="text-destructive">*</span>
-                    </Label>
-                    <ResumeUpload
-                      value={formData.resume_url}
-                      onChange={(url) => setFormData((prev) => ({ ...prev, resume_url: url }))}
-                      disabled={loading}
-                      required
-                    />
-                  </div>
+                {/* Cover Letter */}
+                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                  <h2 className="text-xl font-bold text-foreground mb-6">Cover Letter</h2>
 
                   <div className="space-y-2">
-                    <Label htmlFor="linkedin_url" className="flex items-center gap-2">
-                      <Linkedin className="h-4 w-4" />
-                      LinkedIn Profile
+                    <Label htmlFor="cover_letter">
+                      Tell us why you're a great fit for this role
                     </Label>
-                    <Input
-                      id="linkedin_url"
-                      name="linkedin_url"
-                      type="url"
-                      placeholder="https://linkedin.com/in/..."
-                      value={formData.linkedin_url}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="portfolio_url" className="flex items-center gap-2">
-                      <Globe className="h-4 w-4" />
-                      Portfolio / Website
-                    </Label>
-                    <Input
-                      id="portfolio_url"
-                      name="portfolio_url"
-                      type="url"
-                      placeholder="https://yourportfolio.com"
-                      value={formData.portfolio_url}
+                    <Textarea
+                      id="cover_letter"
+                      name="cover_letter"
+                      placeholder="I'm excited about this opportunity because..."
+                      rows={8}
+                      value={formData.cover_letter}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
-              </div>
 
-              {/* Cover Letter */}
-              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-foreground mb-6">Cover Letter</h2>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cover_letter">
-                    Tell us why you're a great fit for this role
-                  </Label>
-                  <Textarea
-                    id="cover_letter"
-                    name="cover_letter"
-                    placeholder="I'm excited about this opportunity because..."
-                    rows={8}
-                    value={formData.cover_letter}
-                    onChange={handleChange}
-                  />
+                {/* Submit Button */}
+                <div className="flex flex-col items-center gap-4">
+                  <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={loading}>
+                    {loading ? (
+                      'Submitting...'
+                    ) : (
+                      <>
+                        Submit Application
+                        <Send className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    This site is protected by reCAPTCHA and the Google Privacy Policy and Terms
+                    of Service apply.
+                  </p>
                 </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex flex-col items-center gap-4">
-                <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={loading}>
-                  {loading ? (
-                    'Submitting...'
-                  ) : (
-                    <>
-                      Submit Application
-                      <Send className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  This site is protected by reCAPTCHA and the Google Privacy Policy and Terms
-                  of Service apply.
-                </p>
-              </div>
-            </form>
-          )}
-        </div>
-      </section>
-    </div>
+              </form>
+            )}
+          </div>
+        </section>
+      </div>
+    </AuthGate>
   )
 }
 

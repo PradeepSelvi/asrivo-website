@@ -308,10 +308,6 @@ export interface ServicesContent {
   process_step_6_title: string
   process_step_6_desc: string
   
-  // Status Section
-  status_title: string
-  status_description: string
-  
   // SEO Fields
   meta_title?: string
   meta_description?: string
@@ -762,10 +758,6 @@ const DEFAULT_SERVICES_CONTENT: ServicesContent = {
   process_step_5_desc: 'Smooth deployment and launch of your solution.',
   process_step_6_title: 'Support & Maintenance',
   process_step_6_desc: 'Ongoing support and continuous improvement.',
-  
-  // Status Section
-  status_title: 'Currently Accepting Projects',
-  status_description: 'We have availability for new projects starting Q2 2025.'
 }
 
 const DEFAULT_CONTACT_CONTENT: ContactContent = {
@@ -1240,8 +1232,6 @@ export async function getServicesContent(): Promise<ServicesContent> {
     process_step_5_desc: content.process_step_5_desc || DEFAULT_SERVICES_CONTENT.process_step_5_desc,
     process_step_6_title: content.process_step_6_title || DEFAULT_SERVICES_CONTENT.process_step_6_title,
     process_step_6_desc: content.process_step_6_desc || DEFAULT_SERVICES_CONTENT.process_step_6_desc,
-    status_title: content.status_title || DEFAULT_SERVICES_CONTENT.status_title,
-    status_description: content.status_description || DEFAULT_SERVICES_CONTENT.status_description,
     meta_title: content.meta_title,
     meta_description: content.meta_description,
     meta_keywords: content.meta_keywords

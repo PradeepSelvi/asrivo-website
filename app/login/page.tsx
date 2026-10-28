@@ -6,24 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Lock, Mail, Eye, EyeOff, ArrowLeft, Home, Loader2, CheckCircle } from 'lucide-react'
 
-export default function LoginPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </main>
-      }
-    >
-      <LoginContent />
-    </Suspense>
-  )
-}
-
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const resetSuccess = searchParams.get('reset') === 'success'
+  const redirectTo = searchParams.get('redirectTo') || '/'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -75,8 +62,8 @@ function LoginContent() {
         return
       }
 
-      // Success - redirect to dashboard or home
-      router.push('/')
+      // Success - redirect to original destination or home
+      router.push(redirectTo)
       router.refresh()
     } catch (err) {
       console.error('Login error:', err)
@@ -283,5 +270,19 @@ function LoginContent() {
         </p>
       </div>
     </main>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </main>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   )
 }
