@@ -10,6 +10,7 @@ import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { contactFormRateLimit } from '@/lib/utils/rate-limit'
 import { contactFormSchema } from '@/lib/utils/validation'
 import { ZodError } from 'zod'
+import { getSiteUrl } from '@/lib/utils/site-url'
 
 // 👉 GET — Admin only: fetch all contact submissions
 export async function GET(request: NextRequest) {
@@ -63,15 +64,13 @@ export async function POST(request: NextRequest) {
     name = validatedData.name
     const { message, company, subject, type, captchaToken } = validatedData
 
-    // 🤖 CAPTCHA Verification (if token provided)
-    if (captchaToken) {
-      const captchaResult = await verifyCaptcha(captchaToken, 'contact_form')
-      if (!captchaResult.success) {
-        return NextResponse.json(
-          apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
-          { status: HTTP_STATUS.FORBIDDEN }
-        )
-      }
+    // 🤖 CAPTCHA Verification — always enforced when RECAPTCHA_SECRET_KEY is configured
+    const captchaResult = await verifyCaptcha(captchaToken ?? null, 'contact_form')
+    if (!captchaResult.success) {
+      return NextResponse.json(
+        apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
+        { status: HTTP_STATUS.FORBIDDEN }
+      )
     }
 
     const supabase = createApiClient({ useServiceRole: true })
@@ -101,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // 🔔 Send notification to admins
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/admin/send-notification-email`, {
+      await fetch(`${getSiteUrl()}/api/admin/send-notification-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

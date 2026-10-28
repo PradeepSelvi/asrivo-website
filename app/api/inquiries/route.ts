@@ -27,16 +27,14 @@ export async function POST(request: NextRequest) {
     email = raw.email
     name = raw.name
 
-    // 🤖 CAPTCHA Verification (if token provided)
+    // 🤖 CAPTCHA Verification — always enforced when RECAPTCHA_SECRET_KEY is configured
     const captchaToken = raw.captchaToken
-    if (captchaToken) {
-      const captchaResult = await verifyCaptcha(captchaToken, 'service_inquiry')
-      if (!captchaResult.success) {
-        return NextResponse.json(
-          apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
-          { status: HTTP_STATUS.FORBIDDEN }
-        )
-      }
+    const captchaResult = await verifyCaptcha(captchaToken ?? null, 'service_inquiry')
+    if (!captchaResult.success) {
+      return NextResponse.json(
+        apiError('Security verification failed. Please try again.', 'CAPTCHA_FAILED'),
+        { status: HTTP_STATUS.FORBIDDEN }
+      )
     }
 
     // Format phone and whatsapp with country code if provided
