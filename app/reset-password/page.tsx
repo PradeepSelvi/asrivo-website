@@ -81,7 +81,7 @@ function ResetPasswordContent() {
             setCheckingSession(false)
             return
           }
-        } catch (e) {}
+        } catch (_e) { /* hash parsing errors are safely ignored */ }
       }
 
       // 2. Check query params for explicit error

@@ -160,7 +160,6 @@ export default function TeamImageUpload({
             {/* Avatar Preview */}
             <div className="relative group shrink-0">
               <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-indigo-500/40 bg-background/50 shadow-md flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={value}
                   alt="Team member preview"

@@ -180,7 +180,6 @@ export default function ProjectImageUpload({
             <div className={`relative group shrink-0 rounded-xl overflow-hidden border border-border bg-background/50 shadow-sm flex items-center justify-center ${
               aspectRatio === 'video' ? 'w-full sm:w-36 aspect-video' : 'w-24 h-24'
             }`}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={value}
                 alt={`${label} preview`}
