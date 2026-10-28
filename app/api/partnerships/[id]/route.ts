@@ -1,22 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiClient } from '@/lib/supabase/api-client'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/api/auth-middleware'
 
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Admin-only: require authenticated session
-    const supabaseAuth = await createServerClient()
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    // Admin-only: check admin_profiles membership
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
 
     const params = await context.params
     const supabase = createApiClient({ useServiceRole: true })
@@ -61,16 +54,9 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Admin-only: require authenticated session
-    const supabaseAuth = await createServerClient()
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    // Admin-only: check admin_profiles membership
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
 
     const { id } = await context.params
     const supabase = createApiClient({ useServiceRole: true })

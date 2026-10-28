@@ -1,5 +1,5 @@
 import { createApiClient } from '@/lib/supabase/api-client'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/api/auth-middleware'
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyCaptcha } from '@/lib/utils/captcha'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
@@ -133,16 +133,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Admin-only: require authenticated session
-    const supabaseAuth = await createServerClient()
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    // Admin-only: require admin role
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
 
     const supabase = createApiClient({ useServiceRole: true })
     const searchParams = request.nextUrl.searchParams
