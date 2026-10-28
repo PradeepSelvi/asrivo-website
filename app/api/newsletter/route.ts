@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyCaptcha } from '@/lib/utils/captcha'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
@@ -32,7 +33,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    // Use service-role client so RLS doesn't block anonymous subscribers.
+    const supabase = createApiClient({ useServiceRole: true })
 
     // Check if already subscribed
     const { data: existing } = await supabase

@@ -141,6 +141,8 @@ if (fs.existsSync(envLocalPath)) {
   }
   
   if (envContent.includes('NEXT_PUBLIC_ABSTRACT_API_KEY')) {
+    checkFailed('Insecure configuration: NEXT_PUBLIC_ABSTRACT_API_KEY exposes secret key to browsers (rename to ABSTRACT_API_KEY)');
+  } else if (envContent.includes('ABSTRACT_API_KEY')) {
     checkPassed('AbstractAPI key is configured');
   } else {
     checkWarning('AbstractAPI key not found (email validation will not work)');

@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { HTTP_STATUS, ERROR_MESSAGES } from '@/lib/constants/http'
 import { apiError } from './api-handler'
 
 /**
  * Verify user authentication and return user object
+ * Supports both Next.js session cookies and Bearer tokens
  */
 export async function requireAuth(request: NextRequest) {
   const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  let { data: { user }, error } = await supabase.auth.getUser()
+
+  if (error || !user) {
+    const authHeader = request.headers.get('authorization')
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      const tokenResult = await supabase.auth.getUser(token)
+      if (tokenResult.data?.user) {
+        user = tokenResult.data.user
+        error = null
+      }
+    }
+  }
 
   if (error || !user) {
     return {
@@ -36,12 +50,13 @@ export async function requireAdmin(request: NextRequest) {
 
   const { user, supabase } = authResult
 
-  // Check admin status
-  const { data: adminProfile, error: adminError } = await supabase
+  // Check admin status in admin_profiles using service role client to avoid RLS recursion
+  const adminClient = createApiClient({ useServiceRole: true })
+  const { data: adminProfile, error: adminError } = await adminClient
     .from('admin_profiles')
     .select('role')
-    .eq('user_id', user!.id)
-    .single()
+    .eq('id', user!.id)
+    .maybeSingle()
 
   if (adminError || !adminProfile) {
     return {
@@ -64,24 +79,24 @@ export async function requireAdmin(request: NextRequest) {
 }
 
 /**
- * Check if user is super admin
+ * Verify high admin privileges
  */
-export async function requireSuperAdmin(request: NextRequest) {
+export async function requireHighAdmin(request: NextRequest) {
   const adminResult = await requireAdmin(request)
   
   if (adminResult.error) {
     return adminResult
   }
 
-  const { adminProfile } = adminResult
-
-  if (adminProfile?.role !== 'super_admin') {
+  if (adminResult.adminProfile?.role !== 'high') {
     return {
-      ...adminResult,
       error: NextResponse.json(
-        apiError('Super admin access required', 'AUTHORIZATION_ERROR'),
+        apiError(ERROR_MESSAGES.FORBIDDEN, 'INSUFFICIENT_PERMISSIONS'),
         { status: HTTP_STATUS.FORBIDDEN }
-      )
+      ),
+      user: adminResult.user,
+      supabase: adminResult.supabase,
+      adminProfile: adminResult.adminProfile
     }
   }
 

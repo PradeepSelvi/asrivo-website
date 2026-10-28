@@ -56,10 +56,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate unique filename
+    // Generate unique filename safely mapped from verified MIME type
+    const MIME_MAP: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
+    }
+    const fileExt = MIME_MAP[file.type] || 'jpg'
     const timestamp = Date.now()
     const randomString = Math.random().toString(36).substring(7)
-    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const folder = type === 'avatar' ? 'avatars' : 'covers'
     const fileName = `${folder}/${user.id}/${timestamp}-${randomString}.${fileExt}`
 

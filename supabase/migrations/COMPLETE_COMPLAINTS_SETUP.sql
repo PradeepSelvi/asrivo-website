@@ -22,8 +22,9 @@ CREATE TABLE IF NOT EXISTS complaints (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Disable RLS for public access (no login required)
-ALTER TABLE complaints DISABLE ROW LEVEL SECURITY;
+-- RLS is intentionally left enabled (Postgres default).
+-- Policies are defined in enable_complaints_rls.sql.
+-- Do NOT add DISABLE ROW LEVEL SECURITY here.
 
 -- Create updated_at trigger
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -46,21 +47,30 @@ CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);
 CREATE INDEX IF NOT EXISTS idx_complaints_priority ON complaints(priority);
 CREATE INDEX IF NOT EXISTS idx_complaints_email ON complaints(email);
 
--- Enable realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE complaints;
+-- Enable realtime (idempotent)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'complaints'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE complaints;
+    END IF;
+END $$;
 
 -- ============================================
 -- 2. CREATE STORAGE BUCKET FOR PROOF DOCUMENTS
 -- ============================================
 
--- Create storage bucket for complaint proof documents
+-- Create private storage bucket for complaint proof documents (CWE-862 / F-029)
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('proof of complain', 'proof of complain', true)
-ON CONFLICT (id) DO NOTHING;
+VALUES ('proof of complain', 'proof of complain', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
 
--- Set allowed MIME types for the bucket
+-- Set allowed MIME types and ensure private bucket configuration
 UPDATE storage.buckets
-SET allowed_mime_types = ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']
+SET allowed_mime_types = ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'],
+    public = false
 WHERE id = 'proof of complain';
 
 -- Set file size limit (3MB = 3145728 bytes)
@@ -71,18 +81,38 @@ WHERE id = 'proof of complain';
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Allow public uploads" ON storage.objects;
 DROP POLICY IF EXISTS "Allow public access" ON storage.objects;
+DROP POLICY IF EXISTS "Allow admins to read complaint proofs" ON storage.objects;
+DROP POLICY IF EXISTS "Allow admins to delete complaint proofs" ON storage.objects;
 
--- Create policy for public uploads (INSERT)
+-- Create policy for public uploads (INSERT only)
 CREATE POLICY "Allow public uploads"
 ON storage.objects FOR INSERT
 TO public
 WITH CHECK (bucket_id = 'proof of complain');
 
--- Create policy for public access (SELECT)
-CREATE POLICY "Allow public access"
+-- Create policy for authorized reviewer access (SELECT - authenticated admins only)
+CREATE POLICY "Allow admins to read complaint proofs"
 ON storage.objects FOR SELECT
-TO public
-USING (bucket_id = 'proof of complain');
+TO authenticated
+USING (
+  bucket_id = 'proof of complain' AND
+  EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE admin_profiles.id = auth.uid()
+  )
+);
+
+-- Create policy for admins to delete (DELETE)
+CREATE POLICY "Allow admins to delete complaint proofs"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'proof of complain' AND
+  EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE admin_profiles.id = auth.uid()
+  )
+);
 
 -- ============================================
 -- 3. ADD TYPE COLUMN TO CONTACTS TABLE

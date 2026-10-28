@@ -28,64 +28,52 @@ DROP POLICY IF EXISTS "Admins can update project images" ON storage.objects;
 DROP POLICY IF EXISTS "Admins can delete project images" ON storage.objects;
 DROP POLICY IF EXISTS "Admins can view project images" ON storage.objects;
 
--- 3. Policy: Allow authenticated users / admins to read project photos
+-- 3. Policy: Only admins can read project photos (F-013 / CWE-863)
 CREATE POLICY "Admins can view project images"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
   bucket_id = 'project-images'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 );
 
--- 4. Policy: Allow authenticated users / admins to upload project photos
+-- 4. Policy: Only admins can upload project photos (F-013 / CWE-863)
 CREATE POLICY "Admins can upload project images"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
   bucket_id = 'project-images'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 );
 
--- 5. Policy: Allow authenticated users / admins to update project photos
+-- 5. Policy: Only admins can update project photos (F-013 / CWE-863)
 CREATE POLICY "Admins can update project images"
 ON storage.objects FOR UPDATE
 TO authenticated
 USING (
   bucket_id = 'project-images'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 )
 WITH CHECK (bucket_id = 'project-images');
 
--- 6. Policy: Allow authenticated users / admins to delete project photos
+-- 6. Policy: Only admins can delete project photos (F-013 / CWE-863)
 CREATE POLICY "Admins can delete project images"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (
   bucket_id = 'project-images'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 );
 

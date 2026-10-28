@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
+import { requireAdmin } from '@/lib/api/auth-middleware'
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyCaptcha } from '@/lib/utils/captcha'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
@@ -52,7 +54,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    // Use service-role client so RLS doesn't block anonymous form submissions.
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('client_inquiries')
@@ -117,6 +120,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
+
     const supabase = await createClient()
 
     const { data: inquiries, error } = await supabase

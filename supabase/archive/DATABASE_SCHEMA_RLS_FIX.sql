@@ -1,7 +1,16 @@
 -- ============================================
+-- DEPRECATED ARCHIVE FILE — DO NOT RUN
+-- This file is superseded by:
+--   supabase/migrations/fix_crm_and_audit_rls.sql
+--   supabase/schema/CRM_DATABASE_SCHEMA.sql (F-012/F-013 hardened)
+--   supabase/schema/DATABASE_SCHEMA.sql (F-012/F-013 hardened)
+-- The policies below used auth.role() = 'authenticated' (too broad).
+-- All live policies now require admin_profiles membership.
+-- ============================================
 -- TIGHTENED RLS POLICIES FOR ASRIVO TECH
 -- Security Audit Fix - Admin-Only Tables Protection
 -- ============================================
+
 
 -- ============================================
 -- DROP EXISTING POLICIES THAT NEED FIXES
@@ -31,53 +40,65 @@ DROP POLICY IF EXISTS "Enable read for authenticated users only" ON contacts;
 -- ============================================
 
 -- AUDIT_LOGS: Admin read-only, no public access
+DROP POLICY IF EXISTS "Admin read only" ON audit_logs;
 CREATE POLICY "Admin read only" ON audit_logs
   FOR SELECT
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Block all writes from clients" ON audit_logs;
 CREATE POLICY "Block all writes from clients" ON audit_logs
   FOR INSERT
   WITH CHECK (false);
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON audit_logs;
 CREATE POLICY "Block all updates from clients" ON audit_logs
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON audit_logs;
 CREATE POLICY "Block all deletes from clients" ON audit_logs
   FOR DELETE
   USING (false);
 
 -- ANALYTICS: Admin read-only, server-side inserts only
+DROP POLICY IF EXISTS "Admin read only" ON analytics;
 CREATE POLICY "Admin read only" ON analytics
   FOR SELECT
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Block all writes from clients" ON analytics;
 CREATE POLICY "Block all writes from clients" ON analytics
   FOR INSERT
   WITH CHECK (false);
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON analytics;
 CREATE POLICY "Block all updates from clients" ON analytics
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON analytics;
 CREATE POLICY "Block all deletes from clients" ON analytics
   FOR DELETE
   USING (false);
 
 -- SETTINGS: Public read, admin write only
+DROP POLICY IF EXISTS "Public read access" ON settings;
 CREATE POLICY "Public read access" ON settings
   FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Admin write only" ON settings;
 CREATE POLICY "Admin write only" ON settings
   FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Admin update only" ON settings;
 CREATE POLICY "Admin update only" ON settings
   FOR UPDATE
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Admin delete only" ON settings;
 CREATE POLICY "Admin delete only" ON settings
   FOR DELETE
   USING (auth.role() = 'authenticated');
@@ -87,54 +108,66 @@ CREATE POLICY "Admin delete only" ON settings
 -- ============================================
 
 -- CONTACTS: Public can submit, admin can read
+DROP POLICY IF EXISTS "Public can submit contacts" ON contacts;
 CREATE POLICY "Public can submit contacts" ON contacts
   FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin read only" ON contacts;
 CREATE POLICY "Admin read only" ON contacts
   FOR SELECT
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON contacts;
 CREATE POLICY "Block all updates from clients" ON contacts
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON contacts;
 CREATE POLICY "Block all deletes from clients" ON contacts
   FOR DELETE
   USING (false);
 
 -- SERVICE_INQUIRIES: Public can submit, admin can read
+DROP POLICY IF EXISTS "Public can submit inquiries" ON service_inquiries;
 CREATE POLICY "Public can submit inquiries" ON service_inquiries
   FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin read only" ON service_inquiries;
 CREATE POLICY "Admin read only" ON service_inquiries
   FOR SELECT
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Admin update only" ON service_inquiries;
 CREATE POLICY "Admin update only" ON service_inquiries
   FOR UPDATE
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON service_inquiries;
 CREATE POLICY "Block all deletes from clients" ON service_inquiries
   FOR DELETE
   USING (false);
 
 -- JOB_APPLICATIONS: Public can submit, admin can read
+DROP POLICY IF EXISTS "Public can submit applications" ON job_applications;
 CREATE POLICY "Public can submit applications" ON job_applications
   FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin read only" ON job_applications;
 CREATE POLICY "Admin read only" ON job_applications
   FOR SELECT
   USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Admin update only" ON job_applications;
 CREATE POLICY "Admin update only" ON job_applications
   FOR UPDATE
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON job_applications;
 CREATE POLICY "Block all deletes from clients" ON job_applications
   FOR DELETE
   USING (false);
@@ -144,66 +177,81 @@ CREATE POLICY "Block all deletes from clients" ON job_applications
 -- ============================================
 
 -- PROJECTS: Public read, no write
+DROP POLICY IF EXISTS "Block all writes from clients" ON projects;
 CREATE POLICY "Block all writes from clients" ON projects
   FOR INSERT
   WITH CHECK (false);
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON projects;
 CREATE POLICY "Block all updates from clients" ON projects
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON projects;
 CREATE POLICY "Block all deletes from clients" ON projects
   FOR DELETE
   USING (false);
 
 -- TEAM_MEMBERS: Public read, no write
+DROP POLICY IF EXISTS "Block all writes from clients" ON team_members;
 CREATE POLICY "Block all writes from clients" ON team_members
   FOR INSERT
   WITH CHECK (false);
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON team_members;
 CREATE POLICY "Block all updates from clients" ON team_members
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON team_members;
 CREATE POLICY "Block all deletes from clients" ON team_members
   FOR DELETE
   USING (false);
 
 -- SERVICES: Public read, no write
+DROP POLICY IF EXISTS "Block all writes from clients" ON services;
 CREATE POLICY "Block all writes from clients" ON services
   FOR INSERT
   WITH CHECK (false);
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON services;
 CREATE POLICY "Block all updates from clients" ON services
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON services;
 CREATE POLICY "Block all deletes from clients" ON services
   FOR DELETE
   USING (false);
 
 -- TESTIMONIALS: Public read, no write
+DROP POLICY IF EXISTS "Block all writes from clients" ON testimonials;
 CREATE POLICY "Block all writes from clients" ON testimonials
   FOR INSERT
   WITH CHECK (false);
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON testimonials;
 CREATE POLICY "Block all updates from clients" ON testimonials
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON testimonials;
 CREATE POLICY "Block all deletes from clients" ON testimonials
   FOR DELETE
   USING (false);
 
 -- JOB_POSTINGS: Public read, no write
+DROP POLICY IF EXISTS "Block all writes from clients" ON job_postings;
 CREATE POLICY "Block all writes from clients" ON job_postings
   FOR INSERT
   WITH CHECK (false);
 
+DROP POLICY IF EXISTS "Block all updates from clients" ON job_postings;
 CREATE POLICY "Block all updates from clients" ON job_postings
   FOR UPDATE
   USING (false);
 
+DROP POLICY IF EXISTS "Block all deletes from clients" ON job_postings;
 CREATE POLICY "Block all deletes from clients" ON job_postings
   FOR DELETE
   USING (false);

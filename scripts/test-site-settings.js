@@ -149,20 +149,51 @@ function testSettingFormats(settings) {
   console.log('🔎 Test 3: Validating Setting Formats');
   console.log('-------------------------------------------');
   
+  // Safe linear email validation with disjoint token classes (CWE-1333 ReDoS mitigation)
+  const SAFE_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
+
   const tests = [
     {
       key: 'contact_email',
-      test: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+      test: (val) => {
+        if (!val || typeof val !== 'string') return false;
+        let clean = val.trim();
+        if (clean.startsWith('"') && clean.endsWith('"')) {
+          try {
+            clean = JSON.parse(clean);
+          } catch {
+            clean = clean.slice(1, -1);
+          }
+        }
+        clean = clean.trim();
+        // RFC 5321 length bounding (min 5, max 254 chars)
+        if (clean.length < 5 || clean.length > 254) return false;
+        return SAFE_EMAIL_REGEX.test(clean);
+      },
       message: 'Valid email format'
     },
     {
       key: 'social_linkedin',
-      test: (val) => !val || val.startsWith('http'),
+      test: (val) => {
+        if (!val) return true;
+        let clean = String(val).trim();
+        if (clean.startsWith('"') && clean.endsWith('"')) {
+          try { clean = JSON.parse(clean); } catch { clean = clean.slice(1, -1); }
+        }
+        return clean.startsWith('http://') || clean.startsWith('https://');
+      },
       message: 'Valid URL format'
     },
     {
       key: 'social_instagram',
-      test: (val) => !val || val.startsWith('http'),
+      test: (val) => {
+        if (!val) return true;
+        let clean = String(val).trim();
+        if (clean.startsWith('"') && clean.endsWith('"')) {
+          try { clean = JSON.parse(clean); } catch { clean = clean.slice(1, -1); }
+        }
+        return clean.startsWith('http://') || clean.startsWith('https://');
+      },
       message: 'Valid URL format'
     }
   ];

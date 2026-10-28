@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiClient } from '@/lib/supabase/api-client'
+import { requireAdmin } from '@/lib/api/auth-middleware'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { apiRateLimit } from '@/lib/utils/rate-limit'
+import { isValidEmail } from '@/lib/utils/validation'
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 60 requests per minute per IP
+  const limited = await applyRateLimit(request, apiRateLimit)
+  if (limited) return limited
+
   try {
     const body = await request.json()
     
@@ -31,6 +39,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const cleanEmail = String(email).trim().toLowerCase()
+    if (cleanEmail.length > 254 || !isValidEmail(cleanEmail)) {
+      return NextResponse.json(
+        { error: 'Invalid email address format' },
+        { status: 400 }
+      )
+    }
+
     // Validate documents
     if (!agreementDocumentUrl || !nocDocumentUrl || !proposalDocumentUrl) {
       return NextResponse.json(
@@ -56,7 +72,7 @@ export async function POST(request: NextRequest) {
       .insert({
         company_name: companyName,
         contact_person: contactPerson,
-        email,
+        email: cleanEmail,
         phone,
         website: website || null,
         partnership_type: partnershipType,
@@ -101,7 +117,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Create Supabase client with service role for admin read access
+    // ── Admin only ─────────────────────────────────────────────────────────────
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
+
     const supabase = createApiClient({ useServiceRole: true })
 
     const searchParams = request.nextUrl.searchParams
@@ -123,7 +142,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Database error:', error)
       return NextResponse.json(
-        { error: 'Failed to fetch partnerships', details: error.message },
+        { error: 'Failed to fetch partnerships' },
         { status: 500 }
       )
     }

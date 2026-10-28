@@ -312,59 +312,97 @@ ALTER TABLE crm_pipeline_stages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE crm_settings ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
--- ROW LEVEL SECURITY POLICIES
--- Only authenticated admin users can access CRM data
+-- ROW LEVEL SECURITY POLICIES (F-012 / CWE-863 Hardened)
+-- Only verified administrators (present in admin_profiles) can access CRM data
 -- ============================================
 
--- CRM Leads
+-- Drop all old permissive policies that used auth.role() = 'authenticated'
 DROP POLICY IF EXISTS "Authenticated users can view leads" ON crm_leads;
-CREATE POLICY "Authenticated users can view leads" ON crm_leads
-  FOR SELECT USING (auth.role() = 'authenticated');
-
 DROP POLICY IF EXISTS "Authenticated users can insert leads" ON crm_leads;
-CREATE POLICY "Authenticated users can insert leads" ON crm_leads
-  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-
 DROP POLICY IF EXISTS "Authenticated users can update leads" ON crm_leads;
-CREATE POLICY "Authenticated users can update leads" ON crm_leads
-  FOR UPDATE USING (auth.role() = 'authenticated');
-
 DROP POLICY IF EXISTS "Authenticated users can delete leads" ON crm_leads;
-CREATE POLICY "Authenticated users can delete leads" ON crm_leads
-  FOR DELETE USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_leads" ON crm_leads;
 
--- CRM Deals (repeat for all tables)
 DROP POLICY IF EXISTS "Authenticated users can manage deals" ON crm_deals;
-CREATE POLICY "Authenticated users can manage deals" ON crm_deals
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_deals" ON crm_deals;
 
 DROP POLICY IF EXISTS "Authenticated users can manage activities" ON crm_activities;
-CREATE POLICY "Authenticated users can manage activities" ON crm_activities
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_activities" ON crm_activities;
 
 DROP POLICY IF EXISTS "Authenticated users can manage tasks" ON crm_tasks;
-CREATE POLICY "Authenticated users can manage tasks" ON crm_tasks
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_tasks" ON crm_tasks;
 
 DROP POLICY IF EXISTS "Authenticated users can manage tags" ON crm_tags;
-CREATE POLICY "Authenticated users can manage tags" ON crm_tags
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_tags" ON crm_tags;
 
 DROP POLICY IF EXISTS "Authenticated users can manage notes" ON crm_notes;
-CREATE POLICY "Authenticated users can manage notes" ON crm_notes
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_notes" ON crm_notes;
 
 DROP POLICY IF EXISTS "Authenticated users can manage templates" ON crm_email_templates;
-CREATE POLICY "Authenticated users can manage templates" ON crm_email_templates
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_email_templates" ON crm_email_templates;
 
 DROP POLICY IF EXISTS "Authenticated users can manage pipeline stages" ON crm_pipeline_stages;
-CREATE POLICY "Authenticated users can manage pipeline stages" ON crm_pipeline_stages
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_pipeline_stages" ON crm_pipeline_stages;
 
 DROP POLICY IF EXISTS "Authenticated users can manage CRM settings" ON crm_settings;
-CREATE POLICY "Authenticated users can manage CRM settings" ON crm_settings
-  FOR ALL USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Admins can manage crm_settings" ON crm_settings;
+
+-- Create strict admin-only policies
+CREATE POLICY "Admins can manage crm_leads" ON crm_leads
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_deals" ON crm_deals
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_activities" ON crm_activities
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_tasks" ON crm_tasks
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_tags" ON crm_tags
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_notes" ON crm_notes
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_email_templates" ON crm_email_templates
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_pipeline_stages" ON crm_pipeline_stages
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+CREATE POLICY "Admins can manage crm_settings" ON crm_settings
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
+
+-- Explicitly revoke permissions from anon role on all CRM tables
+REVOKE ALL ON crm_leads FROM anon;
+REVOKE ALL ON crm_deals FROM anon;
+REVOKE ALL ON crm_activities FROM anon;
+REVOKE ALL ON crm_tasks FROM anon;
+REVOKE ALL ON crm_tags FROM anon;
+REVOKE ALL ON crm_notes FROM anon;
+REVOKE ALL ON crm_email_templates FROM anon;
+REVOKE ALL ON crm_pipeline_stages FROM anon;
+REVOKE ALL ON crm_settings FROM anon;
 
 -- ============================================
 -- DEFAULT DATA

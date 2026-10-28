@@ -42,13 +42,36 @@ if (fs.existsSync(envExamplePath)) {
 
 console.log('');
 
+// Load .env.local if present
+if (fs.existsSync(envLocalPath)) {
+  const envContent = fs.readFileSync(envLocalPath, 'utf8');
+  envContent.split('\n').forEach(line => {
+    const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+    if (match) {
+      const key = match[1];
+      let value = match[2] || '';
+      if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+      if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
+      if (!process.env[key]) {
+        process.env[key] = value.trim();
+      }
+    }
+  });
+}
+
 // Check AbstractAPI key
 console.log('🔑 Checking API keys...');
-const abstractApiKey = process.env.NEXT_PUBLIC_ABSTRACT_API_KEY;
+
+if (process.env.NEXT_PUBLIC_ABSTRACT_API_KEY) {
+  issues.push('NEXT_PUBLIC_ABSTRACT_API_KEY is insecurely defined as a public client variable. Rename it to ABSTRACT_API_KEY.');
+  console.log('   ❌ NEXT_PUBLIC_ABSTRACT_API_KEY found! Remove NEXT_PUBLIC_ prefix to prevent credential exposure in client bundles.');
+}
+
+const abstractApiKey = process.env.ABSTRACT_API_KEY;
 
 if (abstractApiKey) {
-  if (abstractApiKey === 'your_abstract_api_key') {
-    issues.push('NEXT_PUBLIC_ABSTRACT_API_KEY is set to placeholder value');
+  if (abstractApiKey === 'your_abstract_api_key' || abstractApiKey === 'your_key_here') {
+    issues.push('ABSTRACT_API_KEY is set to placeholder value');
     console.log('   ❌ AbstractAPI key is placeholder');
     console.log('      Update with real key from https://www.abstractapi.com/');
   } else if (abstractApiKey.length < 20) {
@@ -58,8 +81,8 @@ if (abstractApiKey) {
     success.push('AbstractAPI key is configured');
     console.log('   ✅ AbstractAPI key is set');
   }
-} else {
-  issues.push('NEXT_PUBLIC_ABSTRACT_API_KEY not set');
+} else if (!process.env.NEXT_PUBLIC_ABSTRACT_API_KEY) {
+  issues.push('ABSTRACT_API_KEY not set');
   console.log('   ❌ AbstractAPI key not found');
   console.log('      Get your key: https://www.abstractapi.com/api/email-verification-validation-api');
 }
@@ -134,7 +157,7 @@ if (issues.length === 0 && warnings.length === 0) {
   console.log('Quick fix guide:');
   console.log('   1. Create .env.local if missing: copy .env.example .env.local');
   console.log('   2. Get AbstractAPI key: https://www.abstractapi.com/');
-  console.log('   3. Add to .env.local: NEXT_PUBLIC_ABSTRACT_API_KEY=your_key_here\n');
+  console.log('   3. Add to .env.local: ABSTRACT_API_KEY=your_key_here\n');
   process.exit(1);
 }
 

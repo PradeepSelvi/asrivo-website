@@ -1,22 +1,42 @@
+const getSupabaseHostname = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) return 'csgbpsywrexqgvzkvkqw.supabase.co';
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return 'csgbpsywrexqgvzkvkqw.supabase.co';
+  }
+};
+
+const trustedSupabaseHosts = Array.from(
+  new Set(['csgbpsywrexqgvzkvkqw.supabase.co', getSupabaseHostname()].filter(Boolean))
+);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Production optimizations
   poweredByHeader: false, // Remove X-Powered-By header for security
   compress: true, // Enable compression
   
-  // Image optimization
+  // Image optimization & SSRF hardening (CWE-918)
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Block redirects completely to prevent redirect-based SSRF / DNS rebinding
+    maximumRedirects: 0,
+    // Ensure internal / private network IPs are forbidden
+    dangerouslyAllowLocalIP: false,
     remotePatterns: [
-      {
+      ...trustedSupabaseHosts.map((hostname) => ({
         protocol: 'https',
-        hostname: '**.supabase.co',
-      },
+        hostname,
+        pathname: '/storage/v1/object/public/**',
+      })),
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+        pathname: '/**',
       },
     ],
   },

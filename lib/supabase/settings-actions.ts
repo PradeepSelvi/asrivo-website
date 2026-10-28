@@ -3,6 +3,60 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { revalidatePath } from 'next/cache'
+import { isValidEmail } from '@/lib/utils/validation'
+
+const MAX_SETTING_VALUE_LENGTH = 10000
+
+/**
+ * Validate setting values before persistence to prevent ReDoS or oversized payload attacks
+ */
+function validateSettingField(fullKey: string, stringValue: string): void {
+  if (stringValue.length > MAX_SETTING_VALUE_LENGTH) {
+    throw new Error(`Setting '${fullKey}' exceeds maximum allowed length of ${MAX_SETTING_VALUE_LENGTH} characters.`)
+  }
+
+  const normalizedKey = fullKey.toLowerCase()
+  if (
+    normalizedKey === 'site.contact_email' ||
+    normalizedKey === 'contact_email' ||
+    normalizedKey.endsWith('_email') ||
+    normalizedKey.endsWith('.email')
+  ) {
+    let cleanEmail = stringValue.trim()
+    if (cleanEmail.startsWith('"') && cleanEmail.endsWith('"')) {
+      try {
+        cleanEmail = JSON.parse(cleanEmail)
+      } catch {
+        cleanEmail = cleanEmail.slice(1, -1)
+      }
+    }
+    cleanEmail = cleanEmail.trim()
+    if (cleanEmail !== '' && !isValidEmail(cleanEmail)) {
+      throw new Error(`Invalid email address format for '${fullKey}'. Email must be valid and between 5 and 254 characters.`)
+    }
+  }
+
+  if (
+    normalizedKey.includes('linkedin') ||
+    normalizedKey.includes('instagram') ||
+    normalizedKey.includes('facebook') ||
+    normalizedKey.includes('twitter') ||
+    normalizedKey.endsWith('_url')
+  ) {
+    let cleanUrl = stringValue.trim()
+    if (cleanUrl.startsWith('"') && cleanUrl.endsWith('"')) {
+      try {
+        cleanUrl = JSON.parse(cleanUrl)
+      } catch {
+        cleanUrl = cleanUrl.slice(1, -1)
+      }
+    }
+    cleanUrl = cleanUrl.trim()
+    if (cleanUrl !== '' && !cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+      throw new Error(`Invalid URL format for '${fullKey}'. URL must start with http:// or https://.`)
+    }
+  }
+}
 
 // Helper function to verify high admin permission
 async function requireHighAdmin() {
@@ -113,6 +167,7 @@ export async function updateSiteSetting(
     const fullKey = `${category}.${key}`
     // Store as plain string value
     const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
+    validateSettingField(fullKey, stringValue)
     
     const { data, error } = await supabase
       .from('site_settings')
@@ -145,6 +200,13 @@ export async function updateMultipleSettings(
     await requireHighAdmin()
     const supabase = await createClient()
     
+    // Validate all settings before performing any DB operations
+    for (const { category, key, value } of settings) {
+      const fullKey = `${category}.${key}`
+      const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
+      validateSettingField(fullKey, stringValue)
+    }
+
     // Update each setting
     const results = await Promise.all(
       settings.map(async ({ category, key, value }) => {
@@ -191,6 +253,7 @@ export async function createSiteSetting(
     
     const fullKey = `${category}.${key}`
     const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
+    validateSettingField(fullKey, stringValue)
     
     const { data, error } = await supabase
       .from('site_settings')

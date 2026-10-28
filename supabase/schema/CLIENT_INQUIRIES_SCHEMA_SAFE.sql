@@ -59,14 +59,22 @@ ALTER TABLE client_inquiries ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Anyone can submit inquiries" ON client_inquiries;
 DROP POLICY IF EXISTS "Admins can view all inquiries" ON client_inquiries;
 DROP POLICY IF EXISTS "Admins can update inquiries" ON client_inquiries;
+DROP POLICY IF EXISTS "Admins can delete inquiries" ON client_inquiries;
 
 -- Create RLS Policies
+-- Public submissions: require status to be 'new' and internal admin fields to be NULL (CWE-915 mitigation)
 CREATE POLICY "Anyone can submit inquiries"
   ON client_inquiries
   FOR INSERT
   TO public
-  WITH CHECK (true);
+  WITH CHECK (
+    status = 'new'
+    AND notes IS NULL
+    AND assigned_to IS NULL
+    AND converted_to_lead_id IS NULL
+  );
 
+-- Admins can view all inquiries; submitting users can view only their own
 CREATE POLICY "Admins can view all inquiries"
   ON client_inquiries
   FOR SELECT
@@ -76,11 +84,33 @@ CREATE POLICY "Admins can view all inquiries"
       SELECT 1 FROM admin_profiles
       WHERE admin_profiles.id = auth.uid()
     )
+    OR (
+      email = (auth.jwt() ->> 'email')
+    )
   );
 
+-- Admins can update inquiries
 CREATE POLICY "Admins can update inquiries"
   ON client_inquiries
   FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
+
+-- Admins can delete inquiries
+CREATE POLICY "Admins can delete inquiries"
+  ON client_inquiries
+  FOR DELETE
   TO authenticated
   USING (
     EXISTS (
@@ -98,16 +128,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Drop and recreate trigger
+-- Drop and recreate trigger (idempotent)
 DROP TRIGGER IF EXISTS client_inquiries_updated_at_trigger ON client_inquiries;
 CREATE TRIGGER client_inquiries_updated_at_trigger
   BEFORE UPDATE ON client_inquiries
   FOR EACH ROW
   EXECUTE FUNCTION update_client_inquiries_updated_at();
 
--- Grant permissions
-GRANT SELECT, INSERT, UPDATE ON client_inquiries TO authenticated;
-GRANT SELECT, INSERT ON client_inquiries TO anon;
+-- Grant permissions (never grant table-wide SELECT or UPDATE to anon)
+REVOKE ALL ON client_inquiries FROM anon;
+GRANT INSERT ON client_inquiries TO anon, authenticated;
+GRANT SELECT, UPDATE, DELETE ON client_inquiries TO authenticated;
 
 -- Add comment
 COMMENT ON TABLE client_inquiries IS 'Stores client project inquiries submitted through the Get Started form';

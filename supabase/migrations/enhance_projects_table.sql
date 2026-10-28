@@ -19,8 +19,9 @@ ADD COLUMN IF NOT EXISTS prd_file_url TEXT,
 ADD COLUMN IF NOT EXISTS prd_file_name TEXT,
 ADD COLUMN IF NOT EXISTS gallery_images TEXT[];
 
--- Disable RLS for public access
-ALTER TABLE projects DISABLE ROW LEVEL SECURITY;
+-- RLS is intentionally left enabled.
+-- Public SELECT and admin-only write policies are in enable_projects_rls.sql.
+-- Do NOT add DISABLE ROW LEVEL SECURITY here.
 
 -- Enable realtime
 DO $$

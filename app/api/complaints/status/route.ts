@@ -1,9 +1,14 @@
 import { createApiClient } from '@/lib/supabase/api-client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { isValidEmail } from '@/lib/utils/validation'
+import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
+import { apiRateLimit } from '@/lib/utils/rate-limit'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET - Fetch complaints by email (authenticated users only, own complaints)
 export async function GET(request: NextRequest) {
+  const limited = await applyRateLimit(request, apiRateLimit)
+  if (limited) return limited
   try {
     // Require authentication — users can only look up their own complaints
     const supabaseAuth = await createServerClient()
@@ -19,7 +24,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const email = searchParams.get('email')
 
-    if (!email) {
+    // F-016 / CWE-1333: Require string, bound length BEFORE regex, use linear-time validator
+    if (!email || typeof email !== 'string') {
       return NextResponse.json(
         { error: 'Email parameter is required' },
         { status: 400 }
@@ -28,17 +34,25 @@ export async function GET(request: NextRequest) {
 
     const cleanEmail = email.trim().toLowerCase()
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(cleanEmail)) {
+    // Bound length (RFC 5321 max: 254 chars) and apply linear-time validator
+    if (cleanEmail.length > 254 || !isValidEmail(cleanEmail)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
       )
     }
 
-    // Ensure the user can only look up their own complaints
-    if (user.email?.toLowerCase() !== cleanEmail) {
+    // Ensure the user can only look up their own complaints.
+    // Explicit null check first — a user with no email in their JWT must never
+    // accidentally match (undefined !== string is true, but be explicit).
+    if (!user.email) {
+      return NextResponse.json(
+        { error: 'Your account has no verified email address' },
+        { status: 403 }
+      )
+    }
+
+    if (user.email.toLowerCase() !== cleanEmail) {
       return NextResponse.json(
         { error: 'You can only look up your own complaints' },
         { status: 403 }
@@ -47,10 +61,12 @@ export async function GET(request: NextRequest) {
 
     const supabase = createApiClient({ useServiceRole: true })
 
+    // Use eq (exact match) not ilike — cleanEmail is already lowercased and
+    // ilike accepts SQL LIKE wildcards which could match unintended rows.
     const { data, error } = await supabase
       .from('complaints')
       .select('*')
-      .ilike('email', cleanEmail)
+      .eq('email', cleanEmail)
       .order('created_at', { ascending: false })
 
     if (error) {

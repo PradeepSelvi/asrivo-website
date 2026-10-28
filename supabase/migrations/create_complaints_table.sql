@@ -14,8 +14,9 @@ CREATE TABLE IF NOT EXISTS complaints (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Disable RLS for public access (no login required)
-ALTER TABLE complaints DISABLE ROW LEVEL SECURITY;
+-- RLS is intentionally left enabled (Postgres default).
+-- Policies are defined in enable_complaints_rls.sql.
+-- Do NOT add DISABLE ROW LEVEL SECURITY here.
 
 -- Create updated_at trigger
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -26,6 +27,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_complaints_updated_at ON complaints;
 CREATE TRIGGER update_complaints_updated_at
     BEFORE UPDATE ON complaints
     FOR EACH ROW
@@ -37,5 +39,13 @@ CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);
 CREATE INDEX IF NOT EXISTS idx_complaints_priority ON complaints(priority);
 CREATE INDEX IF NOT EXISTS idx_complaints_email ON complaints(email);
 
--- Enable realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE complaints;
+-- Enable realtime (idempotent)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'complaints'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE complaints;
+    END IF;
+END $$;

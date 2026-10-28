@@ -20,11 +20,19 @@ CREATE TABLE IF NOT EXISTS complaints (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Disable RLS for complaints (PUBLIC ACCESS - no authentication required)
-ALTER TABLE complaints DISABLE ROW LEVEL SECURITY;
+-- RLS is managed in enable_complaints_rls.sql.
+-- Do NOT add DISABLE ROW LEVEL SECURITY here.
 
--- Enable realtime for complaints
-ALTER PUBLICATION supabase_realtime ADD TABLE complaints;
+-- Enable realtime for complaints (idempotent)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'complaints'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE complaints;
+    END IF;
+END $$;
 
 -- Create updated_at trigger for complaints
 CREATE OR REPLACE FUNCTION update_complaints_updated_at()

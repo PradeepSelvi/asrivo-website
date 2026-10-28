@@ -1,2 +1,10 @@
--- Enable Realtime for partnerships table
-ALTER PUBLICATION supabase_realtime ADD TABLE partnerships;
+-- Enable Realtime for partnerships table (idempotent)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'partnerships'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE partnerships;
+    END IF;
+END $$;

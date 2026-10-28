@@ -24,31 +24,64 @@ CREATE INDEX IF NOT EXISTS idx_partnerships_email ON partnerships(email);
 -- Enable Row Level Security
 ALTER TABLE partnerships ENABLE ROW LEVEL SECURITY;
 
--- Create policy for public inserts (anyone can submit)
+-- Clean up existing policies
+DROP POLICY IF EXISTS "Allow public insert" ON partnerships;
+DROP POLICY IF EXISTS "Allow authenticated read" ON partnerships;
+DROP POLICY IF EXISTS "Allow authenticated update" ON partnerships;
+DROP POLICY IF EXISTS "Allow authenticated delete" ON partnerships;
+DROP POLICY IF EXISTS "Allow admins and owners to read partnerships" ON partnerships;
+DROP POLICY IF EXISTS "Allow admins to update partnerships" ON partnerships;
+DROP POLICY IF EXISTS "Allow admins to delete partnerships" ON partnerships;
+
+-- Policy for public inserts (anyone can submit a partnership request)
 CREATE POLICY "Allow public insert" ON partnerships
   FOR INSERT
   TO public
   WITH CHECK (true);
 
--- Create policy for authenticated reads (admins only)
-CREATE POLICY "Allow authenticated read" ON partnerships
+-- Policy for reads: verified admins can read all, applicants can read their own
+CREATE POLICY "Allow admins and owners to read partnerships" ON partnerships
   FOR SELECT
   TO authenticated
-  USING (true);
+  USING (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+    OR (
+      email = (auth.jwt() ->> 'email')
+    )
+  );
 
--- Create policy for authenticated updates (admins only)
-CREATE POLICY "Allow authenticated update" ON partnerships
+-- Policy for updates: verified admins only
+CREATE POLICY "Allow admins to update partnerships" ON partnerships
   FOR UPDATE
   TO authenticated
-  USING (true);
+  USING (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
 
--- Create policy for authenticated deletes (admins only)
-CREATE POLICY "Allow authenticated delete" ON partnerships
+-- Policy for deletes: verified admins only
+CREATE POLICY "Allow admins to delete partnerships" ON partnerships
   FOR DELETE
   TO authenticated
-  USING (true);
+  USING (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
 
--- Create trigger to update updated_at
+-- Create trigger to update updated_at (idempotent)
 CREATE OR REPLACE FUNCTION update_partnerships_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -57,6 +90,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS partnerships_updated_at ON partnerships;
 CREATE TRIGGER partnerships_updated_at
   BEFORE UPDATE ON partnerships
   FOR EACH ROW

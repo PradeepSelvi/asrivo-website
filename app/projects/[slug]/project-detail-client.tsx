@@ -21,7 +21,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeRaw from 'rehype-raw'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 
 interface Project {
   id: number
@@ -414,7 +414,30 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeRaw]}
+                  rehypePlugins={[
+                    // Sanitize HTML strictly — no script, iframe, srcdoc or
+                    // event-handler attributes. rehypeRaw was removed because
+                    // PRDs are Markdown-only and raw HTML pass-through creates
+                    // a stored-XSS vector (CWE-79 / F-006).
+                    [
+                      rehypeSanitize,
+                      {
+                        ...defaultSchema,
+                        tagNames: (defaultSchema.tagNames ?? []).filter(
+                          (tag) => !['script', 'iframe', 'object', 'embed', 'form', 'input', 'button'].includes(tag)
+                        ),
+                        attributes: {
+                          ...defaultSchema.attributes,
+                          // Strip all event-handler attributes globally
+                          '*': (defaultSchema.attributes?.['*'] ?? []).filter(
+                            (attr) => !String(attr).startsWith('on')
+                          ),
+                          // Disallow srcdoc everywhere
+                          iframe: [],
+                        },
+                      },
+                    ],
+                  ]}
                   components={{
                     h1: ({ node, ...props }) => <h1 className="text-3xl font-bold text-foreground mb-4 mt-8" {...props} />,
                     h2: ({ node, ...props }) => <h2 className="text-2xl font-bold text-foreground mb-3 mt-6" {...props} />,

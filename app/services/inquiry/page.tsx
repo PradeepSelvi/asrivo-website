@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Check, Send, AlertCircle, Upload, File, X } from 'lucide-react'
 import Link from 'next/link'
+import { isValidEmail } from '@/lib/utils/validation'
 
 const FORM_STORAGE_KEY = 'inquiry_form_data'
 const STEP_STORAGE_KEY = 'inquiry_form_step'
@@ -202,7 +203,7 @@ export default function ServiceInquiryPage() {
           setError('Company/Business name is required')
           return false
         }
-        if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        if (!isValidEmail(formData.email)) {
           setError('Valid email is required')
           return false
         }

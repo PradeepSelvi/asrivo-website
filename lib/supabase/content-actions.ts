@@ -5,6 +5,7 @@ import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
 import { createApiClient } from '@/lib/supabase/api-client'
 import { revalidatePath } from 'next/cache'
 import { randomBytes } from 'crypto'
+import { sendInquiryStatusEmail } from '@/lib/utils/status-email'
 
 // Helper function to verify permissions
 async function checkAuthAndPermission(requiredRole?: 'high') {
@@ -934,18 +935,14 @@ export async function updateInquiryStatus(id: string | number, status: string) {
 
     if (error) throw new Error(error.message)
 
-    // Send email notification to client
+    // Send email notification to client via safe server-side function (CWE-862 / CWE-116)
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/send-status-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: inquiry.email,
-          name: inquiry.name,
-          company: inquiry.company,
-          status: status,
-          inquiryId: id
-        })
+      await sendInquiryStatusEmail({
+        id: inquiry.id,
+        email: inquiry.email,
+        name: inquiry.name,
+        company: inquiry.company,
+        status: status
       })
     } catch (emailError) {
       console.error('Failed to send status email:', emailError)

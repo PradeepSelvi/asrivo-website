@@ -299,16 +299,61 @@ ALTER TABLE analytics ENABLE ROW LEVEL SECURITY;
 -- the whole block safe to re-run.
 -- ============================================
 
--- Contacts: Public can insert their own, only admin can read
+-- Contacts: Public can insert their own, only admin can read/update/delete
 DROP POLICY IF EXISTS "Enable insert for all users" ON contacts;
-CREATE POLICY "Enable insert for all users" ON contacts
+DROP POLICY IF EXISTS "Public can submit contacts" ON contacts;
+DROP POLICY IF EXISTS "contacts_insert_public" ON contacts;
+CREATE POLICY "contacts_insert_public" ON contacts
   FOR INSERT
   WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Enable read for authenticated users only" ON contacts;
-CREATE POLICY "Enable read for authenticated users only" ON contacts
+DROP POLICY IF EXISTS "Enable read for admins only" ON contacts;
+DROP POLICY IF EXISTS "Admin read only contacts" ON contacts;
+DROP POLICY IF EXISTS "Admin read only" ON contacts;
+DROP POLICY IF EXISTS "contacts_select_admin" ON contacts;
+CREATE POLICY "contacts_select_admin" ON contacts
   FOR SELECT
-  USING (auth.role() = 'authenticated');
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Block all updates from clients contacts" ON contacts;
+DROP POLICY IF EXISTS "Block all updates from clients" ON contacts;
+DROP POLICY IF EXISTS "contacts_update_admin" ON contacts;
+CREATE POLICY "contacts_update_admin" ON contacts
+  FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Block all deletes from clients contacts" ON contacts;
+DROP POLICY IF EXISTS "Block all deletes from clients" ON contacts;
+DROP POLICY IF EXISTS "contacts_delete_admin" ON contacts;
+CREATE POLICY "contacts_delete_admin" ON contacts
+  FOR DELETE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+      AND admin_profiles.role = 'high'
+    )
+  );
 
 -- Service Inquiries: Public can insert
 DROP POLICY IF EXISTS "Enable insert for all users" ON service_inquiries;
@@ -376,11 +421,18 @@ CREATE POLICY "Enable read for all users" ON settings
   FOR SELECT
   USING (true);
 
--- Audit Logs: Authenticated users only
+-- Audit Logs: Authenticated admins only (F-012 / CWE-863)
 DROP POLICY IF EXISTS "Enable read for authenticated users" ON audit_logs;
-CREATE POLICY "Enable read for authenticated users" ON audit_logs
+DROP POLICY IF EXISTS "Enable read for admins only" ON audit_logs;
+CREATE POLICY "Enable read for admins only" ON audit_logs
   FOR SELECT
-  USING (auth.role() = 'authenticated');
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
 
 -- ============================================
 -- DEFAULT SETTINGS DATA

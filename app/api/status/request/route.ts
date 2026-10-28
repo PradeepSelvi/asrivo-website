@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isValidEmail } from '@/lib/utils/validation'
 import { randomBytes } from 'crypto'
 import { Resend } from 'resend'
 
@@ -16,9 +17,19 @@ const TOKEN_EXPIRY_MINUTES = 15
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const email = (body?.email ?? '').trim().toLowerCase()
+    const rawEmail = body?.email
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // F-016 / CWE-1333: Require string, bound length BEFORE regex, use linear-time validator
+    if (!rawEmail || typeof rawEmail !== 'string') {
+      return NextResponse.json(
+        { success: false, error: 'A valid email address is required.' },
+        { status: 400 }
+      )
+    }
+
+    const email = rawEmail.trim().toLowerCase()
+
+    if (!isValidEmail(email)) {
       return NextResponse.json(
         { success: false, error: 'A valid email address is required.' },
         { status: 400 }

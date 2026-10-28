@@ -32,49 +32,40 @@ WITH CHECK (
   bucket_id = 'resumes'
 );
 
--- 4. Policy: Authenticated admins can view resumes (SELECT)
+-- 4. Policy: Only admins can view resumes (F-013 / CWE-863)
 CREATE POLICY "Admins can view resumes"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
   bucket_id = 'resumes'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 );
 
--- 5. Policy: Authenticated admins can update resumes (UPDATE)
+-- 5. Policy: Only admins can update resumes (F-013 / CWE-863)
 CREATE POLICY "Admins can update resumes"
 ON storage.objects FOR UPDATE
 TO authenticated
 USING (
   bucket_id = 'resumes'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 )
 WITH CHECK (bucket_id = 'resumes');
 
--- 6. Policy: Authenticated admins can delete resumes (DELETE)
+-- 6. Policy: Only admins can delete resumes (F-013 / CWE-863)
 CREATE POLICY "Admins can delete resumes"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (
   bucket_id = 'resumes'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 );
 

@@ -26,8 +26,9 @@ CREATE TABLE complaints (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Disable RLS for public access
-ALTER TABLE complaints DISABLE ROW LEVEL SECURITY;
+-- RLS is intentionally left enabled (Postgres default).
+-- Policies are defined in enable_complaints_rls.sql.
+-- Do NOT add DISABLE ROW LEVEL SECURITY here.
 
 -- Create updated_at trigger function (if not exists)
 CREATE OR REPLACE FUNCTION update_updated_at_column()

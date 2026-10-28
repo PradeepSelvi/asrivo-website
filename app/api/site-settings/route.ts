@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { requireHighAdmin } from '@/lib/api/auth-middleware'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET - Fetch all site settings
@@ -42,19 +43,14 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT - Update a site setting
+// PUT - Update a site setting (High Admin only)
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const auth = await requireHighAdmin(request)
+    if (auth.error) return auth.error
 
-    // Check authentication
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const user = auth.user!
+    const supabase = auth.supabase
 
     const body = await request.json()
     const { setting_key, setting_value } = body

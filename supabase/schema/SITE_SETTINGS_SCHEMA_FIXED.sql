@@ -22,22 +22,57 @@ CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(key);
 -- Enable RLS
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 
--- Allow public read access for site settings
+-- Helper function to verify high-admin role (non-recursive, SECURITY DEFINER)
+CREATE OR REPLACE FUNCTION public.is_high_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE id = auth.uid()
+      AND role = 'high'
+  );
+$$;
+
+-- Drop existing policies
+DROP POLICY IF EXISTS "Allow public read access to site settings" ON site_settings;
+DROP POLICY IF EXISTS "Allow authenticated admins to modify settings" ON site_settings;
+DROP POLICY IF EXISTS "Allow admins to manage settings" ON site_settings;
+DROP POLICY IF EXISTS "Allow high admins to insert settings" ON site_settings;
+DROP POLICY IF EXISTS "Allow high admins to update settings" ON site_settings;
+DROP POLICY IF EXISTS "Allow high admins to delete settings" ON site_settings;
+
+-- Policy 1: Public read access for site settings
 CREATE POLICY "Allow public read access to site settings"
   ON site_settings
   FOR SELECT
+  TO public
   USING (true);
 
--- Only authenticated admins can modify settings
--- FIXED: Uses admin_profiles instead of admin_users
-CREATE POLICY "Allow authenticated admins to modify settings"
+-- Policy 2: Only high-level admins can insert settings
+CREATE POLICY "Allow high admins to insert settings"
   ON site_settings
-  FOR ALL
-  USING (
-    auth.uid() IN (
-      SELECT id FROM admin_profiles WHERE role IN ('high', 'low')
-    )
-  );
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_high_admin());
+
+-- Policy 3: Only high-level admins can update settings
+CREATE POLICY "Allow high admins to update settings"
+  ON site_settings
+  FOR UPDATE
+  TO authenticated
+  USING (public.is_high_admin())
+  WITH CHECK (public.is_high_admin());
+
+-- Policy 4: Only high-level admins can delete settings
+CREATE POLICY "Allow high admins to delete settings"
+  ON site_settings
+  FOR DELETE
+  TO authenticated
+  USING (public.is_high_admin());
 
 -- Insert default site settings
 INSERT INTO site_settings (category, key, value, description) VALUES
@@ -122,23 +157,38 @@ RETURNS JSONB AS $$
   SELECT value FROM site_settings WHERE category = p_category AND key = p_key LIMIT 1;
 $$ LANGUAGE sql STABLE;
 
--- Create helper function to update setting value
+-- Create helper function to update setting value (high-admin only)
 CREATE OR REPLACE FUNCTION update_site_setting(p_category VARCHAR, p_key VARCHAR, p_value JSONB)
 RETURNS BOOLEAN AS $$
 BEGIN
+  IF NOT public.is_high_admin() THEN
+    RAISE EXCEPTION 'Access denied: only high-level administrators can modify site settings.';
+  END IF;
+
   UPDATE site_settings
   SET value = p_value, updated_at = NOW()
   WHERE category = p_category AND key = p_key;
   
   RETURN FOUND;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- Grant permissions
+-- Grant permissions (least-privilege)
+REVOKE ALL ON site_settings FROM anon;
 GRANT SELECT ON site_settings TO anon, authenticated;
-GRANT ALL ON site_settings TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON site_settings TO authenticated;
 
 COMMENT ON TABLE site_settings IS 'Stores all website configuration settings that can be edited by high-level admins';
-COMMENT ON COLUMN site_settings.category IS 'Setting category: site, homepage, theme, email, security';
-COMMENT ON COLUMN site_settings.key IS 'Unique setting identifier within category';
-COMMENT ON COLUMN site_settings.value IS 'JSON value - can be string, number, boolean, object, or array';
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'site_settings' AND column_name = 'category') THEN
+    EXECUTE 'COMMENT ON COLUMN site_settings.category IS ''Setting category: site, homepage, theme, email, security''';
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'site_settings' AND column_name = 'key') THEN
+    EXECUTE 'COMMENT ON COLUMN site_settings.key IS ''Unique setting identifier within category''';
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'site_settings' AND column_name = 'value') THEN
+    EXECUTE 'COMMENT ON COLUMN site_settings.value IS ''JSON value - can be string, number, boolean, object, or array''';
+  END IF;
+END $$;

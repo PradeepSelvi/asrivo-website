@@ -12,21 +12,30 @@ export async function sendEmail({
   to,
   subject,
   html,
+  text,
 }: {
   to: string;
   subject: string;
   html: string;
+  text?: string;
 }) {
   if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
     console.error('CRITICAL: Email credentials (GMAIL_USER/GMAIL_APP_PASSWORD) are missing in .env.local');
     return { success: false, error: 'Missing email credentials' };
   }
 
-  const mailOptions = {
+  const mailOptions: {
+    from: string | undefined;
+    to: string;
+    subject: string;
+    html: string;
+    text?: string;
+  } = {
     from: process.env.GMAIL_USER,
     to,
     subject,
     html,
+    ...(text ? { text } : {}),
   };
 
   try {

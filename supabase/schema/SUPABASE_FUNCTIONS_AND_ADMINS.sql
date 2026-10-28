@@ -1,7 +1,7 @@
 -- ============================================================
 -- SUPABASE FUNCTIONS, TRIGGERS & ADMIN SETUP
--- High Admin : pradeepselvi126@gmail.com / PRk@123456
--- Low Admin  : idnumberselect@gmail.com  / IDn@123456
+-- High Admin : Enrolled securely via Supabase Auth Dashboard
+-- Low Admin  : Enrolled securely via Supabase Auth Dashboard
 -- Safe to re-run (idempotent)
 -- ============================================================
 
@@ -70,6 +70,7 @@ RETURNS TEXT
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
+SET search_path = public
 AS $$
   SELECT role FROM admin_profiles WHERE id = auth.uid();
 $$;
@@ -80,6 +81,7 @@ RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
+SET search_path = public
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM admin_profiles
@@ -94,6 +96,7 @@ RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
+SET search_path = public
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM admin_profiles
@@ -298,16 +301,33 @@ CREATE OR REPLACE FUNCTION reorder_items(
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_old_order INTEGER;
 BEGIN
+  -- 1. Authorization check: caller must be a verified administrator
+  IF NOT is_admin() THEN
+    RAISE EXCEPTION 'Unauthorized: administrator access required to reorder items';
+  END IF;
+
+  -- 2. Input validation and table allowlist
+  IF p_table NOT IN ('projects', 'team_members', 'services', 'testimonials', 'page_content') THEN
+    RAISE EXCEPTION 'Invalid table: % is not a reorderable content table', p_table;
+  END IF;
+
+  IF p_id IS NULL OR p_new_order IS NULL OR p_new_order < 0 THEN
+    RAISE EXCEPTION 'Invalid parameters: item ID and non-negative new order are required';
+  END IF;
+
+  -- 3. Query existing display_order safely using parameterized query
   EXECUTE format('SELECT display_order FROM %I WHERE id = $1', p_table)
   INTO v_old_order
   USING p_id;
 
   IF v_old_order IS NULL THEN RETURN; END IF;
 
+  -- 4. Shift neighboring records to maintain sequence
   IF p_new_order < v_old_order THEN
     EXECUTE format('
       UPDATE %I SET display_order = display_order + 1
@@ -320,10 +340,15 @@ BEGIN
     ', p_table) USING v_old_order, p_new_order;
   END IF;
 
+  -- 5. Set new order on target item
   EXECUTE format('UPDATE %I SET display_order = $1 WHERE id = $2', p_table)
   USING p_new_order, p_id;
 END;
 $$;
+
+-- Revoke anonymous access and restrict execution to authenticated users
+REVOKE EXECUTE ON FUNCTION reorder_items(TEXT, BIGINT, INTEGER) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION reorder_items(TEXT, BIGINT, INTEGER) TO authenticated;
 
 
 -- ============================================================
@@ -517,13 +542,13 @@ BEGIN
 END;
 $$;
 
--- Low admin: write access limited to projects, services, team, testimonials, job_postings
+-- Low admin: write access limited to projects, services, team, job_postings
 DO $$
 DECLARE
   tbl TEXT;
 BEGIN
   FOREACH tbl IN ARRAY ARRAY[
-    'projects', 'team_members', 'services', 'testimonials', 'job_postings'
+    'projects', 'team_members', 'services', 'job_postings'
   ]
   LOOP
     EXECUTE format('
@@ -536,6 +561,19 @@ BEGIN
   END LOOP;
 END;
 $$;
+
+-- Testimonials: High admins have full control (INSERT, UPDATE, DELETE).
+-- Low admins (editors) have UPDATE access only (edit content, verify, reorder).
+-- Creation and deletion strictly require high-admin privileges (Finding F-035 / CWE-863).
+DROP POLICY IF EXISTS "Low admin write access" ON testimonials;
+DROP POLICY IF EXISTS "Low admin update access" ON testimonials;
+
+CREATE POLICY "Low admin update access"
+  ON testimonials
+  FOR UPDATE
+  TO authenticated
+  USING (is_admin())
+  WITH CHECK (is_admin());
 
 
 -- ============================================================
@@ -550,140 +588,25 @@ $$;
 -- Run this ONCE in the Supabase SQL Editor.
 -- ============================================================
 
-DO $$
-DECLARE
-  v_high_admin_id UUID;
-  v_low_admin_id  UUID;
-BEGIN
+-- SECURITY NOTE (F-011 / CWE-798):
+-- Do NOT insert fixed passwords into auth.users.
+-- 1. Create the admin user accounts in Supabase Dashboard:
+--    Dashboard -> Authentication -> Users -> "Add User" (or "Invite User").
+-- 2. Run the script below to link existing auth accounts to admin_profiles:
 
-  -- ── High Admin ──────────────────────────────────────────
-  -- Check if the user already exists
-  SELECT id INTO v_high_admin_id
-  FROM auth.users
-  WHERE email = 'pradeepselvi126@gmail.com';
+-- Assign High Admin Role
+INSERT INTO public.admin_profiles (id, email, role)
+SELECT id, email, 'high'
+FROM auth.users
+WHERE email = 'pradeepselvi126@gmail.com'
+ON CONFLICT (id) DO UPDATE SET role = 'high', updated_at = NOW();
 
-  IF v_high_admin_id IS NULL THEN
-    -- Create user via Supabase internal helper
-    v_high_admin_id := gen_random_uuid();
-
-    INSERT INTO auth.users (
-      id,
-      instance_id,
-      email,
-      encrypted_password,
-      email_confirmed_at,
-      raw_app_meta_data,
-      raw_user_meta_data,
-      role,
-      aud,
-      created_at,
-      updated_at
-    ) VALUES (
-      v_high_admin_id,
-      '00000000-0000-0000-0000-000000000000',
-      'pradeepselvi126@gmail.com',
-      crypt('PRk@123456', gen_salt('bf')),
-      NOW(),
-      '{"provider":"email","providers":["email"]}'::jsonb,
-      '{"full_name":"Pradeep Selvi","role":"high_admin"}'::jsonb,
-      'authenticated',
-      'authenticated',
-      NOW(),
-      NOW()
-    );
-
-    -- Create identity record (required for email login)
-    INSERT INTO auth.identities (
-      id,
-      provider_id,
-      user_id,
-      identity_data,
-      provider,
-      last_sign_in_at,
-      created_at,
-      updated_at
-    ) VALUES (
-      gen_random_uuid(),
-      v_high_admin_id::TEXT,
-      v_high_admin_id,
-      jsonb_build_object('sub', v_high_admin_id::TEXT, 'email', 'pradeepselvi126@gmail.com'),
-      'email',
-      NOW(),
-      NOW(),
-      NOW()
-    );
-  END IF;
-
-  -- Assign high admin role
-  INSERT INTO admin_profiles (id, email, role)
-  VALUES (v_high_admin_id, 'pradeepselvi126@gmail.com', 'high')
-  ON CONFLICT (id) DO UPDATE
-    SET role = 'high', updated_at = NOW();
-
-
-  -- ── Low Admin ───────────────────────────────────────────
-  SELECT id INTO v_low_admin_id
-  FROM auth.users
-  WHERE email = 'idnumberselect@gmail.com';
-
-  IF v_low_admin_id IS NULL THEN
-    v_low_admin_id := gen_random_uuid();
-
-    INSERT INTO auth.users (
-      id,
-      instance_id,
-      email,
-      encrypted_password,
-      email_confirmed_at,
-      raw_app_meta_data,
-      raw_user_meta_data,
-      role,
-      aud,
-      created_at,
-      updated_at
-    ) VALUES (
-      v_low_admin_id,
-      '00000000-0000-0000-0000-000000000000',
-      'idnumberselect@gmail.com',
-      crypt('IDn@123456', gen_salt('bf')),
-      NOW(),
-      '{"provider":"email","providers":["email"]}'::jsonb,
-      '{"full_name":"ID Number Select","role":"low_admin"}'::jsonb,
-      'authenticated',
-      'authenticated',
-      NOW(),
-      NOW()
-    );
-
-    INSERT INTO auth.identities (
-      id,
-      provider_id,
-      user_id,
-      identity_data,
-      provider,
-      last_sign_in_at,
-      created_at,
-      updated_at
-    ) VALUES (
-      gen_random_uuid(),
-      v_low_admin_id::TEXT,
-      v_low_admin_id,
-      jsonb_build_object('sub', v_low_admin_id::TEXT, 'email', 'idnumberselect@gmail.com'),
-      'email',
-      NOW(),
-      NOW(),
-      NOW()
-    );
-  END IF;
-
-  -- Assign low admin role
-  INSERT INTO admin_profiles (id, email, role)
-  VALUES (v_low_admin_id, 'idnumberselect@gmail.com', 'low')
-  ON CONFLICT (id) DO UPDATE
-    SET role = 'low', updated_at = NOW();
-
-END;
-$$;
+-- Assign Low Admin Role
+INSERT INTO public.admin_profiles (id, email, role)
+SELECT id, email, 'low'
+FROM auth.users
+WHERE email = 'idnumberselect@gmail.com'
+ON CONFLICT (id) DO UPDATE SET role = 'low', updated_at = NOW();
 
 
 -- ============================================================

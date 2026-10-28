@@ -242,7 +242,16 @@ export default function InquiryDetailClient({ inquiry, isHigh }: { inquiry: any;
             <div className="space-y-1">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">PRD Document (Uploaded)</label>
               <a
-                href={inquiry.prd_file_url}
+                href={(() => {
+                  const url = inquiry.prd_file_url
+                  if (!url) return '#'
+                  if (url.startsWith('/api/inquiries/download/')) return url
+                  let path = url
+                  if (url.includes('inquiry-documents/')) {
+                    path = url.split('inquiry-documents/').pop() || url
+                  }
+                  return `/api/inquiries/download/${encodeURIComponent(path.replace(/^\/+/, ''))}`
+                })()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 bg-primary/10 border border-primary/20 rounded-xl p-3 transition-all hover:bg-primary/20"

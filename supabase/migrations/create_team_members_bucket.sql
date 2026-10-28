@@ -30,18 +30,15 @@ ON storage.objects FOR SELECT
 TO public
 USING (bucket_id = 'team-members');
 
--- 4. Policy: Allow authenticated users / admins to upload team member photos
+-- 4. Policy: Only admins can upload team member photos (F-013 / CWE-863)
 CREATE POLICY "Admins can upload team member images"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
   bucket_id = 'team-members'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 );
 
@@ -52,18 +49,15 @@ TO authenticated
 USING (bucket_id = 'team-members')
 WITH CHECK (bucket_id = 'team-members');
 
--- 6. Policy: Allow authenticated users / admins to delete team member photos
+-- 6. Policy: Only admins can delete team member photos (F-013 / CWE-863)
 CREATE POLICY "Admins can delete team member images"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (
   bucket_id = 'team-members'
-  AND (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-    OR auth.role() = 'authenticated'
+  AND EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE admin_profiles.id = auth.uid()
   )
 );
 

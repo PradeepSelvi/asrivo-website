@@ -5,8 +5,25 @@ import { z } from 'zod'
  * Helps prevent injection attacks and invalid data
  */
 
-// Email validation
-export const emailSchema = z.string().email().min(5).max(255)
+// Safe linear-time email validation (CWE-1333 ReDoS mitigation)
+// RFC 5321 max length is 254 chars. Disjoint token classes prevent catastrophic backtracking.
+export const SAFE_EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
+
+export function isValidEmail(email: unknown): email is string {
+  if (typeof email !== 'string') return false
+  const trimmed = email.trim()
+  if (trimmed.length < 5 || trimmed.length > 254) return false
+  return SAFE_EMAIL_REGEX.test(trimmed)
+}
+
+// Email validation schema: bounds length first so oversized inputs never touch regex
+export const emailSchema = z
+  .string({ required_error: 'Email is required' })
+  .trim()
+  .min(5, 'Email must be at least 5 characters')
+  .max(254, 'Email must not exceed 254 characters')
+  .regex(SAFE_EMAIL_REGEX, 'Invalid email address format')
 
 // Contact form
 export const contactFormSchema = z.object({

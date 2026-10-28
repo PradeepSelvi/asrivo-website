@@ -60,8 +60,9 @@ BEGIN
     END IF;
 END $$;
 
--- Disable RLS
-ALTER TABLE projects DISABLE ROW LEVEL SECURITY;
+-- RLS is intentionally left enabled.
+-- Public SELECT and admin-only write policies are in enable_projects_rls.sql.
+-- Do NOT add DISABLE ROW LEVEL SECURITY here.
 
 -- Enable realtime
 DO $$

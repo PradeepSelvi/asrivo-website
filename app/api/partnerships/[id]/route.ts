@@ -84,3 +84,39 @@ export async function GET(
     )
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    // Admin-only: check admin_profiles membership
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
+
+    const { id } = await context.params
+    const supabase = createApiClient({ useServiceRole: true })
+
+    const { error } = await supabase
+      .from('partnerships')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Database error deleting partnership:', error.message)
+      return NextResponse.json(
+        { error: 'Failed to delete partnership' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ success: true, message: 'Partnership deleted successfully' })
+  } catch (error) {
+    console.error('Server error in DELETE /api/partnerships/[id]:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+

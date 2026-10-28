@@ -105,8 +105,8 @@ export function apiHandler<T = any>(
           const { data: adminProfile } = await supabase
             .from('admin_profiles')
             .select('role')
-            .eq('user_id', user.id)
-            .single()
+            .eq('id', user.id)
+            .maybeSingle()
 
           if (!adminProfile) {
             return NextResponse.json(

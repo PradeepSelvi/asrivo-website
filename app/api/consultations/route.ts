@@ -26,8 +26,9 @@ export async function POST(request: NextRequest) {
     email = validatedData.email
     const { phone, whatsapp, availability, preferredMode, message } = validatedData
 
-    // Use anon client for public submissions
-    const supabase = createApiClient()
+    // Use service-role client so RLS doesn't block public form submissions.
+    // All validation and rate-limiting have already run above.
+    const supabase = createApiClient({ useServiceRole: true })
 
     // Insert consultation request
     const { data, error } = await supabase

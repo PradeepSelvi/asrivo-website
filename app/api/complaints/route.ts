@@ -10,10 +10,36 @@ import { apiSuccess, apiError } from '@/lib/types/api'
 import { HTTP_STATUS } from '@/lib/constants'
 import { logError } from '@/lib/utils/error-handler'
 
-// GET - Fetch all complaints (for admin)
+// GET - Fetch all complaints (admin only)
 export async function GET(request: NextRequest) {
   try {
+    // ── 1. Require authentication ──────────────────────────────────────────────
+    const supabaseAuth = await createServerClient()
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        apiError('Authentication required', 'UNAUTHORIZED'),
+        { status: HTTP_STATUS.UNAUTHORIZED }
+      )
+    }
+
+    // ── 2. Require admin role ──────────────────────────────────────────────────
     const supabase = createApiClient({ useServiceRole: true })
+    const { data: adminProfile } = await supabase
+      .from('admin_profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (!adminProfile) {
+      return NextResponse.json(
+        apiError('Forbidden: admin access required', 'FORBIDDEN'),
+        { status: HTTP_STATUS.FORBIDDEN }
+      )
+    }
+
+    // ── 3. Fetch complaints ────────────────────────────────────────────────────
     const searchParams = request.nextUrl.searchParams
     const status = searchParams.get('status')
     const limit = parseInt(searchParams.get('limit') || '100')
@@ -32,17 +58,17 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
+        apiError(error.message, 'DATABASE_ERROR'),
+        { status: HTTP_STATUS.BAD_REQUEST }
       )
     }
 
-    return NextResponse.json({ success: true, count: data?.length || 0, data })
+    return NextResponse.json(apiSuccess(data, undefined, { total: data?.length || 0 }))
 
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      apiError(error.message || 'Internal server error', 'INTERNAL_SERVER_ERROR'),
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     )
   }
 }
@@ -69,6 +95,22 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
+    // F-016 / CWE-1333: Bound email length and verify string type before schema validation
+    if (body?.email !== undefined) {
+      if (typeof body.email !== 'string') {
+        return NextResponse.json(
+          apiError('Email must be a string', 'VALIDATION_ERROR'),
+          { status: HTTP_STATUS.BAD_REQUEST }
+        )
+      }
+      if (body.email.length > 254) {
+        return NextResponse.json(
+          apiError('Email cannot exceed 254 characters', 'VALIDATION_ERROR'),
+          { status: HTTP_STATUS.BAD_REQUEST }
+        )
+      }
+    }
+
     // ✅ Zod Validation
     const validatedData = complaintSchema.parse(body)
     

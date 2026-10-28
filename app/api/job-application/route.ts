@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -25,7 +26,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    // Use service-role client so RLS doesn't block anonymous applicants.
+    const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase
       .from('job_applications')

@@ -101,7 +101,8 @@ export default function ComplaintDetailClient({
 
   const getProofDocumentUrl = () => {
     if (!complaint.proof_document_url) return null
-    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/proof%20of%20complain/${complaint.proof_document_url}`
+    const filename = complaint.proof_document_url.split('/').pop() || complaint.proof_document_url
+    return `/api/complaints/download/${encodeURIComponent(filename)}`
   }
 
   const getPriorityColor = (priority: string) => {

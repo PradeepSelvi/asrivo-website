@@ -111,14 +111,40 @@ export const forgotPasswordRateLimit = new RateLimiter({
   uniqueTokenPerInterval: 5,  // 5 requests per hour
 })
 
+function isValidIp(ip: string): boolean {
+  if (!ip || typeof ip !== 'string' || ip.length > 45) return false
+  const ipv4Regex = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/
+  const ipv6Regex = /^[a-fA-F0-9:]+$/
+  return ipv4Regex.test(ip.trim()) || ipv6Regex.test(ip.trim())
+}
+
 /**
- * Get client identifier from request
+ * Safely extracts client IP address.
+ * Prioritizes trusted infrastructure headers and validates IP syntax (CWE-307).
  */
 export function getClientIdentifier(request: Request): string {
-  // Try to get IP from various headers (depending on deployment platform)
+  // 1. Cloudflare connecting IP (set by Cloudflare edge proxy)
+  const cfIp = request.headers.get('cf-connecting-ip')
+  if (cfIp && isValidIp(cfIp)) {
+    return cfIp.trim()
+  }
+
+  // 2. Vercel / reverse-proxy real IP header
+  const vercelIp = request.headers.get('x-vercel-ip') || request.headers.get('x-real-ip')
+  if (vercelIp && isValidIp(vercelIp)) {
+    return vercelIp.trim()
+  }
+
+  // 3. X-Forwarded-For: validate IP format to prevent spoofed/injected tokens
   const forwarded = request.headers.get('x-forwarded-for')
-  const realIp = request.headers.get('x-real-ip')
-  const ip = forwarded?.split(',')[0] || realIp || 'unknown'
-  
-  return ip
+  if (forwarded) {
+    const candidates = forwarded.split(',').map((s) => s.trim()).filter(Boolean)
+    for (const candidate of candidates) {
+      if (isValidIp(candidate)) {
+        return candidate
+      }
+    }
+  }
+
+  return '127.0.0.1'
 }

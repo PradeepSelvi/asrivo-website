@@ -23,18 +23,31 @@ export function UserProfileMenu() {
   useEffect(() => {
     const supabase = createClient()
     
+    // Helper to fetch profile with fallback
+    const fetchProfile = async (userId: string) => {
+      let { data } = await supabase
+        .from('user_profiles')
+        .select('avatar_url, full_name')
+        .eq('id', userId)
+        .maybeSingle()
+
+      if (!data) {
+        const { data: fallbackData } = await supabase
+          .from('profiles')
+          .select('avatar_url, full_name')
+          .eq('id', userId)
+          .maybeSingle()
+        data = fallbackData
+      }
+      return data
+    }
+
     // Get initial session and profile
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
       
       if (session?.user) {
-        // Fetch profile data from user_profiles table
-        const { data: profileData } = await supabase
-          .from('user_profiles')
-          .select('avatar_url, full_name')
-          .eq('id', session.user.id)
-          .single()
-        
+        const profileData = await fetchProfile(session.user.id)
         setProfile(profileData)
       }
       
@@ -48,13 +61,7 @@ export function UserProfileMenu() {
       setUser(session?.user ?? null)
       
       if (session?.user) {
-        // Fetch updated profile data
-        const { data: profileData } = await supabase
-          .from('user_profiles')
-          .select('avatar_url, full_name')
-          .eq('id', session.user.id)
-          .single()
-        
+        const profileData = await fetchProfile(session.user.id)
         setProfile(profileData)
       } else {
         setProfile(null)

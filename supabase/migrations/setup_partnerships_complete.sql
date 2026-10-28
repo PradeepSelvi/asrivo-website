@@ -35,11 +35,65 @@ BEGIN
   END IF;
 END $$;
 
--- Step 3: Disable RLS (for public submissions)
-ALTER TABLE partnerships DISABLE ROW LEVEL SECURITY;
+-- Step 3: Enable RLS and configure secure policies (Finding F-030 / CWE-863)
+ALTER TABLE partnerships ENABLE ROW LEVEL SECURITY;
 
--- Step 4: Enable Realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE partnerships;
+DROP POLICY IF EXISTS "Allow public insert" ON partnerships;
+DROP POLICY IF EXISTS "Allow authenticated read" ON partnerships;
+DROP POLICY IF EXISTS "Allow authenticated update" ON partnerships;
+DROP POLICY IF EXISTS "Allow authenticated delete" ON partnerships;
+DROP POLICY IF EXISTS "Allow admins and owners to read partnerships" ON partnerships;
+DROP POLICY IF EXISTS "Allow admins to update partnerships" ON partnerships;
+DROP POLICY IF EXISTS "Allow admins to delete partnerships" ON partnerships;
+
+CREATE POLICY "Allow public insert" ON partnerships
+  FOR INSERT
+  TO public
+  WITH CHECK (true);
+
+CREATE POLICY "Allow admins and owners to read partnerships" ON partnerships
+  FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+    OR (
+      email = (auth.jwt() ->> 'email')
+    )
+  );
+
+CREATE POLICY "Allow admins to update partnerships" ON partnerships
+  FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Allow admins to delete partnerships" ON partnerships
+  FOR DELETE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
+
+-- Step 4: Enable Realtime (idempotent)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND tablename = 'partnerships'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE partnerships;
+    END IF;
+END $$;
 
 -- Step 5: Create storage bucket (private)
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -66,13 +120,25 @@ DROP POLICY IF EXISTS "Admins can read partnership documents" ON storage.objects
 CREATE POLICY "Admins can read partnership documents"
 ON storage.objects FOR SELECT
 TO authenticated
-USING (bucket_id = 'partnership-documents');
+USING (
+  bucket_id = 'partnership-documents' AND
+  EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE admin_profiles.id = auth.uid()
+  )
+);
 
 DROP POLICY IF EXISTS "Admins can delete partnership documents" ON storage.objects;
 CREATE POLICY "Admins can delete partnership documents"
 ON storage.objects FOR DELETE
 TO authenticated
-USING (bucket_id = 'partnership-documents');
+USING (
+  bucket_id = 'partnership-documents' AND
+  EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE admin_profiles.id = auth.uid()
+  )
+);
 
 -- Step 7: Create updated_at trigger
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -104,7 +170,7 @@ SELECT 'Bucket exists' as check_type, EXISTS (
   SELECT FROM storage.buckets WHERE id = 'partnership-documents'
 ) as result
 UNION ALL
-SELECT 'RLS disabled' as check_type, NOT EXISTS (
+SELECT 'RLS enabled' as check_type, EXISTS (
   SELECT FROM pg_tables 
   WHERE tablename = 'partnerships' AND rowsecurity = true
 ) as result;

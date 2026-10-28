@@ -34,9 +34,10 @@ CREATE POLICY "Anyone can view active content"
   ON public.page_content FOR SELECT
   USING (is_active = true);
 
-CREATE POLICY "Authenticated users can manage content"
+CREATE POLICY "Admins can manage content"
   ON public.page_content FOR ALL TO authenticated
-  USING (true) WITH CHECK (true);
+  USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.admin_profiles WHERE admin_profiles.id = auth.uid()));
 
 -- Trigger for updated_at
 CREATE OR REPLACE FUNCTION update_page_content_updated_at()

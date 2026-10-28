@@ -284,7 +284,7 @@ export default function AdminComplaintsPage() {
                     <div>
                       {complaint.proof_document_url ? (
                         <a
-                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/proof%20of%20complain/${complaint.proof_document_url}`}
+                          href={`/api/complaints/download/${encodeURIComponent(complaint.proof_document_url.split('/').pop() || complaint.proof_document_url)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-primary hover:underline flex items-center gap-1"
@@ -397,7 +397,7 @@ export default function AdminComplaintsPage() {
                     <div className="flex items-center gap-2 pt-2">
                       {complaint.proof_document_url && (
                         <a
-                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/proof%20of%20complain/${complaint.proof_document_url}`}
+                          href={`/api/complaints/download/${encodeURIComponent(complaint.proof_document_url.split('/').pop() || complaint.proof_document_url)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-all"

@@ -18,26 +18,58 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
 -- Enable Row Level Security
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 
+-- Helper function to verify high-admin role (non-recursive, SECURITY DEFINER)
+CREATE OR REPLACE FUNCTION public.is_high_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.admin_profiles
+    WHERE id = auth.uid()
+      AND role = 'high'
+  );
+$$;
+
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Allow public read access" ON public.site_settings;
 DROP POLICY IF EXISTS "Allow admins to manage settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow public read access to site settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow authenticated admins to modify settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow high admins to insert settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow high admins to update settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow high admins to delete settings" ON public.site_settings;
 
 -- Policy 1: Public read access
 CREATE POLICY "Allow public read access" 
   ON public.site_settings
   FOR SELECT 
+  TO public
   USING (true);
 
--- Policy 2: Admin write access
-CREATE POLICY "Allow admins to manage settings" 
+-- Policy 2: High admin INSERT
+CREATE POLICY "Allow high admins to insert settings"
   ON public.site_settings
-  FOR ALL 
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.admin_profiles
-      WHERE admin_profiles.id = auth.uid()
-    )
-  );
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_high_admin());
+
+-- Policy 3: High admin UPDATE
+CREATE POLICY "Allow high admins to update settings"
+  ON public.site_settings
+  FOR UPDATE
+  TO authenticated
+  USING (public.is_high_admin())
+  WITH CHECK (public.is_high_admin());
+
+-- Policy 4: High admin DELETE
+CREATE POLICY "Allow high admins to delete settings"
+  ON public.site_settings
+  FOR DELETE
+  TO authenticated
+  USING (public.is_high_admin());
 
 -- Create index for performance
 CREATE INDEX IF NOT EXISTS idx_site_settings_category_key 

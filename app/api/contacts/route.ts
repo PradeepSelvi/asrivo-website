@@ -2,6 +2,7 @@ import { createApiClient } from '@/lib/supabase/api-client'
 import { requireAdmin } from '@/lib/api/auth-middleware'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/mail'
+import { escapeHtml, escapeHtmlWithLineBreaks, sanitizeHeader } from '@/lib/utils/html-escape'
 import { verifyCaptcha } from '@/lib/utils/captcha'
 import { handleApiError, logError } from '@/lib/utils/error-handler'
 import { apiSuccess, apiError } from '@/lib/types/api'
@@ -113,22 +114,45 @@ export async function POST(request: NextRequest) {
       // Don't fail the whole operation if notification fails
     }
 
-    // 📧 Send email notification to Admin
+    // 📧 Send email notification to Admin (Finding F-020 / CWE-116: HTML-encode all user input)
     const adminEmail = process.env.ADMIN_EMAIL || process.env.GMAIL_USER
     if (adminEmail) {
+      const safeName = escapeHtml(name)
+      const safeEmail = escapeHtml(email)
+      const safeCompany = company ? escapeHtml(company) : 'N/A'
+      const safeSubject = subject ? escapeHtml(subject) : 'No Subject'
+      const safeMessage = escapeHtmlWithLineBreaks(message)
+      const emailSubject = `New Contact Form Message: ${sanitizeHeader(subject, 'No Subject')}`
+
+      const plainTextMessage = [
+        'New Contact Message Received',
+        '----------------------------',
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Company: ${company || 'N/A'}`,
+        `Subject: ${subject || 'N/A'}`,
+        '',
+        'Message:',
+        message,
+        '',
+        '----------------------------',
+        'This is an automated notification from Asrivo Tech Website.'
+      ].join('\n')
+
       await sendEmail({
         to: adminEmail,
-        subject: `New Contact Form Message: ${subject || 'No Subject'}`,
+        subject: emailSubject,
+        text: plainTextMessage,
         html: `
           <div style="font-family: sans-serif; padding: 20px; color: #333;">
             <h2 style="color: #1FA2E1;">New Contact Message Received</h2>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Company:</strong> ${company || 'N/A'}</p>
-            <p><strong>Subject:</strong> ${subject || 'N/A'}</p>
+            <p><strong>Name:</strong> ${safeName}</p>
+            <p><strong>Email:</strong> ${safeEmail}</p>
+            <p><strong>Company:</strong> ${safeCompany}</p>
+            <p><strong>Subject:</strong> ${safeSubject}</p>
             <p><strong>Message:</strong></p>
             <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #1FA2E1;">
-              ${message.replace(/\n/g, '<br/>')}
+              ${safeMessage}
             </div>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
             <p style="font-size: 12px; color: #999;">This is an automated notification from Asrivo Tech Website.</p>
