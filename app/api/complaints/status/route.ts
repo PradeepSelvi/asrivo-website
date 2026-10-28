@@ -1,5 +1,5 @@
 import { createApiClient } from '@/lib/supabase/api-client'
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET - Fetch complaints by email (authenticated users only, own complaints)
