@@ -88,7 +88,6 @@ function ApplyContent() {
         throw new Error(errorMsg)
       }
 
-      console.log('Success:', result)
       setSubmitted(true)
     } catch (error) {
       console.error('Error submitting form:', error)

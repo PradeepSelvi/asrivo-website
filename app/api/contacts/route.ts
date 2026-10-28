@@ -1,4 +1,5 @@
 import { createApiClient } from '@/lib/supabase/api-client'
+import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/mail'
 import { verifyCaptcha } from '@/lib/utils/captcha'
@@ -10,9 +11,20 @@ import { contactFormRateLimit } from '@/lib/utils/rate-limit'
 import { contactFormSchema } from '@/lib/utils/validation'
 import { ZodError } from 'zod'
 
-// 👉 GET (optional - to fetch contacts)
+// 👉 GET — Admin only: fetch all contact submissions
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication (admin use)
+    const supabaseAuth = await createServerClient()
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        apiError('Authentication required', 'UNAUTHORIZED'),
+        { status: HTTP_STATUS.UNAUTHORIZED }
+      )
+    }
+
     const supabase = createApiClient({ useServiceRole: true })
 
     const { data, error } = await supabase

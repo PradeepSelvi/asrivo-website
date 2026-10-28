@@ -169,7 +169,6 @@ export default function ContactPageClient({ content }: ContactPageProps) {
       throw new Error(errorMsg);
     }
 
-    console.log('Success:', result);
     setSubmitted(true);
 
   } catch (error) {
