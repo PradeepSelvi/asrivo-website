@@ -45,6 +45,7 @@ function isValidUrl(urlStr: string): boolean {
  */
 function sanitizeText(value: unknown, maxLength: number): string | null {
   if (typeof value !== 'string') return null
+  // eslint-disable-next-line no-control-regex
   const cleaned = value.replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, '').trim()
   return cleaned.slice(0, maxLength)
 }
@@ -247,11 +248,13 @@ export async function ensureUserProfile(): Promise<{
     }
 
     // Check if profile exists
-    let { data: existingProfile, error } = await supabase
+    const { data: initialProfile, error } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('id', user.id)
       .maybeSingle()
+
+    let existingProfile = initialProfile
 
     if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
       const fallback = await supabase

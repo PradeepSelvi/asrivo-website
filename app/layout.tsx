@@ -1,9 +1,15 @@
 import React from "react"
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import { ConditionalLayout } from '@/components/conditional-layout'
 import { AuthRecoveryInterceptor } from '@/components/auth-recovery-interceptor'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Asrivo Tech - Building Tomorrow\'s Digital Solutions',
@@ -43,15 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-sans antialiased">
+      <body className={`${inter.className} antialiased`}>
         <AuthRecoveryInterceptor />
         <ConditionalLayout>{children}</ConditionalLayout>
         <Analytics />
