@@ -33,34 +33,30 @@ function LoginContent() {
     }
 
     try {
-      const supabase = createClient()
-      
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Route through the API to enforce account/IP lockout (CWE-307)
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (authError) {
-        // Handle specific error messages
-        if (authError.message.includes('Email not confirmed')) {
+      const data = await res.json()
+
+      if (!res.ok) {
+        if (data.error === 'EMAIL_NOT_CONFIRMED') {
           setErrorMsg('Please check your email and click the confirmation link before logging in.')
           setShowResendLink(true)
-        } else if (authError.message.includes('Invalid login credentials')) {
-          setErrorMsg('Invalid email or password.')
-          setShowResendLink(false)
         } else {
-          setErrorMsg(authError.message)
+          setErrorMsg(data.error || 'Invalid email or password.')
           setShowResendLink(false)
         }
         setLoading(false)
         return
       }
 
-      if (!authData.user) {
-        setErrorMsg('Invalid email or password.')
-        setLoading(false)
-        return
-      }
+      // The API route sets session cookies; refresh the Supabase client to pick them up
+      const supabase = createClient()
+      await supabase.auth.getSession()
 
       // Success - redirect to original destination or home
       router.push(redirectTo)

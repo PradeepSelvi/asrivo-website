@@ -128,14 +128,14 @@ export default function NotificationBell() {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 z-30" 
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]" 
             onClick={() => setIsOpen(false)}
           />
           
           {/* Dropdown Panel */}
-          <div className="fixed right-4 mt-2 w-[calc(100vw-2rem)] sm:w-96 sm:absolute sm:right-0 bg-card border border-border rounded-xl shadow-2xl z-40 max-h-[600px] flex flex-col">
+          <div className="fixed top-16 right-4 sm:top-auto sm:right-0 sm:absolute mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-white dark:bg-card border border-border rounded-xl shadow-2xl z-50 max-h-[600px] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
+            <div className="flex items-center justify-between p-4 border-b border-border shrink-0 bg-white dark:bg-card">
               <div>
                 <h3 className="font-semibold text-foreground">Notifications</h3>
                 <p className="text-xs text-muted-foreground">
@@ -162,7 +162,7 @@ export default function NotificationBell() {
             </div>
 
             {/* Notifications List */}
-            <div className="overflow-y-auto flex-1">
+            <div className="overflow-y-auto flex-1 bg-white dark:bg-card">
               {loading ? (
                 <div className="p-8 text-center text-muted-foreground">
                   <div className="inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2" />
@@ -218,7 +218,7 @@ export default function NotificationBell() {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-border text-center shrink-0">
+              <div className="p-3 border-t border-border text-center shrink-0 bg-white dark:bg-card">
                 <Link
                   href="/admin/notifications"
                   onClick={() => setIsOpen(false)}

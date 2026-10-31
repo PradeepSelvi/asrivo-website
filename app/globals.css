@@ -342,6 +342,9 @@
 .animate-scroll-testimonials {
   animation: scroll-testimonials 60s linear infinite;
   will-change: transform;
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
 }
 
 

@@ -5,6 +5,7 @@ import AdminSidebar from './admin-sidebar'
 import NotificationBell from '@/components/admin/notification-bell'
 import AutoLogout from '@/components/admin/auto-logout'
 import { SessionRefresh } from '@/components/admin/session-refresh'
+import { AdminMobileBackButton } from '@/components/admin/admin-mobile-back-button'
 import { Menu } from 'lucide-react'
 
 interface AdminLayoutClientProps {
@@ -28,7 +29,7 @@ export default function AdminLayoutClient({ children, user, isHigh }: AdminLayou
       <SessionRefresh />
       
       {/* Single Top Header - spans full width */}
-      <header className="h-16 border-b border-border bg-card/50 backdrop-blur-md flex items-center shrink-0 z-40">
+      <header className="h-16 border-b border-border bg-card shadow-sm flex items-center shrink-0 z-40">
         {/* Mobile menu button */}
         <button
           onClick={() => setIsMobileMenuOpen(true)}
@@ -37,6 +38,11 @@ export default function AdminLayoutClient({ children, user, isHigh }: AdminLayou
         >
           <Menu className="w-5 h-5" />
         </button>
+
+        {/* Mobile Back / Dashboard buttons in header */}
+        <div className="lg:hidden ml-2 flex items-center">
+          <AdminMobileBackButton />
+        </div>
         
         {/* Desktop: Logo section matching sidebar width */}
         <div className="hidden lg:flex items-center gap-3 w-72 px-5 border-r border-border shrink-0">

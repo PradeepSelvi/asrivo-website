@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { uploadRateLimit } from '@/lib/utils/rate-limit'
 import { randomBytes } from 'crypto'
@@ -27,6 +28,17 @@ export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, uploadRateLimit)
   if (limited) return limited
 
+  // Require user authentication (CWE-863: bind upload to authenticated owner)
+  const supabaseAuth = await createServerClient()
+  const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+  if (authError || !user) {
+    return NextResponse.json(
+      { success: false, error: 'Authentication required to upload complaint evidence.' },
+      { status: 401 }
+    )
+  }
+
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null
@@ -46,18 +58,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return NextResponse.json({ success: false, error: 'Server configuration error.' }, { status: 500 })
-    }
+    const supabase = createApiClient({ useServiceRole: true })
 
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    )
-
-    // Safe filename — never trust client-supplied filename
+    // Safe filename immutably bound to authenticated user's ID
     const ext = EXT_MAP[file.type] ?? 'bin'
-    const safeName = `proof_${Date.now()}_${randomBytes(6).toString('hex')}.${ext}`
+    const safeName = `proof_${user.id}_${Date.now()}_${randomBytes(6).toString('hex')}.${ext}`
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)

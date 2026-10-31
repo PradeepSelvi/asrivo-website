@@ -1,4 +1,5 @@
 import { createApiClient } from '@/lib/supabase/api-client'
+import { requireAdmin } from '@/lib/api/auth-middleware'
 import { NextRequest, NextResponse } from 'next/server'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { formSubmitRateLimit } from '@/lib/utils/rate-limit'
@@ -9,9 +10,12 @@ import { apiSuccess, apiError } from '@/lib/types/api'
 import { HTTP_STATUS } from '@/lib/constants'
 import { logError } from '@/lib/utils/error-handler'
 
-// GET - Fetch all job applications (for admin)
+// GET - Fetch all job applications (Admin only - Finding F-002 / CWE-862)
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
+
     const supabase = createApiClient({ useServiceRole: true })
     const searchParams = request.nextUrl.searchParams
     const status = searchParams.get('status')
@@ -153,9 +157,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH - Update job application status (for admin)
+// PATCH - Update job application status (Admin only)
 export async function PATCH(request: NextRequest) {
   try {
+    const auth = await requireAdmin(request)
+    if (auth.error) return auth.error
+
     const body = await request.json()
     const { id, status } = body
 

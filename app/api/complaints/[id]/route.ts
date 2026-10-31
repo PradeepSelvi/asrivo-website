@@ -1,6 +1,9 @@
 import { createApiClient } from '@/lib/supabase/api-client'
 import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 
 // Allowed workflow values (prevent injection of arbitrary field values)
 const ALLOWED_STATUSES = ['new', 'in_progress', 'resolved', 'closed', 'rejected'] as const
@@ -10,46 +13,68 @@ type ComplaintStatus = typeof ALLOWED_STATUSES[number]
 type ComplaintPriority = typeof ALLOWED_PRIORITIES[number]
 
 // GET - Fetch single complaint by ID
-// Authorization: owner (email match) OR any admin.
+// Authorization: verified admin OR verified complaint owner (authenticated session).
+// Mitigates CWE-862 / CWE-807: Enforces authorization decision BEFORE reading complaint records.
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 1. Require authentication
-    const adminResult = await getCurrentAdmin()
-    const supabase = createApiClient({ useServiceRole: true })
-
-    // 2. Fetch the complaint
     const { id } = await params
 
-    const { data, error } = await supabase
-      .from('complaints')
-      .select('*')
-      .eq('id', id)
-      .single()
+    if (!id || typeof id !== 'string') {
+      return NextResponse.json({ error: 'Valid complaint ID is required' }, { status: 400 })
+    }
 
-    if (error || !data) {
+    // 1. Require verified authentication upfront before querying complaint data
+    const supabaseAuth = await createServerClient()
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user) {
       return NextResponse.json(
-        { error: 'Complaint not found' },
-        { status: 404 }
+        { error: 'Unauthorized: Authentication required to view complaint details' },
+        { status: 401 }
       )
     }
 
-    // 3. Authorization: verified admin OR complaint owner (email match)
-    const isAdmin = adminResult.success && adminResult.user
-    const isOwner = request.headers.get('x-user-email')?.toLowerCase() === data.email?.toLowerCase()
+    // 2. Check if user is an administrator
+    const adminResult = await getCurrentAdmin()
+    const isAdmin = Boolean(adminResult.success && adminResult.user)
 
-    if (!isAdmin && !isOwner) {
+    const supabase = createApiClient({ useServiceRole: true })
+
+    let query = supabase.from('complaints').select('*').eq('id', id)
+
+    // 3. If not an admin, strictly scope query to the caller's verified email address
+    // This ensures no caller can read or probe another person's complaint record
+    if (!isAdmin) {
+      if (!user.email) {
+        return NextResponse.json(
+          { error: 'Forbidden: A verified email address is required to access complaint records' },
+          { status: 403 }
+        )
+      }
+      query = query.eq('email', user.email.toLowerCase())
+    }
+
+    const { data, error } = await query.maybeSingle()
+
+    if (error) {
+      console.error('Error fetching complaint detail:', error)
+      return NextResponse.json({ error: 'Database error fetching complaint' }, { status: 500 })
+    }
+
+    if (!data) {
       return NextResponse.json(
-        { error: 'Forbidden: admin access or complaint ownership required' },
-        { status: 403 }
+        { error: 'Complaint not found or you do not have permission to view it' },
+        { status: 404 }
       )
     }
 
     return NextResponse.json({ success: true, data })
 
   } catch (error: any) {
+    console.error('Complaint detail handler exception:', error)
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }
@@ -64,9 +89,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 1. Require HIGH admin role
-    // Complaint workflow transitions (status, priority changes) are protected
-    // operations that only high administrators may perform.
+    // 1. Require HIGH admin role upfront
     const adminResult = await getCurrentAdmin()
 
     if (!adminResult.success || !adminResult.user) {
@@ -113,7 +136,6 @@ export async function PATCH(
     }
 
     if (Object.keys(updateData).length === 1) {
-      // only updated_at - nothing to actually update
       return NextResponse.json(
         { error: 'No valid fields provided for update' },
         { status: 400 }

@@ -115,8 +115,29 @@ export async function POST(request: NextRequest) {
     const validatedData = complaintSchema.parse(body)
     
     name = validatedData.name
-    email = validatedData.email
+    email = user.email ? user.email.toLowerCase() : validatedData.email.toLowerCase()
+
+    // Enforce email ownership: user cannot file a complaint under someone else's email (CWE-863)
+    if (user.email && validatedData.email.toLowerCase() !== user.email.toLowerCase()) {
+      return NextResponse.json(
+        apiError('You can only submit complaints under your authenticated email address', 'FORBIDDEN'),
+        { status: HTTP_STATUS.FORBIDDEN }
+      )
+    }
+
     const { phone, subject, description, category, priority, proofDocumentUrl, captchaToken } = validatedData
+
+    // Verify evidence attachment ownership (CWE-863):
+    // Submitter can only attach files uploaded by their own authenticated user ID
+    if (proofDocumentUrl) {
+      const cleanProofName = proofDocumentUrl.split('/').pop() || proofDocumentUrl
+      if (cleanProofName.startsWith('proof_') && !cleanProofName.startsWith(`proof_${user.id}_`)) {
+        return NextResponse.json(
+          apiError('Forbidden: You can only attach evidence files uploaded by your own account', 'FORBIDDEN'),
+          { status: HTTP_STATUS.FORBIDDEN }
+        )
+      }
+    }
 
     // CAPTCHA verification (if token provided)
     if (captchaToken) {
