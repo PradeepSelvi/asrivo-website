@@ -8,7 +8,7 @@ const BUCKET_NAME = 'resumes'
 
 // Strict whitelist for server-generated resume file names:
 // e.g. "1730268481234-a1b2c3d4e5f67890.pdf" or standard alphanumeric hyphen/underscore
-const SAFE_RESUME_FILENAME_REGEX = /^[a-zA-Z0-9_\-]+\.pdf$/i
+const SAFE_RESUME_FILENAME_REGEX = /^[a-zA-Z0-9_-]+\.pdf$/i
 
 export async function GET(
   request: NextRequest,

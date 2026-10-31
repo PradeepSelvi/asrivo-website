@@ -14,7 +14,7 @@ const MIME_MAP: Record<string, string> = {
 }
 
 // Strict allowlist for segment characters: alphanumeric, dash, underscore, dot
-const SAFE_SEGMENT_REGEX = /^[a-zA-Z0-9_\-\.]+$/
+const SAFE_SEGMENT_REGEX = /^[a-zA-Z0-9_.-]+$/
 
 export async function GET(
   request: NextRequest,

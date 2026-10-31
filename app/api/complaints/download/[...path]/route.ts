@@ -8,7 +8,7 @@ const BUCKET_NAME = 'proof of complain'
 
 // Strict allowlist: only server-generated complaint evidence filenames are permitted
 // Formats: proof_<userId>_<timestamp>_<hex>.<ext> or legacy proof_<timestamp>_<hex>.<ext>
-const SAFE_PROOF_REGEX = /^proof_[a-zA-Z0-9_\-]+\.(jpg|jpeg|png|webp|pdf)$/i
+const SAFE_PROOF_REGEX = /^proof_[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp|pdf)$/i
 
 export async function GET(
   request: NextRequest,
