@@ -486,7 +486,7 @@ export default function ServiceInquiryPage() {
                   <select
                     value={formData.countryCode}
                     onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                    className="w-32 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="w-28 flex-shrink-0 px-3 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                   >
                     <option value="+91">+91 (IN)</option>
                     <option value="+1">+1 (US)</option>
@@ -497,7 +497,7 @@ export default function ServiceInquiryPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="flex-1 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="flex-1 min-w-0 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                     placeholder="9876543210"
                   />
                 </div>
@@ -511,7 +511,7 @@ export default function ServiceInquiryPage() {
                   <select
                     value={formData.whatsappCountryCode}
                     onChange={(e) => setFormData({ ...formData, whatsappCountryCode: e.target.value })}
-                    className="w-32 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="w-28 flex-shrink-0 px-3 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                   >
                     <option value="+91">+91 (IN)</option>
                     <option value="+1">+1 (US)</option>
@@ -522,7 +522,7 @@ export default function ServiceInquiryPage() {
                     type="tel"
                     value={formData.whatsapp}
                     onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                    className="flex-1 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    className="flex-1 min-w-0 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                     placeholder="9876543210 (optional)"
                   />
                 </div>

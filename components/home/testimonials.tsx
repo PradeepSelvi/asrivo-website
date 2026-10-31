@@ -33,20 +33,19 @@ function TestimonialCardItem({
     .toUpperCase()
 
   return (
-    <div className={fullWidth ? "w-full" : "flex-shrink-0 w-[320px] sm:w-[400px] flex flex-col"}>
-      <div className="group relative rounded-2xl border border-border bg-card p-8 transition-all duration-700 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2 overflow-hidden h-full flex flex-col justify-between">
+    <div 
+      className={fullWidth ? "w-full" : "flex-shrink-0 w-[280px] sm:w-[360px]"} 
+      style={{ isolation: 'isolate', position: 'relative', zIndex: 1 }}
+    >
+      <div className="group relative rounded-2xl border border-border bg-card p-6 sm:p-8 transition-all duration-700 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2 overflow-hidden h-full flex flex-col justify-between" style={{ isolation: 'isolate' }}>
         {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-        {/* Glow effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl opacity-0 group-hover:opacity-100 blur-lg transition-opacity duration-500 -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
 
         <div className="relative z-10 flex-1 flex flex-col justify-between">
           <div>
             {/* Quote icon with animation */}
             <div className="relative">
               <Quote className="h-12 w-12 text-primary/20 transition-all duration-500 group-hover:text-primary/40 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
 
             {/* Rating stars */}
@@ -68,7 +67,6 @@ function TestimonialCardItem({
           <div className="mt-8 flex items-center gap-4">
             {/* Avatar with animated ring */}
             <div className="relative shrink-0">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm scale-110" />
               {testimonial.avatar ? (
                 <img
                   src={testimonial.avatar}
@@ -171,34 +169,33 @@ export function Testimonials({
         </div>
 
         {/* Infinite Auto-Scrolling Carousel with zero seam gap */}
-        <div className="mt-16 relative">
+        <div className="mt-16 relative" style={{ isolation: 'isolate' }}>
           {/* Gradient overlays for fade effect */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-background to-transparent z-20 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-background to-transparent z-20 pointer-events-none" />
 
           <div className="overflow-hidden w-full">
             <div
-              className="flex w-max animate-scroll-testimonials hover:[animation-play-state:paused]"
-              style={{ animationDuration: `${Math.max(45, marqueeItems.length * 5)}s` }}
+              className="flex gap-6 animate-scroll-testimonials hover:[animation-play-state:paused]"
+              style={{ 
+                animationDuration: `${Math.max(45, marqueeItems.length * 5)}s`,
+                isolation: 'isolate'
+              }}
             >
               {/* First set of testimonials */}
-              <div className="flex shrink-0 items-stretch gap-8 pr-8">
-                {marqueeItems.map((testimonial, index) => (
-                  <TestimonialCardItem
-                    key={`set1-${index}-${testimonial.id ?? index}`}
-                    testimonial={testimonial}
-                  />
-                ))}
-              </div>
+              {marqueeItems.map((testimonial, index) => (
+                <TestimonialCardItem
+                  key={`set1-${index}-${testimonial.id ?? index}`}
+                  testimonial={testimonial}
+                />
+              ))}
               {/* Duplicate identical set for seamless 50% loop */}
-              <div className="flex shrink-0 items-stretch gap-8 pr-8" aria-hidden="true">
-                {marqueeItems.map((testimonial, index) => (
-                  <TestimonialCardItem
-                    key={`set2-${index}-${testimonial.id ?? index}`}
-                    testimonial={testimonial}
-                  />
-                ))}
-              </div>
+              {marqueeItems.map((testimonial, index) => (
+                <TestimonialCardItem
+                  key={`set2-${index}-${testimonial.id ?? index}`}
+                  testimonial={testimonial}
+                />
+              ))}
             </div>
           </div>
         </div>

@@ -17,15 +17,25 @@ const MAX_ACCOUNT_ATTEMPTS = 5
 const MAX_IP_ATTEMPTS = 15
 const LOCKOUT_DURATION = 30 * 60 * 1000 // 30 minutes
 
-function checkRateLimit(
+/**
+ * Atomically reserves attempt capacity before asynchronous authentication (CWE-307).
+ * Prevents race conditions where concurrent requests all pass checks simultaneously.
+ */
+function reserveAttempt(
   key: string,
   maxAttempts: number
 ): { allowed: boolean; remainingAttempts: number; lockedUntil: number | null } {
   const now = Date.now()
-  const attempt = loginAttempts.get(key)
+  let attempt = loginAttempts.get(key)
 
   if (!attempt) {
-    return { allowed: true, remainingAttempts: maxAttempts - 1, lockedUntil: null }
+    attempt = { count: 1, lockedUntil: null }
+    loginAttempts.set(key, attempt)
+    return {
+      allowed: true,
+      remainingAttempts: maxAttempts - 1,
+      lockedUntil: null,
+    }
   }
 
   // Check if lockout period is currently active
@@ -39,46 +49,74 @@ function checkRateLimit(
 
   // Reset entry if lockout has expired
   if (attempt.lockedUntil && now >= attempt.lockedUntil) {
-    loginAttempts.delete(key)
-    return { allowed: true, remainingAttempts: maxAttempts - 1, lockedUntil: null }
+    attempt.count = 1
+    attempt.lockedUntil = null
+    return {
+      allowed: true,
+      remainingAttempts: maxAttempts - 1,
+      lockedUntil: null,
+    }
   }
 
-  // Check if max attempts reached
+  // If already at or over max attempts, enforce lockout
   if (attempt.count >= maxAttempts) {
-    const lockedUntil = now + LOCKOUT_DURATION
-    attempt.lockedUntil = lockedUntil
+    if (!attempt.lockedUntil) {
+      attempt.lockedUntil = now + LOCKOUT_DURATION
+    }
     return {
       allowed: false,
       remainingAttempts: 0,
-      lockedUntil,
+      lockedUntil: attempt.lockedUntil,
     }
+  }
+
+  // Atomically increment attempt count (reserving capacity for this in-flight request)
+  attempt.count++
+  if (attempt.count >= maxAttempts) {
+    attempt.lockedUntil = now + LOCKOUT_DURATION
   }
 
   return {
     allowed: true,
-    remainingAttempts: maxAttempts - attempt.count - 1,
+    remainingAttempts: Math.max(0, maxAttempts - attempt.count),
     lockedUntil: null,
   }
 }
 
-function recordFailedAttempt(key: string, maxAttempts: number): void {
+function getAttemptStatus(
+  key: string,
+  maxAttempts: number
+): { remainingAttempts: number; lockedUntil: number | null } {
   const now = Date.now()
   const attempt = loginAttempts.get(key)
-
-  if (!attempt) {
-    loginAttempts.set(key, { count: 1, lockedUntil: null })
-  } else if (attempt.lockedUntil && now >= attempt.lockedUntil) {
-    loginAttempts.set(key, { count: 1, lockedUntil: null })
-  } else {
-    attempt.count++
-    if (attempt.count >= maxAttempts) {
-      attempt.lockedUntil = now + LOCKOUT_DURATION
-    }
+  if (!attempt) return { remainingAttempts: maxAttempts, lockedUntil: null }
+  if (attempt.lockedUntil && now < attempt.lockedUntil) {
+    return { remainingAttempts: 0, lockedUntil: attempt.lockedUntil }
   }
+  return { remainingAttempts: Math.max(0, maxAttempts - attempt.count), lockedUntil: null }
 }
 
-function clearAttempts(key: string): void {
+/**
+ * Safely reconciles attempts on success without allowing an older request to erase a newer lockout.
+ */
+function clearAttemptsOnSuccess(key: string): void {
+  const attempt = loginAttempts.get(key)
+  if (!attempt) return
+  // Never erase an active lockout established by another request
+  if (attempt.lockedUntil && Date.now() < attempt.lockedUntil) {
+    return
+  }
   loginAttempts.delete(key)
+}
+
+/**
+ * Releases reserved attempt count if an unexpected server/network failure aborted before auth
+ */
+function releaseAttemptOnServerError(key: string): void {
+  const attempt = loginAttempts.get(key)
+  if (!attempt) return
+  if (attempt.lockedUntil && Date.now() < attempt.lockedUntil) return
+  if (attempt.count > 0) attempt.count--
 }
 
 // Clean up old expired entries periodically
@@ -92,6 +130,10 @@ setInterval(() => {
 }, 60 * 1000)
 
 export async function POST(request: NextRequest) {
+  let accountKey = ''
+  let clientKey = ''
+  let capacityReserved = false
+
   try {
     const body = await request.json()
     const { email, password } = body
@@ -107,57 +149,54 @@ export async function POST(request: NextRequest) {
     const identifier = getClientIdentifier(request)
 
     // F-025 / CWE-307: Shared atomic account-level key + IP-level key
-    // The accountKey guarantees that changing or spoofing request headers cannot reset the lockout counter.
-    const accountKey = `account:${cleanEmail}`
-    const clientKey = `ip:${identifier}`
+    accountKey = `account:${cleanEmail}`
+    clientKey = `ip:${identifier}`
 
-    // 1. Check account-level lockout first
-    const accountLimit = checkRateLimit(accountKey, MAX_ACCOUNT_ATTEMPTS)
-    if (!accountLimit.allowed) {
-      const remainingMinutes = Math.ceil((accountLimit.lockedUntil! - Date.now()) / 60000)
+    // 1. Atomically check and reserve account-level capacity upfront
+    const accountReservation = reserveAttempt(accountKey, MAX_ACCOUNT_ATTEMPTS)
+    if (!accountReservation.allowed) {
+      const remainingMinutes = Math.ceil((accountReservation.lockedUntil! - Date.now()) / 60000)
       return NextResponse.json(
         {
           error: `Too many failed login attempts for this account. Locked for ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}.`,
-          lockedUntil: accountLimit.lockedUntil,
+          lockedUntil: accountReservation.lockedUntil,
         },
         { status: 429 }
       )
     }
 
-    // 2. Check client IP-level rate limit
-    const clientLimit = checkRateLimit(clientKey, MAX_IP_ATTEMPTS)
-    if (!clientLimit.allowed) {
-      const remainingMinutes = Math.ceil((clientLimit.lockedUntil! - Date.now()) / 60000)
+    // 2. Atomically check and reserve client IP-level capacity upfront
+    const clientReservation = reserveAttempt(clientKey, MAX_IP_ATTEMPTS)
+    if (!clientReservation.allowed) {
+      const remainingMinutes = Math.ceil((clientReservation.lockedUntil! - Date.now()) / 60000)
       return NextResponse.json(
         {
           error: `Too many login attempts from this network. Please try again after ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}.`,
-          lockedUntil: clientLimit.lockedUntil,
+          lockedUntil: clientReservation.lockedUntil,
         },
         { status: 429 }
       )
     }
 
+    capacityReserved = true
+
     const supabase = await createClient()
 
-    // Attempt authentication
+    // 3. Attempt authentication asynchronously (capacity is already atomically reserved)
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: cleanEmail,
       password,
     })
 
     if (authError || !authData.user || !authData.session) {
-      // Record failed attempt on both account and client IP
-      recordFailedAttempt(accountKey, MAX_ACCOUNT_ATTEMPTS)
-      recordFailedAttempt(clientKey, MAX_IP_ATTEMPTS)
+      const currentAccountStatus = getAttemptStatus(accountKey, MAX_ACCOUNT_ATTEMPTS)
 
-      const updatedAccountLimit = checkRateLimit(accountKey, MAX_ACCOUNT_ATTEMPTS)
-
-      if (!updatedAccountLimit.allowed) {
-        const remainingMinutes = Math.ceil((updatedAccountLimit.lockedUntil! - Date.now()) / 60000)
+      if (currentAccountStatus.lockedUntil) {
+        const remainingMinutes = Math.ceil((currentAccountStatus.lockedUntil - Date.now()) / 60000)
         return NextResponse.json(
           {
             error: `Too many failed login attempts. Account locked for ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}.`,
-            lockedUntil: updatedAccountLimit.lockedUntil,
+            lockedUntil: currentAccountStatus.lockedUntil,
           },
           { status: 429 }
         )
@@ -166,34 +205,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: authError?.message || 'Invalid email or password',
-          remainingAttempts: updatedAccountLimit.remainingAttempts,
+          remainingAttempts: currentAccountStatus.remainingAttempts,
         },
         { status: 401 }
       )
     }
 
-    // Verify admin role
+    // 4. Verify admin role
     const result = await verifyAdminProfile(authData.user.id)
 
     if (!result.success) {
       await supabase.auth.signOut()
-      recordFailedAttempt(accountKey, MAX_ACCOUNT_ATTEMPTS)
-      recordFailedAttempt(clientKey, MAX_IP_ATTEMPTS)
-
-      const updatedAccountLimit = checkRateLimit(accountKey, MAX_ACCOUNT_ATTEMPTS)
+      const currentAccountStatus = getAttemptStatus(accountKey, MAX_ACCOUNT_ATTEMPTS)
 
       return NextResponse.json(
         {
           error: 'Unauthorized: You do not have administrator permissions',
-          remainingAttempts: updatedAccountLimit.remainingAttempts,
+          remainingAttempts: currentAccountStatus.remainingAttempts,
         },
         { status: 403 }
       )
     }
 
-    // Clear attempts on successful login for both account and client IP
-    clearAttempts(accountKey)
-    clearAttempts(clientKey)
+    // 5. Successful login: Reconcile and clear attempts safely
+    clearAttemptsOnSuccess(accountKey)
+    clearAttemptsOnSuccess(clientKey)
 
     // Set session cookies manually to ensure they persist
     const successResponse = NextResponse.json({
@@ -201,7 +237,6 @@ export async function POST(request: NextRequest) {
       user: authData.user,
     })
 
-    // Set auth cookies from the session
     if (authData.session) {
       successResponse.cookies.set('sb-access-token', authData.session.access_token, {
         path: '/',
@@ -221,6 +256,10 @@ export async function POST(request: NextRequest) {
     return successResponse
   } catch (error) {
     console.error('Login error:', error)
+    if (capacityReserved) {
+      releaseAttemptOnServerError(accountKey)
+      releaseAttemptOnServerError(clientKey)
+    }
     return NextResponse.json(
       { error: 'An unexpected error occurred' },
       { status: 500 }

@@ -4,7 +4,6 @@ import React, { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { verifyAdminProfile } from '@/lib/supabase/admin-actions'
 import { Lock, Mail, AlertTriangle, Loader2, Eye, EyeOff, ArrowLeft, Home } from 'lucide-react'
 
 function AdminLoginContent() {
@@ -52,29 +51,27 @@ function AdminLoginContent() {
     }
 
     try {
-      const supabase = createClient()
-      
-      // Sign in with password directly (no API route)
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Route through the API to enforce account/IP lockout
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (authError || !authData.user) {
-        setErrorMsg(authError?.message || 'Authentication failed.')
+      const data = await res.json()
+
+      if (!res.ok) {
+        setErrorMsg(data.error || 'Authentication failed.')
+        if (typeof data.remainingAttempts === 'number') {
+          setRemainingAttempts(data.remainingAttempts)
+        }
         setLoading(false)
         return
       }
 
-      // Verify admin role
-      const result = await verifyAdminProfile(authData.user.id)
-
-      if (!result.success) {
-        await supabase.auth.signOut()
-        setErrorMsg('Unauthorized: You do not have administrator permissions.')
-        setLoading(false)
-        return
-      }
+      // The API route sets session cookies; refresh the Supabase client to pick them up
+      const supabase = createClient()
+      await supabase.auth.getSession()
 
       // Success - redirect
       router.refresh()
