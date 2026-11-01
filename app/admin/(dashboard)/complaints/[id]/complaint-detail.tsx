@@ -1,3 +1,4 @@
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 "use client"
 
 import React, { useState } from 'react'
@@ -229,7 +230,7 @@ export default function ComplaintDetailClient({
                 <Mail className="w-5 h-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Email</p>
-                  <a href={`mailto:${complaint.email}`} className="text-sm font-medium text-primary hover:underline">
+                  <a href={buildSafeMailto(complaint.email)} className="text-sm font-medium text-primary hover:underline">
                     {complaint.email}
                   </a>
                 </div>

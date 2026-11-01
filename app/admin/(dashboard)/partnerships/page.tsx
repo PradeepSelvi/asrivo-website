@@ -1,3 +1,4 @@
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 'use client'
 
 import React, { useEffect, useState } from 'react'
@@ -472,7 +473,7 @@ export default function PartnershipsPage() {
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Email</p>
                     <a
-                      href={`mailto:${selectedPartnership.email}`}
+                      href={buildSafeMailto(selectedPartnership.email)}
                       className="text-primary hover:underline flex items-center gap-1"
                     >
                       <Mail className="w-3 h-3" />

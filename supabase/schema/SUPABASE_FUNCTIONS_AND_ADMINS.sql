@@ -588,10 +588,11 @@ CREATE POLICY "Low admin update access"
 -- Run this ONCE in the Supabase SQL Editor.
 -- ============================================================
 
--- SECURITY NOTE (F-011 / CWE-798):
+-- SECURITY NOTE (F-011 / F-028 / CWE-798):
 -- Do NOT insert fixed passwords into auth.users.
 -- 1. Create the admin user accounts in Supabase Dashboard:
 --    Dashboard -> Authentication -> Users -> "Add User" (or "Invite User").
+--    Rotate credentials and revoke sessions for accounts previously created by legacy scripts.
 -- 2. Run the script below to link existing auth accounts to admin_profiles:
 
 -- Assign High Admin Role

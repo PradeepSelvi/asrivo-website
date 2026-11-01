@@ -21,7 +21,6 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 
 interface Project {
   id: number
@@ -414,31 +413,27 @@ export default function ProjectDetailClient({ project: initialProject }: { proje
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[
-                    // Sanitize HTML strictly — no script, iframe, srcdoc or
-                    // event-handler attributes. rehypeRaw was removed because
-                    // PRDs are Markdown-only and raw HTML pass-through creates
-                    // a stored-XSS vector (CWE-79 / F-006).
-                    [
-                      rehypeSanitize,
-                      {
-                        ...defaultSchema,
-                        tagNames: (defaultSchema.tagNames ?? []).filter(
-                          (tag) => !['script', 'iframe', 'object', 'embed', 'form', 'input', 'button'].includes(tag)
-                        ),
-                        attributes: {
-                          ...defaultSchema.attributes,
-                          // Strip all event-handler attributes globally
-                          '*': (defaultSchema.attributes?.['*'] ?? []).filter(
-                            (attr) => !String(attr).startsWith('on')
-                          ),
-                          // Disallow srcdoc everywhere
-                          iframe: [],
-                        },
-                      },
-                    ],
-                  ]}
                   components={{
+                    // Prevent active HTML execution (Finding F-019 / CWE-79)
+                    iframe: () => null,
+                    script: () => null,
+                    object: () => null,
+                    embed: () => null,
+                    form: () => null,
+                    a: ({ node, href, children, ...props }) => {
+                      const isSafe = href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('/'));
+                      return (
+                        <a
+                          href={isSafe ? href : '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary underline hover:text-primary/80"
+                          {...props}
+                        >
+                          {children}
+                        </a>
+                      );
+                    },
                     h1: ({ node, ...props }) => <h1 className="text-3xl font-bold text-foreground mb-4 mt-8" {...props} />,
                     h2: ({ node, ...props }) => <h2 className="text-2xl font-bold text-foreground mb-3 mt-6" {...props} />,
                     h3: ({ node, ...props }) => <h3 className="text-xl font-bold text-foreground mb-2 mt-4" {...props} />,

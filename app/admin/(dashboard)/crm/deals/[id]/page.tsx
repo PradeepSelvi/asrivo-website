@@ -1,3 +1,4 @@
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 import { getDealById, getActivities, getTasks, getNotes } from '@/lib/supabase/crm-actions'
 import { Briefcase, IndianRupee, Calendar, TrendingUp, Mail, Phone, Building2, User, Edit, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -123,7 +124,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
                 <p className="text-xs text-muted-foreground uppercase font-semibold mb-1">Contact Email</p>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-muted-foreground" />
-                  <a href={`mailto:${deal.contact_email}`} className="text-sm text-primary hover:underline">
+                  <a href={buildSafeMailto(deal.contact_email)} className="text-sm text-primary hover:underline">
                     {deal.contact_email}
                   </a>
                 </div>

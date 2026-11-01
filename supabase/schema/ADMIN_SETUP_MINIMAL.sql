@@ -52,15 +52,16 @@ CREATE POLICY "Admins can read their own profile" ON admin_profiles
 
 
 -- ════════════════════════════════════════════
--- BLOCK 3: Enroll Admin Users (Secure Enrollment - F-011 / CWE-798)
+-- BLOCK 3: Enroll Admin Users (Secure Enrollment - F-011 / F-028 / CWE-798)
 -- Run after Block 2 succeeds.
 -- ════════════════════════════════════════════
--- SECURITY NOTE:
+-- SECURITY NOTE (F-028 / CWE-798 Remediation):
 -- Do NOT insert fixed passwords or raw auth.users records in SQL scripts.
 -- 
 -- 1. Create the admin user accounts securely in Supabase Dashboard:
 --    Dashboard -> Authentication -> Users -> "Add User" (or "Invite User").
---    Supply a strong, unique password for each administrator.
+--    Supply a strong, unique, randomly-generated password or send an invitation link.
+--    Rotate credentials and revoke existing sessions for accounts previously created by legacy scripts.
 --
 -- 2. Run the script below to link the auth user to admin_profiles:
 

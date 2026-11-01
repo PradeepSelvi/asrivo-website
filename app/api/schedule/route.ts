@@ -1,3 +1,4 @@
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createApiClient } from '@/lib/supabase/api-client'
 import { requireAdmin } from '@/lib/api/auth-middleware'
 import { NextRequest, NextResponse } from 'next/server'
@@ -52,22 +53,50 @@ export async function POST(request: NextRequest) {
   let name: string | undefined
 
   try {
+    // 🔒 Enforce authenticated user session (Finding F-016 / CWE-306)
+    const supabaseAuth = await createServerClient()
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user || !user.email) {
+      return NextResponse.json(
+        apiError('Authentication required to schedule a consultation', 'UNAUTHORIZED'),
+        { status: HTTP_STATUS.UNAUTHORIZED }
+      )
+    }
+
+    const verifiedEmail = user.email.toLowerCase().trim()
+
     const body = await request.json()
     
     // ✅ Zod Validation on the server before constructing or sending confirmation (CWE-74)
     const validatedData = scheduleSchema.parse(body)
+
+    // Bind to verified identity; reject attempt to book under someone else's email
+    if (validatedData.email && validatedData.email.toLowerCase().trim() !== verifiedEmail) {
+      return NextResponse.json(
+        apiError('Consultations can only be scheduled for your own verified account email', 'FORBIDDEN'),
+        { status: HTTP_STATUS.FORBIDDEN }
+      )
+    }
     
     name = validatedData.name
-    email = validatedData.email
+    email = verifiedEmail
     const {
       phone,
       company,
       service_type,
       preferred_date,
       preferred_time,
+      date,
+      time,
+      brief,
       message,
       timezone,
     } = validatedData
+
+    const effectiveDate = preferred_date || date || null
+    const effectiveTime = preferred_time || time || null
+    const effectiveMessage = message || brief || null
 
     const supabase = createApiClient({ useServiceRole: true })
 
@@ -76,13 +105,13 @@ export async function POST(request: NextRequest) {
       .insert([
         {
           name,
-          email,
+          email: verifiedEmail,
           phone: phone || null,
           company: company || null,
           service_type: service_type || null,
-          preferred_date: preferred_date || null,
-          preferred_time: preferred_time || null,
-          message: message || null,
+          preferred_date: effectiveDate,
+          preferred_time: effectiveTime,
+          message: effectiveMessage,
           timezone: timezone || 'UTC',
           status: 'pending',
         },

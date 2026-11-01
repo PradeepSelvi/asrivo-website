@@ -1,3 +1,4 @@
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 'use client'
 
 import React, { useEffect, useState } from 'react'
@@ -726,7 +727,7 @@ export default function JobApplicationsPage() {
                           </span>
                           <p className="text-sm font-medium">
                             <a
-                              href={`mailto:${selectedApplication.email}`}
+                              href={buildSafeMailto(selectedApplication.email)}
                               className="text-primary hover:underline inline-flex items-center gap-1"
                             >
                               {selectedApplication.email}

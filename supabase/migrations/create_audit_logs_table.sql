@@ -25,19 +25,26 @@ CREATE INDEX idx_audit_logs_status ON audit_logs(status);
 -- Enable Row Level Security
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Policy: Only authenticated users can view audit logs
-CREATE POLICY "Authenticated users can view audit logs"
+-- Policy: Only verified administrators can view audit logs (F-031 / CWE-863)
+DROP POLICY IF EXISTS "Authenticated users can view audit logs" ON audit_logs;
+DROP POLICY IF EXISTS "Enable read for admins only" ON audit_logs;
+CREATE POLICY "Enable read for admins only"
   ON audit_logs
   FOR SELECT
   TO authenticated
-  USING (true);
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
+  );
 
--- Policy: System can insert audit logs (no user restriction)
-CREATE POLICY "System can insert audit logs"
-  ON audit_logs
-  FOR INSERT
-  TO authenticated
-  WITH CHECK (true);
+-- Restrict audit insertion to trusted server operations (service_role); drop public/authenticated INSERT policy
+DROP POLICY IF EXISTS "System can insert audit logs" ON audit_logs;
+
+REVOKE ALL ON audit_logs FROM anon;
+REVOKE INSERT, UPDATE, DELETE ON audit_logs FROM authenticated;
+GRANT SELECT ON audit_logs TO authenticated;
 
 -- Add comment
 COMMENT ON TABLE audit_logs IS 'Tracks all administrative actions for security and compliance';

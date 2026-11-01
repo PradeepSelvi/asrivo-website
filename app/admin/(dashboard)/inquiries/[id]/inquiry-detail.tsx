@@ -1,3 +1,4 @@
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 'use client'
 
 import { useState, useTransition } from 'react'
@@ -114,7 +115,7 @@ export default function InquiryDetailClient({ inquiry, isHigh }: { inquiry: any;
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</label>
             <p className="text-sm text-foreground flex items-center gap-2">
               <Mail className="w-4 h-4 text-muted-foreground" />
-              <a href={`mailto:${inquiry.email}`} className="text-primary hover:text-primary/80">{inquiry.email}</a>
+              <a href={buildSafeMailto(inquiry.email)} className="text-primary hover:text-primary/80">{inquiry.email}</a>
             </p>
           </div>
           <div className="space-y-1">

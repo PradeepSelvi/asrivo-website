@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, Filter, Download, Eye, AlertCircle, CheckCircle, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { formatCsvRow } from '@/lib/utils/csv-helper'
 
 interface AuditLog {
   id: string
@@ -64,24 +65,27 @@ export default function AuditLogsPage() {
   })
 
   const exportLogs = () => {
+    // Mitigate CSV Injection (CWE-1236): RFC 4180 escaping and formula neutralization
+    const headers = ['Date', 'User', 'Action', 'Resource', 'Status', 'IP Address']
     const csvContent = [
-      ['Date', 'User', 'Action', 'Resource', 'Status', 'IP Address'].join(','),
-      ...filteredLogs.map(log => [
+      formatCsvRow(headers),
+      ...filteredLogs.map(log => formatCsvRow([
         new Date(log.created_at).toLocaleString(),
         log.user_email,
         log.action,
         log.resource_type,
         log.status,
         log.ip_address || 'N/A'
-      ].join(','))
-    ].join('\n')
+      ]))
+    ].join('\r\n')
 
-    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = `audit-logs-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
+    window.URL.revokeObjectURL(url)
   }
 
   const getStatusIcon = (status: string) => {

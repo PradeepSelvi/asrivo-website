@@ -55,6 +55,21 @@ export async function createProject(data: {
       }
     }
     
+    // Validate prd_file_url if supplied (CWE-79 / XSS prevention)
+    if ((data as any).prd_file_url) {
+      const prdUrl = String((data as any).prd_file_url).trim()
+      if (
+        prdUrl.includes('..') ||
+        prdUrl.includes('\\') ||
+        prdUrl.includes('<') ||
+        prdUrl.includes('>') ||
+        prdUrl.toLowerCase().startsWith('javascript:') ||
+        prdUrl.toLowerCase().startsWith('data:')
+      ) {
+        throw new Error('Invalid PRD file path or URL')
+      }
+    }
+
     const supabase = await createClient()
 
     const { data: newProject, error } = await supabase
@@ -98,6 +113,21 @@ export async function updateProject(id: string | number, data: {
 }) {
   try {
     await checkAuthAndPermission() // Both high and low can update
+    // Validate prd_file_url if supplied (CWE-79 / XSS prevention)
+    if ((data as any).prd_file_url) {
+      const prdUrl = String((data as any).prd_file_url).trim()
+      if (
+        prdUrl.includes('..') ||
+        prdUrl.includes('\\') ||
+        prdUrl.includes('<') ||
+        prdUrl.includes('>') ||
+        prdUrl.toLowerCase().startsWith('javascript:') ||
+        prdUrl.toLowerCase().startsWith('data:')
+      ) {
+        throw new Error('Invalid PRD file path or URL')
+      }
+    }
+
     const supabase = await createClient()
 
     const { data: updatedProject, error } = await supabase
@@ -731,6 +761,14 @@ export async function createTestimonial(data: {
       }
     }
     
+    // Validate rating is an integer 1-5 (F-020: prevent DoS via large allocation)
+    if (data.rating !== undefined && data.rating !== null) {
+      const r = Number(data.rating)
+      if (!Number.isInteger(r) || r < 1 || r > 5) {
+        throw new Error('Rating must be an integer between 1 and 5')
+      }
+    }
+
     const supabase = await createClient()
 
     const { data: newTestimonial, error } = await supabase
@@ -772,6 +810,14 @@ export async function updateTestimonial(id: string | number, data: {
   try {
     await checkAuthAndPermission()
     const supabase = await createClient()
+
+    // Validate rating is an integer 1-5 (F-020: prevent DoS via large allocation)
+    if (data.rating !== undefined && data.rating !== null) {
+      const r = Number(data.rating)
+      if (!Number.isInteger(r) || r < 1 || r > 5) {
+        throw new Error('Rating must be an integer between 1 and 5')
+      }
+    }
 
     const { data: updatedTestimonial, error } = await supabase
       .from('testimonials')

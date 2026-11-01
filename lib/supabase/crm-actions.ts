@@ -5,7 +5,7 @@ import { getCurrentAdmin } from './admin-actions'
 import { createApiClient } from './api-client'
 
 // ============================================
-// SHARED ADMIN GUARD  (Finding F-012 / CWE-863)
+// SHARED ADMIN GUARD  (Finding F-012 / F-029 / F-030 / CWE-863)
 // Every exported Server Action must call this first.
 // Returns the verified admin user, or null if unauthorized.
 // ============================================
@@ -1008,9 +1008,16 @@ export async function exportLeadsToCSV() {
     lead.lead_source || '', new Date(lead.created_at).toISOString(),
   ])
 
+  // Sanitize against CSV Injection (CWE-1236)
+  const sanitizeCell = (cell: any) => {
+    let str = cell === null || cell === undefined ? '' : String(cell)
+    if (/^[=+\-@\t\r%]/.test(str)) str = "'" + str
+    return `"${str.replace(/"/g, '""')}"`
+  }
+
   const csv = [headers, ...rows]
-    .map((row) => row.map((cell: any) => `"${cell}"`).join(','))
-    .join('\n')
+    .map((row) => row.map(sanitizeCell).join(','))
+    .join('\r\n')
 
   return { success: true, data: csv, filename: `leads-export-${new Date().toISOString().split('T')[0]}.csv` }
 }
@@ -1021,6 +1028,12 @@ export async function exportDealsToCSV() {
 
   const { data: deals } = await getDeals({ is_active: true })
   if (!deals || deals.length === 0) return { success: false, error: 'No deals to export' }
+
+  const sanitizeCell = (cell: any) => {
+    let str = cell === null || cell === undefined ? '' : String(cell)
+    if (/^[=+\-@\t\r%]/.test(str)) str = "'" + str
+    return `"${str.replace(/"/g, '""')}"`
+  }
 
   const headers = [
     'ID', 'Deal Name', 'Company', 'Contact', 'Stage', 'Value',
@@ -1034,8 +1047,8 @@ export async function exportDealsToCSV() {
   ])
 
   const csv = [headers, ...rows]
-    .map((row) => row.map((cell: any) => `"${cell}"`).join(','))
-    .join('\n')
+    .map((row) => row.map(sanitizeCell).join(','))
+    .join('\r\n')
 
   return { success: true, data: csv, filename: `deals-export-${new Date().toISOString().split('T')[0]}.csv` }
 }

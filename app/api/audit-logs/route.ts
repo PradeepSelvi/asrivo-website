@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuditLogs } from '@/lib/utils/audit-logger'
 import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +14,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    // Require admin access (CWE-863 / F-031)
+    const adminClient = createApiClient({ useServiceRole: true })
+    const { data: adminProfile } = await adminClient
+      .from('admin_profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (!adminProfile) {
+      return NextResponse.json(
+        { error: 'Forbidden: Administrator privileges required' },
+        { status: 403 }
       )
     }
 

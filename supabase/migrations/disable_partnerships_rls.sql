@@ -45,6 +45,12 @@ CREATE POLICY "partnerships_admin_update"
       SELECT 1 FROM admin_profiles
       WHERE admin_profiles.id = auth.uid()
     )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM admin_profiles
+      WHERE admin_profiles.id = auth.uid()
+    )
   );
 
 -- Admin-only delete policy

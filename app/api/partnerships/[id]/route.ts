@@ -17,9 +17,16 @@ export async function PATCH(
     const body = await request.json()
     const { status } = body
 
-    if (!status || !['new', 'reviewing', 'accepted', 'rejected'].includes(status)) {
+    if (!status || !['new', 'reviewing', 'under_review', 'accepted', 'rejected'].includes(status)) {
       return NextResponse.json(
         { error: 'Invalid status value' },
+        { status: 400 }
+      )
+    }
+
+    if (!params.id || typeof params.id !== 'string') {
+      return NextResponse.json(
+        { error: 'Invalid partnership ID' },
         { status: 400 }
       )
     }
