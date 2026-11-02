@@ -281,6 +281,7 @@ export default function ServiceInquiryPage() {
 
     try {
       let prdFileUrl = ''
+      let prdUploadToken = ''
 
       // Upload PRD file if provided
       if (prdFile) {
@@ -289,6 +290,9 @@ export default function ServiceInquiryPage() {
         fileFormData.append('file', prdFile)
         fileFormData.append('bucket', 'inquiry-documents')
         fileFormData.append('folder', 'prds')
+        if (formData.email) {
+          fileFormData.append('email', formData.email)
+        }
 
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
@@ -297,20 +301,21 @@ export default function ServiceInquiryPage() {
 
         if (uploadResponse.ok) {
           const uploadData = await uploadResponse.json()
-          prdFileUrl = uploadData.url
+          prdFileUrl = uploadData.path || uploadData.url
+          prdUploadToken = uploadData.uploadToken || ''
         } else {
           console.error('File upload failed, continuing without file')
         }
         setUploadingFile(false)
       }
 
-      
       const response = await fetch('/api/inquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           prdFileUrl,
+          prdUploadToken,
           prdFileName: prdFile?.name || null,
         }),
       })

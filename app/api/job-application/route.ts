@@ -71,11 +71,41 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// GET - List all job applications (admin only) — F-022 / CWE-863
+// Previously used a cookie-backed client with no authorization check,
+// relying solely on the overly-broad authenticated SELECT RLS policy,
+// which allowed any logged-in user to retrieve all applicant records.
+// Now requires verified admin_profiles membership before returning data.
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    // 1. Require a verified session
+    const supabaseAuth = await createClient()
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
 
-    const { data: applications, error } = await supabase
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    // 2. Require admin_profiles membership
+    const supabaseService = createApiClient({ useServiceRole: true })
+    const { data: adminProfile } = await supabaseService
+      .from('admin_profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (!adminProfile) {
+      return NextResponse.json(
+        { error: 'Forbidden: administrator access required' },
+        { status: 403 }
+      )
+    }
+
+    // 3. Fetch applications via service-role client (bypasses RLS)
+    const { data: applications, error } = await supabaseService
       .from('job_applications')
       .select('*')
       .order('created_at', { ascending: false })

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createApiClient } from '@/lib/supabase/api-client'
 
 export type AuditAction = 
   | 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW'
@@ -27,12 +28,13 @@ interface AuditLogData {
  */
 export async function logAudit(data: AuditLogData) {
   try {
-    const supabase = await createClient()
+    const authClient = await createClient()
     
     // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await authClient.auth.getUser()
     
-    // Insert audit log
+    // Insert audit log via service-role to enforce trusted server operations (CWE-863 / F-031)
+    const supabase = createApiClient({ useServiceRole: true })
     const { error } = await supabase
       .from('audit_logs')
       .insert({
@@ -70,7 +72,7 @@ export async function getAuditLogs(filters?: {
   limit?: number
   offset?: number
 }) {
-  const supabase = await createClient()
+  const supabase = createApiClient({ useServiceRole: true })
   
   let query = supabase
     .from('audit_logs')

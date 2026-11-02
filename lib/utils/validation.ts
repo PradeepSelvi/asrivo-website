@@ -81,6 +81,8 @@ export const clientInquirySchema = z.object({
   hear_about_us: z.string().max(200).optional().nullable().or(z.literal('')),
   prdFileUrl: z.string().max(2000).optional().nullable().or(z.literal('')),
   prd_file_url: z.string().max(2000).optional().nullable().or(z.literal('')),
+  prdUploadToken: z.string().max(4000).optional().nullable().or(z.literal('')),
+  prd_upload_token: z.string().max(4000).optional().nullable().or(z.literal('')),
   prdFileName: z.string().max(500).optional().nullable().or(z.literal('')),
   prd_file_name: z.string().max(500).optional().nullable().or(z.literal('')),
   prdText: z.string().max(20000).optional().nullable().or(z.literal('')),

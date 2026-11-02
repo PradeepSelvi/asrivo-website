@@ -34,26 +34,40 @@ WHERE id = 'project-images';
 
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Allow public PRD uploads" ON storage.objects;
+DROP POLICY IF EXISTS "Allow admin PRD uploads" ON storage.objects;
 DROP POLICY IF EXISTS "Allow public PRD access" ON storage.objects;
 DROP POLICY IF EXISTS "Allow public image uploads" ON storage.objects;
+DROP POLICY IF EXISTS "Allow admin image uploads" ON storage.objects;
 DROP POLICY IF EXISTS "Allow public image access" ON storage.objects;
 
--- Create policies for PRD bucket
-CREATE POLICY "Allow public PRD uploads"
+-- Create policies for PRD bucket (restricted to verified admins)
+CREATE POLICY "Allow admin PRD uploads"
 ON storage.objects FOR INSERT
-TO public
-WITH CHECK (bucket_id = 'project-prds');
+TO authenticated
+WITH CHECK (
+  bucket_id = 'project-prds'
+  AND EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE admin_profiles.id = auth.uid()
+  )
+);
 
 CREATE POLICY "Allow public PRD access"
 ON storage.objects FOR SELECT
 TO public
 USING (bucket_id = 'project-prds');
 
--- Create policies for images bucket
-CREATE POLICY "Allow public image uploads"
+-- Create policies for images bucket (restricted to verified admins)
+CREATE POLICY "Allow admin image uploads"
 ON storage.objects FOR INSERT
-TO public
-WITH CHECK (bucket_id = 'project-images');
+TO authenticated
+WITH CHECK (
+  bucket_id = 'project-images'
+  AND EXISTS (
+    SELECT 1 FROM admin_profiles
+    WHERE admin_profiles.id = auth.uid()
+  )
+);
 
 CREATE POLICY "Allow public image access"
 ON storage.objects FOR SELECT

@@ -70,6 +70,13 @@ export async function PATCH(
       }
 
       case 'complaint': {
+        // Enforce HIGH admin requirement to mutate complaint workflow status (F-034 / CWE-862)
+        if (adminResult.user.role !== 'high') {
+          return NextResponse.json(
+            { error: 'Forbidden: High administrator role required to update complaint status' },
+            { status: 403 }
+          )
+        }
         const { error: complaintError } = await supabase
           .from('complaints')
           .update({ status: read ? 'in_progress' : 'new' })

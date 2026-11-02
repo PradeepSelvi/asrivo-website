@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 import { AuthGate } from "@/components/auth-gate"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
@@ -45,6 +46,16 @@ export default function ScheduleClient({
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [userEmail, setUserEmail] = useState("")
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) {
+        setUserEmail(user.email)
+      }
+    })
+  }, [])
 
   const handleNextStep = () => {
     if (step === 1 && date && selectedTime) {
@@ -281,7 +292,7 @@ export default function ScheduleClient({
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="email">Email Address</Label>
-                          <Input id="email" name="email" type="email" placeholder="john@company.com" required />
+                          <Input id="email" name="email" type="email" defaultValue={userEmail} key={userEmail} placeholder="john@company.com" required />
                         </div>
                       </div>
 

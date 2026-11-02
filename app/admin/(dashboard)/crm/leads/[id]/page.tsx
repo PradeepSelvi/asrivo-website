@@ -1,3 +1,4 @@
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 import React from 'react'
 import { getLeadById, getActivities, getNotes, getTasks } from '@/lib/supabase/crm-actions'
 import { getScoreBreakdown, getRecommendedActions } from '@/lib/crm/lead-scoring'
@@ -84,7 +85,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Email</p>
-                  <a href={`mailto:${lead.email}`} className="text-sm text-primary hover:underline">
+                  <a href={buildSafeMailto(lead.email)} className="text-sm text-primary hover:underline">
                     {lead.email}
                   </a>
                 </div>

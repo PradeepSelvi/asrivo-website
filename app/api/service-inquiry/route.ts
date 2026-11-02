@@ -10,6 +10,11 @@ import { ZodError } from 'zod'
 import { apiSuccess, apiError } from '@/lib/types/api'
 import { HTTP_STATUS } from '@/lib/constants'
 import { logError } from '@/lib/utils/error-handler'
+import {
+  extractCanonicalInquiryPath,
+  SAFE_INQUIRY_PATH_REGEX,
+  verifyUploadCapability,
+} from '@/lib/utils/upload-capability'
 
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, formSubmitRateLimit)
@@ -54,6 +59,78 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Verify document attachment ownership (Finding F-012 / CWE-863)
+    const prdRef = validatedData.prdFileUrl || validatedData.prd_file_url || null
+    let verifiedPrdPath: string | null = null
+
+    if (prdRef) {
+      const canonicalPath = extractCanonicalInquiryPath(prdRef)
+
+      if (!SAFE_INQUIRY_PATH_REGEX.test(canonicalPath)) {
+        return NextResponse.json(
+          apiError('Invalid document attachment format', 'VALIDATION_ERROR'),
+          { status: HTTP_STATUS.BAD_REQUEST }
+        )
+      }
+
+      // Check if caller is authenticated admin or regular user
+      let isAdmin = false
+      let authUser: { id: string; email?: string } | null = null
+      try {
+        const serverSupabase = await createClient()
+        const { data: { user } } = await serverSupabase.auth.getUser()
+        if (user) {
+          authUser = { id: user.id, email: user.email }
+          const adminSupabase = createApiClient({ useServiceRole: true })
+          const { data: adminProfile } = await adminSupabase
+            .from('admin_profiles')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle()
+          isAdmin = !!adminProfile
+        }
+      } catch {
+        // Unauthenticated public submission
+      }
+
+      if (!isAdmin) {
+        const cleanFilename = canonicalPath.split('/').pop() || canonicalPath
+
+        // Immutable user identity check (CWE-863)
+        // If filename is bound to a user ID (prd_<userId>_...), caller must match that user ID
+        if (cleanFilename.startsWith('prd_') && !cleanFilename.startsWith('prd_pub_')) {
+          const parts = cleanFilename.split('_')
+          if (parts.length >= 4) {
+            const ownerId = parts[1]
+            if (!authUser || authUser.id !== ownerId) {
+              return NextResponse.json(
+                apiError('Forbidden: You can only attach documents uploaded by your own account', 'FORBIDDEN'),
+                { status: HTTP_STATUS.FORBIDDEN }
+              )
+            }
+          }
+        }
+
+        // Validate server-issued upload capability
+        const uploadToken = validatedData.prdUploadToken || validatedData.prd_upload_token
+        const verification = verifyUploadCapability(uploadToken, {
+          bucket: 'inquiry-documents',
+          path: canonicalPath,
+          userId: authUser?.id || null,
+          email,
+        })
+
+        if (!verification.valid) {
+          return NextResponse.json(
+            apiError(`Unauthorized document reference: ${verification.reason}`, 'FORBIDDEN'),
+            { status: HTTP_STATUS.FORBIDDEN }
+          )
+        }
+      }
+
+      verifiedPrdPath = canonicalPath
+    }
+
     // Use service-role client so RLS doesn't block anonymous form submissions.
     const supabase = createApiClient({ useServiceRole: true })
 
@@ -80,7 +157,7 @@ export async function POST(request: NextRequest) {
         pain_points: validatedData.painPoints || validatedData.pain_points || null,
         reference_links: validatedData.referenceLinks || validatedData.reference_links || null,
         hear_about_us: validatedData.hearAboutUs || validatedData.hear_about_us || null,
-        prd_file_url: validatedData.prdFileUrl || validatedData.prd_file_url || null,
+        prd_file_url: verifiedPrdPath,
         prd_file_name: validatedData.prdFileName || validatedData.prd_file_name || null,
         prd_text: validatedData.prdText || validatedData.prd_text || null,
         status: 'new',

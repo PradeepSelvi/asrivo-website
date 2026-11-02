@@ -312,7 +312,7 @@ ALTER TABLE crm_pipeline_stages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE crm_settings ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
--- ROW LEVEL SECURITY POLICIES (F-012 / CWE-863 Hardened)
+-- ROW LEVEL SECURITY POLICIES (F-012 / F-029 / F-030 / CWE-863 Hardened)
 -- Only verified administrators (present in admin_profiles) can access CRM data
 -- ============================================
 

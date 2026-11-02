@@ -1,5 +1,7 @@
 'use client'
 
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
+
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateInquiryStatus, updateInquiryNotes, deleteInquiry } from '@/lib/supabase/content-actions'
@@ -114,7 +116,7 @@ export default function InquiryDetailClient({ inquiry, isHigh }: { inquiry: any;
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</label>
             <p className="text-sm text-foreground flex items-center gap-2">
               <Mail className="w-4 h-4 text-muted-foreground" />
-              <a href={`mailto:${inquiry.email}`} className="text-primary hover:text-primary/80">{inquiry.email}</a>
+              <a href={buildSafeMailto(inquiry.email)} className="text-primary hover:text-primary/80">{inquiry.email}</a>
             </p>
           </div>
           <div className="space-y-1">

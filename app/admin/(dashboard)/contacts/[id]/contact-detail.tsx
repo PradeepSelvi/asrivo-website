@@ -1,5 +1,7 @@
 "use client"
 
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
+
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
@@ -131,7 +133,7 @@ export default function ContactDetailClient({ contact }: { contact: Contact }) {
                 <Mail className="w-5 h-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">Email</p>
-                  <a href={`mailto:${contact.email}`} className="text-sm font-medium text-primary hover:underline">
+                  <a href={buildSafeMailto(contact.email)} className="text-sm font-medium text-primary hover:underline">
                     {contact.email}
                   </a>
                 </div>
@@ -208,7 +210,7 @@ export default function ContactDetailClient({ contact }: { contact: Contact }) {
                   variant="outline"
                   className="w-full"
                 >
-                  <a href={`mailto:${contact.email}?subject=Re: ${contact.subject}`}>
+                  <a href={buildSafeMailto(contact.email, { subject: `Re: ${contact.subject}` })}>
                     <Mail className="w-4 h-4 mr-2" />
                     Reply via Email
                   </a>

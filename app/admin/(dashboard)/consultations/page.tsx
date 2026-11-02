@@ -1,3 +1,4 @@
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
@@ -156,7 +157,7 @@ export default async function ConsultationsPage() {
                           <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4" />
                             <a
-                              href={`mailto:${consultation.email}`}
+                              href={buildSafeMailto(consultation.email)}
                               className="hover:text-primary"
                             >
                               {consultation.email}

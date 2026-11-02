@@ -2,37 +2,64 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createApiClient } from '@/lib/supabase/api-client'
 
+export const dynamic = 'force-dynamic'
+
+const SAFE_PARTNERSHIP_REGEX = /^([a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(pdf|doc|docx)$/i
+
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ path: string }> }
+  context: { params: Promise<{ path: string | string[] }> }
 ) {
   try {
-    // ── 1. Decode and sanitize the requested path ──────────────────────────────
-    const params = await context.params
-    const filePath = decodeURIComponent(params.path)
-
-    // Guard against path-traversal: reject any segment that navigates upward.
-    if (filePath.split('/').some((seg) => seg === '..' || seg === '.')) {
-      return NextResponse.json(
-        { error: 'Invalid file path' },
-        { status: 400 }
-      )
+    // ── 1. Guard against path-traversal, backslashes, and URI fragments (CWE-22) ─
+    const rawUrl = request.url || ''
+    if (rawUrl.includes('\\') || rawUrl.includes('#') || rawUrl.includes('..')) {
+      return NextResponse.json({ error: 'Invalid file path' }, { status: 400 })
     }
 
-    // ── 2. Require authentication ──────────────────────────────────────────────
+    const params = await context.params
+    const rawPath = Array.isArray(params.path) ? params.path.join('/') : params.path
+    let filePath = decodeURIComponent(rawPath)
+
+    if (filePath.includes('partnership-documents/')) {
+      filePath = filePath.split('partnership-documents/').pop() || filePath
+    }
+    filePath = filePath.replace(/^\/+/, '').split('?')[0]
+
+    // Reject traversal segments
+    if (filePath.split('/').some((seg) => seg === '..' || seg === '.' || seg === '')) {
+      return NextResponse.json({ error: 'Invalid file path' }, { status: 400 })
+    }
+
+    if (!SAFE_PARTNERSHIP_REGEX.test(filePath)) {
+      return NextResponse.json({ error: 'Invalid file path format' }, { status: 400 })
+    }
+
+    // ── 2. Require authentication (CWE-862) ───────────────────────────────────
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    let { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (!user) {
+      const authHeader = request.headers.get('authorization')
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+      if (token) {
+        const adminSupabase = createApiClient({ useServiceRole: true })
+        const { data: tokenData } = await adminSupabase.auth.getUser(token)
+        if (tokenData?.user) {
+          user = tokenData.user
+          authError = null
+        }
+      }
+    }
 
     if (authError || !user) {
       return NextResponse.json(
-        { error: 'Unauthorized - Admin access required' },
+        { error: 'Unauthorized: Authentication required' },
         { status: 401 }
       )
     }
 
-    // ── 3. Require admin membership ────────────────────────────────────────────
-    // `createClient()` uses the caller session; use the service-role client for
-    // the admin_profiles lookup so RLS never blocks the check itself.
+    // ── 3. Check administrator authorization ───────────────────────────────────
     const adminSupabase = createApiClient({ useServiceRole: true })
     const { data: adminProfile } = await adminSupabase
       .from('admin_profiles')
@@ -40,51 +67,101 @@ export async function GET(
       .eq('id', user.id)
       .maybeSingle()
 
-    if (!adminProfile) {
+    const isAdmin = !!adminProfile
+
+    const cleanFilename = filePath.split('/').pop() || filePath
+
+    // ── 4. Authorize against trusted database record (Finding f72d2a11 / CWE-862)
+    let query = adminSupabase
+      .from('partnerships')
+      .select('id, email, agreement_document_url, noc_document_url, proposal_document_url')
+      .or(
+        `agreement_document_url.eq.${filePath},noc_document_url.eq.${filePath},proposal_document_url.eq.${filePath},agreement_document_url.like.%/${cleanFilename},noc_document_url.like.%/${cleanFilename},proposal_document_url.like.%/${cleanFilename}`
+      )
+
+    // If caller is not an administrator, enforce ownership against caller's verified email
+    if (!isAdmin) {
+      if (!user.email) {
+        return NextResponse.json(
+          { error: 'Forbidden: A verified email address is required' },
+          { status: 403 }
+        )
+      }
+      query = query.eq('email', user.email.toLowerCase())
+    }
+
+    const { data: partnerships, error: dbError } = await query.limit(1)
+    const partnership = partnerships?.[0]
+
+    if (dbError || !partnership) {
       return NextResponse.json(
-        { error: 'Forbidden: admin access required' },
+        { error: 'Forbidden: You do not have permission to access this document or document not found' },
         { status: 403 }
       )
     }
 
-    // ── 4. Download file from Supabase Storage ─────────────────────────────────
-    const { data, error } = await supabase.storage
-      .from('partnership-documents')
-      .download(filePath)
+    // Resolve exact canonical storage path from trusted database record
+    const docUrls = [
+      partnership.agreement_document_url,
+      partnership.noc_document_url,
+      partnership.proposal_document_url,
+    ].filter(Boolean) as string[]
 
-    if (error) {
-      console.error('Download error:', error)
+    const matchedUrl = docUrls.find((u) => {
+      let clean = u.trim()
+      if (clean.includes('partnership-documents/')) {
+        clean = clean.split('partnership-documents/').pop() || clean
+      }
+      clean = clean.replace(/^\/+/, '').split('?')[0]
+      return clean === filePath || clean.endsWith(`/${cleanFilename}`) || clean === cleanFilename
+    })
+
+    if (!matchedUrl) {
+      return NextResponse.json(
+        { error: 'Forbidden: Document reference mismatch' },
+        { status: 403 }
+      )
+    }
+
+    let canonicalPath = matchedUrl.trim()
+    if (canonicalPath.includes('partnership-documents/')) {
+      canonicalPath = canonicalPath.split('partnership-documents/').pop() || canonicalPath
+    }
+    const safeCanonicalPath = canonicalPath.replace(/^\/+/, '').split('?')[0]
+
+    // ── 5. Download file from Supabase Storage using verified canonical key ───
+    const { data, error } = await adminSupabase.storage
+      .from('partnership-documents')
+      .download(safeCanonicalPath)
+
+    if (error || !data) {
+      console.error('Partnership document download error:', error)
       return NextResponse.json(
         { error: 'File not found' },
         { status: 404 }
       )
     }
 
-    // ── 5. Stream the file back with appropriate headers ───────────────────────
+    // ── 6. Stream the file back with secure headers ───────────────────────────
     const buffer = Buffer.from(await data.arrayBuffer())
 
-    const ext = filePath.split('.').pop()?.toLowerCase()
-    let contentType = 'application/octet-stream'
-    if (ext === 'pdf') contentType = 'application/pdf'
-    else if (ext === 'doc') contentType = 'application/msword'
+    const ext = safeCanonicalPath.split('.').pop()?.toLowerCase()
+    let contentType = 'application/pdf'
+    if (ext === 'doc') contentType = 'application/msword'
     else if (ext === 'docx') contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-
-    // Use a safe filename — strip directory components before setting the header.
-    const safeFilename = filePath.split('/').pop() ?? 'download'
 
     return new NextResponse(buffer, {
       headers: {
         'Content-Type': contentType,
-        'Content-Disposition': `attachment; filename="${safeFilename}"`,
+        'Content-Disposition': `attachment; filename="${cleanFilename}"`,
+        'Cache-Control': 'private, no-cache, no-store, must-revalidate',
       },
     })
-
   } catch (error) {
-    console.error('Server error:', error)
+    console.error('Server error downloading partnership document:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
-

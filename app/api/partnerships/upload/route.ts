@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createApiClient } from '@/lib/supabase/api-client'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
 import { uploadRateLimit } from '@/lib/utils/rate-limit'
+import { randomBytes } from 'crypto'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB in bytes
 
@@ -39,7 +41,6 @@ export async function POST(request: NextRequest) {
 
     // Validate file type (PDF ONLY)
     const allowedTypes = ['application/pdf']
-    
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
         { error: 'Invalid file type. Only PDF files are allowed' },
@@ -47,49 +48,61 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    // Check uploader identity if authenticated
+    let authUser: { id: string; email?: string } | null = null
+    try {
+      const serverSupabase = await createServerClient()
+      const { data: { user } } = await serverSupabase.auth.getUser()
+      if (user) {
+        authUser = { id: user.id, email: user.email }
+      }
+    } catch {
+      // Anonymous submission
+    }
 
-    // Generate unique filename
-    const fileExt = file.name.split('.').pop()
+    // Generate unique, safe filename immutably bound to user identity if authenticated
+    const fileExt = 'pdf'
     const timestamp = Date.now()
-    const randomId = Math.random().toString(36).substring(7)
-    const fileName = `${documentType}_${timestamp}_${randomId}.${fileExt}`
-    const filePath = partnershipId ? `${partnershipId}/${fileName}` : `temp/${fileName}`
+    const randomHex = randomBytes(6).toString('hex')
+    const fileName = authUser
+      ? `${documentType}_${authUser.id}_${timestamp}_${randomHex}.${fileExt}`
+      : `${documentType}_${timestamp}_${randomHex}.${fileExt}`
 
-    // Convert File to ArrayBuffer
+    // Sanitize partnershipId folder if provided (alphanumeric/hyphens only)
+    const sanitizedFolder = partnershipId && /^[a-zA-Z0-9_-]+$/.test(partnershipId)
+      ? partnershipId
+      : 'temp'
+    const filePath = `${sanitizedFolder}/${fileName}`
+
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
+
+    const supabase = createApiClient({ useServiceRole: true })
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('partnership-documents')
       .upload(filePath, buffer, {
-        contentType: file.type,
+        contentType: 'application/pdf',
         upsert: false,
       })
 
     if (uploadError) {
-      console.error('Upload error:', uploadError)
+      console.error('Partnership upload error:', uploadError)
       return NextResponse.json(
         { error: 'Failed to upload file', details: uploadError.message },
         { status: 500 }
       )
     }
 
-    // Get the file path (not public URL since bucket is private)
-    const fileUrl = uploadData.path
-
     return NextResponse.json({
       success: true,
-      fileUrl,
+      fileUrl: uploadData.path,
       fileName: file.name,
       fileSize: file.size,
     })
   } catch (error) {
-    console.error('Server error:', error)
+    console.error('Server error during partnership upload:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

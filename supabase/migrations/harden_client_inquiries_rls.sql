@@ -62,8 +62,10 @@ CREATE POLICY "Admins can update inquiries"
     )
   );
 
--- 6. Policy for deleting inquiries:
--- Only verified administrators can delete inquiries.
+-- 6. Policy for deleting inquiries (F-026 / CWE-863):
+-- Only HIGH-role administrators can delete inquiries.
+-- Low-role admins can read and update but CANNOT delete.
+-- This matches the application-layer restriction in the DELETE handler.
 CREATE POLICY "Admins can delete inquiries"
   ON client_inquiries
   FOR DELETE
@@ -72,6 +74,7 @@ CREATE POLICY "Admins can delete inquiries"
     EXISTS (
       SELECT 1 FROM admin_profiles
       WHERE admin_profiles.id = auth.uid()
+        AND admin_profiles.role = 'high'
     )
   );
 

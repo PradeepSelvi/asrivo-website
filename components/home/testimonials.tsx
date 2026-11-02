@@ -48,15 +48,22 @@ function TestimonialCardItem({
               <Quote className="h-12 w-12 text-primary/20 transition-all duration-500 group-hover:text-primary/40 group-hover:scale-110" />
             </div>
 
-            {/* Rating stars */}
-            <div className="mt-4 flex gap-1">
-              {[...Array(testimonial.rating || 5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="h-4 w-4 fill-amber-400 text-amber-400 transition-transform duration-300"
-                  style={{ transitionDelay: `${i * 50}ms` }}
-                />
-              ))}
+            {/* Rating stars — fixed 5-position array; stored rating is clamped to 1-5 (F-020) */}
+              <div className="mt-4 flex gap-1">
+              {[1, 2, 3, 4, 5].map((starIndex) => {
+                const clampedRating = Math.min(Math.max(Math.round(testimonial.rating ?? 5), 1), 5)
+                return (
+                  <Star
+                    key={starIndex}
+                    className={`h-4 w-4 transition-transform duration-300 ${
+                      starIndex <= clampedRating
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'fill-gray-200 text-gray-200'
+                    }`}
+                    style={{ transitionDelay: `${(starIndex - 1) * 50}ms` }}
+                  />
+                )
+              })}
             </div>
 
             <p className="mt-4 text-muted-foreground leading-relaxed text-base line-clamp-4">

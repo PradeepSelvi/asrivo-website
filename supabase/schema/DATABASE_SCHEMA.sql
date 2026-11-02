@@ -421,7 +421,7 @@ CREATE POLICY "Enable read for all users" ON settings
   FOR SELECT
   USING (true);
 
--- Audit Logs: Authenticated admins only (F-012 / CWE-863)
+-- Audit Logs: Authenticated admins only (F-012 / F-029 / CWE-863)
 DROP POLICY IF EXISTS "Enable read for authenticated users" ON audit_logs;
 DROP POLICY IF EXISTS "Enable read for admins only" ON audit_logs;
 CREATE POLICY "Enable read for admins only" ON audit_logs
