@@ -1,5 +1,6 @@
-import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 'use client'
+
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 
 import React, { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'

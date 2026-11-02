@@ -1,5 +1,6 @@
-import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 "use client"
+
+import { buildSafeMailto } from '@/lib/utils/mailto-helper'
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
