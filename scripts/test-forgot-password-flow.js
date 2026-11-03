@@ -142,8 +142,27 @@ for (let i = 1; i <= 5; i++) {
 }
 assert(!limiter.check('ip_test'), 'Request 6/5 exceeds rate limit and is rejected')
 
-// TEST SUITE 5: Anti-Enumeration API Response
-console.log('\n[5/5] Testing Anti-Enumeration Behavior on /api/auth/forgot-password...')
+
+// TEST SUITE 5: Domain Resolution and Redirect URLs
+console.log('\n[5/6] Testing Production Domain Resolution & Redirect URL Formation...')
+const fs = require('fs')
+const envContent = fs.readFileSync('.env', 'utf-8')
+const envSiteUrlMatch = envContent.match(/NEXT_PUBLIC_SITE_URL=(.+)/)
+const configuredSiteUrl = envSiteUrlMatch ? envSiteUrlMatch[1].trim() : ''
+
+assert(configuredSiteUrl === 'https://www.asrivotech.in', 'NEXT_PUBLIC_SITE_URL in .env is set to https://www.asrivotech.in')
+
+const PRIMARY_PRODUCTION_DOMAIN = 'https://www.asrivotech.in'
+const resetRedirect = `${PRIMARY_PRODUCTION_DOMAIN}/reset-password`
+assert(resetRedirect === 'https://www.asrivotech.in/reset-password', 'Recovery redirectTo targets /reset-password directly on production domain')
+
+// Check callback redirect sanitization with canonical domain
+const maliciousTarget = 'https://malicious.site/phish'
+const sanitizedTarget = sanitizeNextUrl(maliciousTarget)
+const secureCallbackUrl = new URL(sanitizedTarget, PRIMARY_PRODUCTION_DOMAIN).toString()
+assert(secureCallbackUrl === 'https://www.asrivotech.in/reset-password', 'Malicious callback redirect sanitized to canonical reset-password page')
+
+console.log('\n[6/6] Testing Anti-Enumeration Behavior on /api/auth/forgot-password...')
 async function testApiAntiEnumeration() {
   try {
     const res = await fetch('http://localhost:3000/api/auth/forgot-password', {

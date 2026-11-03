@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, Suspense } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -20,6 +20,38 @@ function LoginContent() {
   const [showResendLink, setShowResendLink] = useState(false)
   const [resending, setResending] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
+
+  // Ensure user is completely signed out after password reset, or redirect away if already logged in
+  useEffect(() => {
+    const supabase = createClient()
+
+    if (resetSuccess) {
+      // User just reset their password: guarantee they are completely signed out
+      supabase.auth.signOut({ scope: 'global' }).catch(() => {})
+      try {
+        if (typeof window !== 'undefined') {
+          Object.keys(localStorage).forEach((key) => {
+            if (key.startsWith('sb-') || key.includes('supabase.auth.token')) {
+              localStorage.removeItem(key)
+            }
+          })
+          Object.keys(sessionStorage).forEach((key) => {
+            if (key.startsWith('sb-') || key.includes('supabase.auth.token')) {
+              sessionStorage.removeItem(key)
+            }
+          })
+        }
+      } catch {}
+      return
+    }
+
+    // If an active session exists and NOT resetting password, redirect to home or destination
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        router.replace(redirectTo)
+      }
+    })
+  }, [resetSuccess, redirectTo, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -107,6 +139,7 @@ function LoginContent() {
       {/* Back to Home Button */}
       <Link
         href="/"
+        target="_self"
         className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border hover:bg-muted transition-all text-sm font-medium text-foreground shadow-sm"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -116,7 +149,7 @@ function LoginContent() {
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8 flex flex-col items-center">
-          <Link href="/" className="mb-4 inline-block group" title="Return to home">
+          <Link href="/" target="_self" className="mb-4 inline-block group" title="Return to home">
             <img
               src="/asrivo.png"
               alt="Asrivo Tech Logo"
@@ -232,7 +265,7 @@ function LoginContent() {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <Link href="/forgot-password" className="text-primary hover:underline">
+              <Link href="/forgot-password" target="_self" className="text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -255,7 +288,7 @@ function LoginContent() {
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Don't have an account? </span>
-            <Link href="/register" className="text-primary hover:underline font-semibold">
+            <Link href="/register" target="_self" className="text-primary hover:underline font-semibold">
               Sign up
             </Link>
           </div>

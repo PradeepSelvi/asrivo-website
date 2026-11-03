@@ -186,6 +186,7 @@ function RegisterContent() {
       {/* Back to Home Button */}
       <Link
         href="/"
+        target="_self"
         className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border hover:bg-muted transition-all text-sm font-medium text-foreground shadow-sm"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -195,7 +196,7 @@ function RegisterContent() {
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8 flex flex-col items-center">
-          <Link href="/" className="mb-4 inline-block group" title="Return to home">
+          <Link href="/" target="_self" className="mb-4 inline-block group" title="Return to home">
             <img
               src="/asrivo.png"
               alt="Asrivo Tech Logo"
@@ -410,11 +411,11 @@ function RegisterContent() {
 
             <div className="text-xs text-muted-foreground">
               By signing up, you agree to our{' '}
-              <Link href="/terms" className="text-primary hover:underline">
+              <Link href="/terms" target="_self" className="text-primary hover:underline">
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-primary hover:underline">
+              <Link href="/privacy" target="_self" className="text-primary hover:underline">
                 Privacy Policy
               </Link>
             </div>
@@ -437,7 +438,7 @@ function RegisterContent() {
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">Already have an account? </span>
-            <Link href="/login" className="text-primary hover:underline font-semibold">
+            <Link href="/login" target="_self" className="text-primary hover:underline font-semibold">
               Sign in
             </Link>
           </div>

@@ -206,7 +206,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
           <div className="bg-card border border-border rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-foreground">Tasks</h3>
-              <Link href="/admin/crm/tasks/new" className="text-sm text-primary hover:underline font-semibold">
+              <Link href={`/admin/crm/tasks/new?deal_id=${dealId}`} className="text-sm text-primary hover:underline font-semibold">
                 + Add
               </Link>
             </div>

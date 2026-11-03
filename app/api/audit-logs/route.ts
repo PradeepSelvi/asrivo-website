@@ -21,13 +21,13 @@ export async function GET(request: NextRequest) {
     const adminClient = createApiClient({ useServiceRole: true })
     const { data: adminProfile } = await adminClient
       .from('admin_profiles')
-      .select('id')
+      .select('id, role')
       .eq('id', user.id)
       .maybeSingle()
 
-    if (!adminProfile) {
+    if (!adminProfile || adminProfile.role !== 'high') {
       return NextResponse.json(
-        { error: 'Forbidden: Administrator privileges required' },
+        { error: 'Forbidden: High administrator privileges required' },
         { status: 403 }
       )
     }

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import {
   Mail,
   ArrowLeft,
@@ -41,6 +42,9 @@ function ForgotPasswordContent() {
   const [countdown, setCountdown] = useState(0)
   const [resending, setResending] = useState(false)
 
+  // Real-time email validation error hint
+  const [emailFormatError, setEmailFormatError] = useState<string | null>(null)
+
   // Surface expired token or URL errors
   useEffect(() => {
     if (errorParam === 'expired') {
@@ -57,6 +61,23 @@ function ForgotPasswordContent() {
     return () => clearInterval(timer)
   }, [countdown])
 
+  // Real-time email format validation as user types
+  const handleEmailChange = (val: string) => {
+    setEmail(val)
+    if (errorMsg) setErrorMsg(null)
+    const trimmed = val.trim()
+    if (!trimmed) {
+      setEmailFormatError(null)
+      return
+    }
+    const result = forgotPasswordSchema.safeParse({ email: trimmed })
+    if (!result.success) {
+      setEmailFormatError(result.error.errors[0]?.message || 'Invalid email format')
+    } else {
+      setEmailFormatError(null)
+    }
+  }
+
   const handleSendResetLink = async (e: React.FormEvent) => {
     e.preventDefault()
     if (loading) return
@@ -72,19 +93,36 @@ function ForgotPasswordContent() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanEmail }),
+      const redirectUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/reset-password`
+        : 'https://asrivotech.in/reset-password'
+
+      const supabase = createClient()
+
+      // Security quarantine: Sign out any older logged-in session so it never mixes with password reset
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          await supabase.auth.signOut({ scope: 'local' })
+        }
+      } catch {}
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: redirectUrl,
       })
 
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        setErrorMsg(result.error || 'Failed to send password reset email.')
+      if (resetError) {
+        setErrorMsg(resetError.message || 'Failed to send password reset email. Please try again.')
         setLoading(false)
         return
       }
+
+      // Record in audit table via API route (non-blocking)
+      fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail }),
+      }).catch(() => {})
 
       setSent(true)
       setCountdown(60)
@@ -102,17 +140,35 @@ function ForgotPasswordContent() {
     setErrorMsg(null)
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      const cleanEmail = email.trim().toLowerCase()
+      const redirectUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/reset-password`
+        : 'https://asrivotech.in/reset-password'
+
+      const supabase = createClient()
+
+      // Security quarantine: Sign out any older logged-in session so it never mixes with password reset
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          await supabase.auth.signOut({ scope: 'local' })
+        }
+      } catch {}
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: redirectUrl,
       })
 
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        setErrorMsg(result.error || 'Failed to resend reset link.')
+      if (resetError) {
+        setErrorMsg(resetError.message || 'Failed to resend reset link.')
       } else {
+        // Record in audit table
+        fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail }),
+        }).catch(() => {})
+
         setCountdown(60)
       }
     } catch {
@@ -131,9 +187,10 @@ function ForgotPasswordContent() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]" />
       </div>
 
-      {/* Back to Home Button */}
+      {/* Back to Home Button (Same-Tab) */}
       <Link
         href="/"
+        target="_self"
         className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border hover:bg-muted transition-all text-sm font-medium text-foreground shadow-sm"
         aria-label="Return to Home"
       >
@@ -147,7 +204,7 @@ function ForgotPasswordContent() {
       <div className="w-full max-w-md">
         {/* Logo and Header */}
         <div className="text-center mb-8 flex flex-col items-center">
-          <Link href="/" className="mb-4 inline-block group" title="Return to home">
+          <Link href="/" target="_self" className="mb-4 inline-block group" title="Return to home">
             <img
               src="/asrivo.png"
               alt="Asrivo Tech Logo"
@@ -196,18 +253,21 @@ function ForgotPasswordContent() {
                       autoComplete="email"
                       placeholder="you@example.com"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => handleEmailChange(e.target.value)}
                       disabled={loading}
                       className="w-full bg-muted border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
                       required
                       autoFocus
                     />
                   </div>
+                  {emailFormatError && email.length > 3 && (
+                    <p className="text-xs text-destructive mt-1">{emailFormatError}</p>
+                  )}
                 </div>
 
                 <button
                   type="submit"
-                  disabled={loading || !email.trim()}
+                  disabled={loading || !email.trim() || Boolean(emailFormatError)}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl py-3 font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center justify-center gap-2 shadow-md hover:shadow-primary/25 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                 >
                   {loading ? (
@@ -228,6 +288,7 @@ function ForgotPasswordContent() {
                 <span className="text-muted-foreground">Remember your password? </span>
                 <Link
                   href="/login"
+                  target="_self"
                   className="text-primary hover:underline font-semibold transition-colors"
                 >
                   Sign in
@@ -244,7 +305,7 @@ function ForgotPasswordContent() {
               <div className="space-y-2">
                 <h2 className="text-lg font-bold text-foreground">Reset Link Sent</h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  If an account exists for <span className="font-semibold text-foreground">{email}</span>, you will receive a secure password reset link shortly.
+                  Password reset link sent to your email. Please check your inbox and spam folder.
                 </p>
               </div>
 
@@ -299,6 +360,7 @@ function ForgotPasswordContent() {
               <div className="pt-2 text-center text-sm">
                 <Link
                   href="/login"
+                  target="_self"
                   className="text-primary hover:underline font-semibold transition-colors"
                 >
                   Back to Sign In

@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button"
 import { LogOut, User, Settings, AlertCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 interface MobileAuthButtonsProps {
   onNavigate: () => void
 }
 
 export function MobileAuthButtons({ onNavigate }: MobileAuthButtonsProps) {
+  const pathname = usePathname()
+  const isAuthPage = ['/login', '/reset-password', '/forgot-password', '/register'].includes(pathname || '')
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -48,6 +50,29 @@ export function MobileAuthButtons({ onNavigate }: MobileAuthButtonsProps) {
     router.push('/')
     router.refresh()
     onNavigate()
+  }
+
+  if (isAuthPage) {
+    return (
+      <div className="flex gap-3">
+        <Link 
+          href="/login"
+          target="_self"
+          className="flex-1 px-4 py-3 text-center text-base font-semibold text-foreground bg-muted hover:bg-muted/80 rounded-xl transition-colors active:scale-98 touch-manipulation"
+          onClick={onNavigate}
+        >
+          Login
+        </Link>
+        <Link 
+          href="/register"
+          target="_self"
+          className="flex-1 px-4 py-3 text-center text-base font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl transition-colors active:scale-98 touch-manipulation"
+          onClick={onNavigate}
+        >
+          Register
+        </Link>
+      </div>
+    )
   }
 
   if (loading) {
@@ -102,6 +127,7 @@ export function MobileAuthButtons({ onNavigate }: MobileAuthButtonsProps) {
     <div className="flex gap-3">
       <Link 
         href="/login"
+        target="_self"
         className="flex-1 px-4 py-3 text-center text-base font-semibold text-foreground bg-muted hover:bg-muted/80 rounded-xl transition-colors active:scale-98 touch-manipulation"
         onClick={onNavigate}
       >
@@ -109,6 +135,7 @@ export function MobileAuthButtons({ onNavigate }: MobileAuthButtonsProps) {
       </Link>
       <Link 
         href="/register"
+        target="_self"
         className="flex-1 px-4 py-3 text-center text-base font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl transition-colors active:scale-98 touch-manipulation"
         onClick={onNavigate}
       >

@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { UserProfileMenu } from "@/components/user-profile-menu"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 
 export function AuthButtons() {
+  const pathname = usePathname()
+  const isAuthPage = ['/login', '/reset-password', '/forgot-password', '/register'].includes(pathname || '')
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -38,6 +41,28 @@ export function AuthButtons() {
     }
   }, [])
 
+  if (isAuthPage) {
+    return (
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-foreground hover:text-[#4fd1ed] hover:bg-muted"
+          asChild
+        >
+          <Link href="/login" target="_self">Login</Link>
+        </Button>
+        <Button
+          size="sm"
+          className="bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg shadow-blue-500/20"
+          asChild
+        >
+          <Link href="/register" target="_self">Register</Link>
+        </Button>
+      </div>
+    )
+  }
+
   if (loading) {
     // Show a subtle loading state
     return (
@@ -59,14 +84,14 @@ export function AuthButtons() {
         className="text-foreground hover:text-[#4fd1ed] hover:bg-muted"
         asChild
       >
-        <Link href="/login">Login</Link>
+        <Link href="/login" target="_self">Login</Link>
       </Button>
       <Button
         size="sm"
         className="bg-[#2b6cb0] hover:bg-[#4fd1ed] text-white shadow-lg shadow-blue-500/20"
         asChild
       >
-        <Link href="/register">Register</Link>
+        <Link href="/register" target="_self">Register</Link>
       </Button>
     </div>
   )

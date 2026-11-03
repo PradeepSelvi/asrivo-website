@@ -3,7 +3,7 @@ import { createApiClient } from '@/lib/supabase/api-client'
 import { forgotPasswordSchema } from '@/lib/utils/validation'
 import { forgotPasswordRateLimit, getClientIdentifier } from '@/lib/utils/rate-limit'
 import { applyRateLimit } from '@/lib/utils/apply-rate-limit'
-import { getSiteUrl } from '@/lib/utils/site-url'
+import { getRealSiteUrl } from '@/lib/utils/site-url'
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
     if (emailLimit) return emailLimit
 
     // 2. Canonical env-driven site URL for auth redirect
-    const siteUrl = getSiteUrl()
-    const redirectTo = `${siteUrl}/auth/confirm?next=/reset-password`
+    const siteUrl = await getRealSiteUrl(request)
+    const redirectTo = `${siteUrl}/reset-password`
 
     // 3. Trigger Supabase password reset
     const supabase = createApiClient({ useServiceRole: true })

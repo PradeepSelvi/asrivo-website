@@ -1,11 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { escapeHtml, escapeHtmlWithLineBreaks, sanitizeHeader } from '@/lib/utils/html-escape'
+import { getSiteUrl } from '@/lib/utils/site-url'
 
 export async function POST(request: NextRequest) {
   try {
+    // SEC-01: Verify caller is an internal service caller or an authenticated administrator
+    const authHeader = request.headers.get('authorization') || ''
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+    const internalSecret = process.env.INTERNAL_API_SECRET || ''
+
+    const isInternalAuth =
+      (serviceKey && authHeader === `Bearer ${serviceKey}`) ||
+      (internalSecret && authHeader === `Bearer ${internalSecret}`)
+
+    const authClient = await createClient()
+
+    if (!isInternalAuth) {
+      const { data: { user } } = await authClient.auth.getUser()
+      if (!user) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      }
+      const { data: adminProf } = await authClient
+        .from('admin_profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (!adminProf) {
+        return NextResponse.json({ success: false, error: 'Forbidden: Admin access required' }, { status: 403 })
+      }
+    }
     const body = await request.json()
     const { type, data } = body
+    const siteUrl = getSiteUrl()
 
     if (!data || typeof data !== 'object') {
       return NextResponse.json({ 
@@ -57,7 +84,7 @@ export async function POST(request: NextRequest) {
               <h3 style="color: #333; margin-top: 20px;">Message</h3>
               <p style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #667eea;">${safeMessage}</p>
               <div style="margin-top: 30px; text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/contacts" 
+                <a href="${siteUrl}/admin/contacts" 
                    style="background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
                   View in Admin Panel
                 </a>
@@ -95,7 +122,7 @@ export async function POST(request: NextRequest) {
               <h3 style="color: #333; margin-top: 20px;">Project Description</h3>
               <p style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #f5576c;">${safeDescription}</p>
               <div style="margin-top: 30px; text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/inquiries" 
+                <a href="${siteUrl}/admin/inquiries" 
                    style="background: #f5576c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
                   View in Admin Panel
                 </a>
@@ -131,7 +158,7 @@ export async function POST(request: NextRequest) {
               <h3 style="color: #333; margin-top: 20px;">Additional Notes</h3>
               <p style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #4facfe;">${safeNotes}</p>
               <div style="margin-top: 30px; text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/consultations" 
+                <a href="${siteUrl}/admin/consultations" 
                    style="background: #4facfe; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
                   View in Admin Panel
                 </a>
@@ -164,7 +191,7 @@ export async function POST(request: NextRequest) {
               <p><strong>Position:</strong> ${safePosition}</p>
               <p><strong>Experience:</strong> ${safeExp} years</p>
               <div style="margin-top: 30px; text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/applications" 
+                <a href="${siteUrl}/admin/applications" 
                    style="background: #fa709a; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
                   View Application
                 </a>
@@ -200,7 +227,7 @@ export async function POST(request: NextRequest) {
               <h3 style="color: #333; margin-top: 20px;">Message</h3>
               <p style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #a8edea;">${safeMessage}</p>
               <div style="margin-top: 30px; text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/partnerships" 
+                <a href="${siteUrl}/admin/partnerships" 
                    style="background: #5fd4c7; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
                   View Request
                 </a>
@@ -232,7 +259,7 @@ export async function POST(request: NextRequest) {
               <h3 style="color: #333; margin-top: 20px;">Complaint</h3>
               <p style="background: #fff; padding: 15px; border-radius: 5px; border-left: 4px solid #ff6b6b;">${safeComplaint}</p>
               <div style="margin-top: 30px; text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/complaints" 
+                <a href="${siteUrl}/admin/complaints" 
                    style="background: #ff6b6b; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
                   View Complaint
                 </a>

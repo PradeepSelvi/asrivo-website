@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User, Settings, LogOut, ChevronDown, UserCircle, Loader2, AlertCircle } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
@@ -14,11 +14,16 @@ interface UserProfile {
 
 export function UserProfileMenu() {
   const router = useRouter()
+  const pathname = usePathname()
+
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Strict Security Isolation: Never render logged-in profile menu on reset-password or auth pages
+  const isAuthOrRecoveryPage = ['/reset-password', '/forgot-password', '/login', '/register'].includes(pathname || '')
 
   useEffect(() => {
     const supabase = createClient()
@@ -93,6 +98,10 @@ export function UserProfileMenu() {
     router.push('/')
     router.refresh()
     setMenuOpen(false)
+  }
+
+  if (isAuthOrRecoveryPage) {
+    return null
   }
 
   if (loading) {

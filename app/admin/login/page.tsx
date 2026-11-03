@@ -4,11 +4,12 @@ import React, { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Lock, Mail, AlertTriangle, Loader2, Eye, EyeOff, ArrowLeft, Home } from 'lucide-react'
+import { Lock, Mail, AlertTriangle, Loader2, Eye, EyeOff, ArrowLeft, Home, CheckCircle } from 'lucide-react'
 
 function AdminLoginContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const resetSuccess = searchParams.get('reset') === 'success'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -26,6 +27,25 @@ function AdminLoginContent() {
   React.useEffect(() => {
     const checkExistingSession = async () => {
       const supabase = createClient()
+      if (resetSuccess) {
+        await supabase.auth.signOut({ scope: 'global' }).catch(() => {})
+        try {
+          if (typeof window !== 'undefined') {
+            Object.keys(localStorage).forEach((key) => {
+              if (key.startsWith('sb-') || key.includes('supabase.auth.token')) {
+                localStorage.removeItem(key)
+              }
+            })
+            Object.keys(sessionStorage).forEach((key) => {
+              if (key.startsWith('sb-') || key.includes('supabase.auth.token')) {
+                sessionStorage.removeItem(key)
+              }
+            })
+          }
+        } catch {}
+        return
+      }
+
       const { data: { user } } = await supabase.auth.getUser()
       
       if (user) {
@@ -36,7 +56,7 @@ function AdminLoginContent() {
     }
     
     checkExistingSession()
-  }, [])
+  }, [resetSuccess])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -114,6 +134,15 @@ function AdminLoginContent() {
         </div>
 
         <div className="bg-background border border-border rounded-2xl p-8 shadow-sm">
+          {resetSuccess && !errorMsg && (
+            <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">Password Reset Successful</p>
+                <p className="text-muted-foreground text-xs mt-0.5">Please sign in with your new password.</p>
+              </div>
+            </div>
+          )}
           {errorMsg && (
             <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-xl flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />

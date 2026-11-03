@@ -241,6 +241,7 @@ export async function POST(request: NextRequest) {
       successResponse.cookies.set('sb-access-token', authData.session.access_token, {
         path: '/',
         maxAge: 60 * 60 * 24 * 7, // 7 days
+        httpOnly: true,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       })
@@ -248,6 +249,7 @@ export async function POST(request: NextRequest) {
       successResponse.cookies.set('sb-refresh-token', authData.session.refresh_token, {
         path: '/',
         maxAge: 60 * 60 * 24 * 7, // 7 days
+        httpOnly: true,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       })

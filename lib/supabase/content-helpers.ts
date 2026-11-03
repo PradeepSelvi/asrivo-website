@@ -1,4 +1,4 @@
-import { createClient } from './server'
+
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 /**
@@ -1402,7 +1402,7 @@ export async function getCareersContent(): Promise<CareersContent> {
  */
 export async function getAllPagesMetadata(): Promise<PageMetadata[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createContentClient()
     
     const { data, error } = await supabase
       .from('page_content')
@@ -1410,7 +1410,7 @@ export async function getAllPagesMetadata(): Promise<PageMetadata[]> {
       .eq('is_active', true)
     
     if (error) {
-      console.error('Error fetching pages metadata:', error)
+      console.error('Error fetching pages metadata:', error.message || error)
       return []
     }
     

@@ -344,15 +344,22 @@ export async function createActivity(activity: CRMActivity) {
 export interface CRMTask {
   id?: number
   title: string
-  description?: string
+  description?: string | null
   task_type?: string
   priority?: string
-  lead_id?: number
-  deal_id?: number
-  assigned_to?: string
-  due_date?: string
-  reminder_date?: string
+  lead_id?: number | null
+  deal_id?: number | null
+  assigned_to?: string | null
+  assigned_by?: string | null
+  due_date?: string | null
+  reminder_date?: string | null
+  completed_at?: string | null
   status?: string
+  created_at?: string
+  updated_at?: string
+  is_overdue?: boolean
+  lead?: { id: number; first_name: string; last_name: string; company_name?: string } | null
+  deal?: { id: number; deal_name: string } | null
 }
 
 export async function getTasks(filters?: {
@@ -369,7 +376,11 @@ export async function getTasks(filters?: {
 
   let query = supabase
     .from('crm_tasks')
-    .select('*')
+    .select(`
+      *,
+      lead:crm_leads (id, first_name, last_name, company_name),
+      deal:crm_deals (id, deal_name)
+    `)
     .order('due_date', { ascending: true })
 
   if (filters?.assigned_to) query = query.eq('assigned_to', filters.assigned_to)
@@ -382,14 +393,64 @@ export async function getTasks(filters?: {
   if (filters?.limit) query = query.limit(filters.limit)
 
   const { data, error } = await query
-  if (error) return { success: false, error: error.message, data: [] }
+  if (error) {
+    let fallbackQuery = supabase
+      .from('crm_tasks')
+      .select('*')
+      .order('due_date', { ascending: true })
+
+    if (filters?.assigned_to) fallbackQuery = fallbackQuery.eq('assigned_to', filters.assigned_to)
+    if (filters?.status) fallbackQuery = fallbackQuery.eq('status', filters.status)
+    if (filters?.lead_id) fallbackQuery = fallbackQuery.eq('lead_id', filters.lead_id)
+    if (filters?.deal_id) fallbackQuery = fallbackQuery.eq('deal_id', filters.deal_id)
+    if (filters?.overdue) {
+      fallbackQuery = fallbackQuery.neq('status', 'completed').lt('due_date', new Date().toISOString())
+    }
+    if (filters?.limit) fallbackQuery = fallbackQuery.limit(filters.limit)
+
+    const fallback = await fallbackQuery
+    if (fallback.error) return { success: false, error: fallback.error.message, data: [] }
+    const tasksWithOverdue = fallback.data?.map((task: any) => ({
+      ...task,
+      is_overdue: task.status !== 'completed' && task.due_date ? new Date(task.due_date) < new Date() : false,
+    }))
+    return { success: true, data: tasksWithOverdue || [] }
+  }
 
   const tasksWithOverdue = data?.map((task: any) => ({
     ...task,
-    is_overdue: task.status !== 'completed' && new Date(task.due_date) < new Date(),
+    is_overdue: task.status !== 'completed' && task.due_date ? new Date(task.due_date) < new Date() : false,
   }))
 
   return { success: true, data: tasksWithOverdue || [] }
+}
+
+export async function getTaskById(id: number) {
+  const admin = await checkAdmin()
+  if (!admin) return { success: false, error: 'Unauthorized' }
+  const supabase = adminClient()
+
+  const { data, error } = await supabase
+    .from('crm_tasks')
+    .select(`
+      *,
+      lead:crm_leads (id, first_name, last_name, company_name),
+      deal:crm_deals (id, deal_name)
+    `)
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    const fallback = await supabase
+      .from('crm_tasks')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (fallback.error) return { success: false, error: fallback.error.message }
+    return { success: true, data: fallback.data }
+  }
+  return { success: true, data }
 }
 
 export async function createTask(task: CRMTask) {
@@ -397,10 +458,12 @@ export async function createTask(task: CRMTask) {
   if (!admin) return { success: false, error: 'Unauthorized' }
   const supabase = adminClient()
 
+  const { lead, deal, is_overdue, id, ...taskData } = task as any
+
   const { data, error } = await supabase
     .from('crm_tasks')
     .insert({
-      ...task,
+      ...taskData,
       assigned_by: admin.id,
       assigned_to: task.assigned_to || admin.id,
     })
@@ -409,6 +472,7 @@ export async function createTask(task: CRMTask) {
 
   if (error) return { success: false, error: error.message }
   revalidatePath('/admin/crm')
+  revalidatePath('/admin/crm/tasks')
   return { success: true, data }
 }
 
@@ -417,20 +481,52 @@ export async function updateTask(id: number, updates: Partial<CRMTask>) {
   if (!admin) return { success: false, error: 'Unauthorized' }
   const supabase = adminClient()
 
+  const { lead, deal, is_overdue, id: _id, ...updateData } = updates as any
+
   const { data, error } = await supabase
     .from('crm_tasks')
-    .update(updates)
+    .update({
+      ...updateData,
+      updated_at: new Date().toISOString(),
+    })
     .eq('id', id)
     .select()
     .single()
 
   if (error) return { success: false, error: error.message }
   revalidatePath('/admin/crm')
+  revalidatePath('/admin/crm/tasks')
   return { success: true, data }
 }
 
 export async function completeTask(id: number) {
-  return updateTask(id, { status: 'completed' })
+  return updateTask(id, {
+    status: 'completed',
+    completed_at: new Date().toISOString(),
+  })
+}
+
+export async function reopenTask(id: number) {
+  return updateTask(id, {
+    status: 'pending',
+    completed_at: null,
+  })
+}
+
+export async function deleteTask(id: number) {
+  const admin = await checkAdmin()
+  if (!admin) return { success: false, error: 'Unauthorized' }
+  const supabase = adminClient()
+
+  const { error } = await supabase
+    .from('crm_tasks')
+    .delete()
+    .eq('id', id)
+
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin/crm')
+  revalidatePath('/admin/crm/tasks')
+  return { success: true }
 }
 
 // ============================================

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentAdmin } from '@/lib/supabase/admin-actions'
+import { formatCsvRow } from '@/lib/utils/csv-helper'
 
 export async function GET(_request: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function GET(_request: NextRequest) {
     }
 
     if (!subscribers || subscribers.length === 0) {
-      return new NextResponse('id,email,status,subscribed_date\n', {
+      return new NextResponse('id,email,status,subscribed_date\r\n', {
         headers: {
           'Content-Type': 'text/csv',
           'Content-Disposition': 'attachment; filename="subscribers.csv"',
@@ -30,17 +31,18 @@ export async function GET(_request: NextRequest) {
       })
     }
 
-    // Build CSV string
-    const header = 'id,email,status,subscribed_date'
-    const rows = subscribers.map((s) => {
-      const id = `"${String(s.id).replace(/"/g, '""')}"`
-      const email = `"${String(s.email ?? '').replace(/"/g, '""')}"`
-      const status = `"${String(s.status ?? '').replace(/"/g, '""')}"`
-      const date = `"${s.created_at ? new Date(s.created_at).toISOString() : ''}"`
-      return `${id},${email},${status},${date}`
-    })
+    // Build CSV string with formula neutralization (CWE-1236)
+    const header = formatCsvRow(['id', 'email', 'status', 'subscribed_date'])
+    const rows = subscribers.map((s) =>
+      formatCsvRow([
+        s.id,
+        s.email ?? '',
+        s.status ?? '',
+        s.created_at ? new Date(s.created_at).toISOString() : '',
+      ])
+    )
 
-    const csv = [header, ...rows].join('\n')
+    const csv = [header, ...rows].join('\r\n')
 
     return new NextResponse(csv, {
       headers: {

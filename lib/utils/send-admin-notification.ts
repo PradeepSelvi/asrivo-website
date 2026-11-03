@@ -1,3 +1,5 @@
+import { getSiteUrl } from '@/lib/utils/site-url'
+
 /**
  * Utility function to send email notifications to all admins
  * whenever a new client request is received
@@ -16,12 +18,16 @@ export async function sendAdminNotification(
   data: NotificationData
 ): Promise<{ success: boolean; error?: unknown; recipients?: number }> {
   try {
+    const siteUrl = getSiteUrl()
+    const internalSecret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.INTERNAL_API_SECRET || ''
+
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/admin/send-notification-email`,
+      `${siteUrl}/api/admin/send-notification-email`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(internalSecret ? { Authorization: `Bearer ${internalSecret}` } : {}),
         },
         body: JSON.stringify({ type, data }),
       }
@@ -32,7 +38,7 @@ export async function sendAdminNotification(
     if (!result.success) {
       console.error('Failed to send admin notification:', result.error)
     } else {
-      console.log(`✅ Admin notification sent (${type}) to ${result.recipients} admin(s)`)
+      console.log(`✅ Admin notification processed (${type})`)
     }
 
     return result
