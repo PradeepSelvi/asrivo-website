@@ -1308,7 +1308,7 @@ function ContactFields({ register }: { register: any }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
           <div className="space-y-2">
             <Label htmlFor="contact_linkedin">LinkedIn URL</Label>
-            <Input id="contact_linkedin" {...register('contact_linkedin')} placeholder="https://linkedin.com/company/asrivotech" />
+            <Input id="contact_linkedin" {...register('contact_linkedin')} placeholder="https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="contact_github">GitHub URL</Label>
@@ -1320,7 +1320,7 @@ function ContactFields({ register }: { register: any }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="contact_instagram">Instagram URL</Label>
-            <Input id="contact_instagram" {...register('contact_instagram')} placeholder="https://instagram.com/asrivotech" />
+            <Input id="contact_instagram" {...register('contact_instagram')} placeholder="https://www.instagram.com/asrivotech?srtk=NTl1YXFrOXRibWNs&utm_source=qr&wa_status_inline=true" />
           </div>
         </div>
       </div>
@@ -1694,7 +1694,7 @@ function TeamFields({ register }: { register: any }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="company_contact_linkedin">LinkedIn URL</Label>
-            <Input id="company_contact_linkedin" {...register('company_contact_linkedin')} placeholder="https://linkedin.com/company/asrivotech" />
+            <Input id="company_contact_linkedin" {...register('company_contact_linkedin')} placeholder="https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="company_contact_github_label">GitHub Label</Label>

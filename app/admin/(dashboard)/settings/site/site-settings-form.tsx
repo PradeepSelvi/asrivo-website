@@ -193,7 +193,7 @@ export function SiteSettingsForm({ initialSettings }: SiteSettingsFormProps) {
             <input
               type="url"
               name="social_linkedin"
-              defaultValue={initialSettings.social_linkedin || "https://linkedin.com/company/asrivotech"}
+              defaultValue={initialSettings.social_linkedin || "https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios"}
               className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               placeholder="https://linkedin.com/company/yourcompany"
             />
@@ -207,7 +207,7 @@ export function SiteSettingsForm({ initialSettings }: SiteSettingsFormProps) {
             <input
               type="url"
               name="social_instagram"
-              defaultValue={initialSettings.social_instagram || "https://instagram.com/asrivotech"}
+              defaultValue={initialSettings.social_instagram || "https://www.instagram.com/asrivotech?srtk=NTl1YXFrOXRibWNs&utm_source=qr&wa_status_inline=true"}
               className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               placeholder="https://instagram.com/yourcompany"
             />

@@ -45,10 +45,10 @@ export const COMPANY = {
 
   // Social media
   social: {
-    linkedin: 'https://linkedin.com/company/asrivotech',
+    linkedin: 'https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
     github: 'https://github.com/asrivotech',
     twitter: 'https://x.com/asrivotech', // Updated to x.com
-    instagram: 'https://instagram.com/asrivotech',
+    instagram: 'https://www.instagram.com/asrivotech?srtk=NTl1YXFrOXRibWNs&utm_source=qr&wa_status_inline=true',
     email: 'mailto:info@asrivotech.in',
   },
 

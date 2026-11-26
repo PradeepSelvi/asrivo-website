@@ -788,10 +788,10 @@ const DEFAULT_CONTACT_CONTENT: ContactContent = {
   contact_phone: '+91 99764 22558',
   contact_address: 'Bangalore, Karnataka, India',
   contact_hours: 'Mon-Fri: 9AM-6PM IST',
-  contact_linkedin: 'https://linkedin.com/company/asrivotech',
+  contact_linkedin: 'https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
   contact_github: 'https://github.com/asrivotech',
   contact_twitter: 'https://x.com/asrivotech',
-  contact_instagram: 'https://instagram.com/asrivotech',
+  contact_instagram: 'https://www.instagram.com/asrivotech?srtk=NTl1YXFrOXRibWNs&utm_source=qr&wa_status_inline=true',
   
   // Additional Company Email Addresses
   media_email: 'media@asrivotech.in',
@@ -864,7 +864,7 @@ const DEFAULT_TEAM_CONTENT: TeamContent = {
   company_contact_description: 'Reach out to our team through any of these channels.',
   company_contact_email: 'hello@asrivotech.in',
   company_contact_email_label: 'Email Us',
-  company_contact_linkedin: 'https://linkedin.com/company/asrivotech',
+  company_contact_linkedin: 'https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
   company_contact_linkedin_label: 'LinkedIn',
   company_contact_github: 'https://github.com/asrivotech',
   company_contact_github_label: 'GitHub',

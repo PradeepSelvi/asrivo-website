@@ -32,9 +32,9 @@ const defaultSettings = {
   contact_email: 'info@asrivotech.in',
   contact_phone: '+91 99764 22558',
   contact_address: 'Madurai, Tamil Nadu, India',
-  social_linkedin: 'https://linkedin.com/company/asrivotech',
+  social_linkedin: 'https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
   social_github: 'https://github.com/asrivotech',
-  social_instagram: 'https://instagram.com/asrivotech',
+  social_instagram: 'https://www.instagram.com/asrivotech?srtk=NTl1YXFrOXRibWNs&utm_source=qr&wa_status_inline=true',
   social_twitter: 'https://x.com/asrivotech',
 }
 

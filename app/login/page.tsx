@@ -41,7 +41,9 @@ function LoginContent() {
             }
           })
         }
-      } catch {}
+      } catch {
+        // Silently ignore session storage cleanup errors
+      }
       return
     }
 
