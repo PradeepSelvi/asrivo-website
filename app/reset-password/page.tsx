@@ -235,7 +235,9 @@ function ResetPasswordContent() {
     try {
       const supabase = createClient()
       await supabase.auth.signOut({ scope: 'local' })
-    } catch {}
+    } catch {
+      // Silently ignore sign out errors - redirect will happen regardless
+    }
     router.push('/')
   }
 
@@ -331,7 +333,9 @@ function ResetPasswordContent() {
               sessionStorage.removeItem(key)
             }
           })
-        } catch {}
+        } catch {
+          // Silently ignore session storage cleanup errors
+        }
       }
 
       isSubmittedSuccessfully.current = true

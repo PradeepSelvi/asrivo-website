@@ -105,7 +105,9 @@ function ForgotPasswordContent() {
         if (session) {
           await supabase.auth.signOut({ scope: 'local' })
         }
-      } catch {}
+      } catch {
+        // Silently ignore session cleanup errors - not critical for password reset flow
+      }
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
         redirectTo: redirectUrl,
@@ -153,7 +155,9 @@ function ForgotPasswordContent() {
         if (session) {
           await supabase.auth.signOut({ scope: 'local' })
         }
-      } catch {}
+      } catch {
+        // Silently ignore session cleanup errors - not critical for password reset flow
+      }
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
         redirectTo: redirectUrl,

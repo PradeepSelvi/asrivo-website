@@ -42,7 +42,9 @@ function AdminLoginContent() {
               }
             })
           }
-        } catch {}
+        } catch {
+          // Silently ignore session storage cleanup errors
+        }
         return
       }
 
