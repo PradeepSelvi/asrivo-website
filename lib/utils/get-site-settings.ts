@@ -135,8 +135,8 @@ function getDefaultSettings() {
     support_email: 'support@asrivotech.in',
     
     // Social Media
-    social_linkedin: 'https://linkedin.com/company/asrivotech',
-    social_instagram: 'https://instagram.com/asrivotech',
+    social_linkedin: 'https://www.linkedin.com/in/asrivo-tech-4820a2449?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
+    social_instagram: 'https://www.instagram.com/asrivotech?srtk=NTl1YXFrOXRibWNs&utm_source=qr&wa_status_inline=true',
     social_twitter: 'https://x.com/asrivotech',
     social_github: 'https://github.com/asrivotech',
     
